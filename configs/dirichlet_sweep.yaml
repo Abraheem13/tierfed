@@ -1,0 +1,9 @@
+# Heterogeneity sweep: alpha controls label skew (lower = more non-IID).
+dataset: diabetes
+dataset_kwargs: {partition: dirichlet}
+alpha_sweep: [0.1, 0.3, 0.5, 1.0, 10.0]
+model: mlp
+strategies: [fedavg, fedprox, fedper, fedlama, nested]
+rounds: 60
+n_clients: 20
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]

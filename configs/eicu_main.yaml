@@ -1,0 +1,13 @@
+# eICU: TRUE hospital identifiers -- removes the pseudo-hospital objection.
+# Requires credentialed PhysioNet download into data/eicu/.
+dataset: eicu
+dataset_kwargs: {partition: natural, min_site: 200, target: mortality}
+model: mlp
+strategy: nested
+strategy_kwargs: {k_slow: 5, k_med: 2}
+rounds: 60
+n_clients: 40
+batch_size: 128
+lr: 0.001
+loss: focal
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]

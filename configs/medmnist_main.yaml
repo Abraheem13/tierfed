@@ -1,0 +1,13 @@
+# Imaging modality + deep architecture, exercising automatic tiering.
+dataset: medmnist
+dataset_kwargs: {flag: pneumoniamnist, partition: dirichlet, alpha: 0.5}
+model: cnn
+model_kwargs: {width: 32}
+strategy: nested
+strategy_kwargs: {k_slow: 5, k_med: 2}
+rounds: 60
+n_clients: 20
+batch_size: 64
+lr: 0.001
+loss: weighted_ce
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
