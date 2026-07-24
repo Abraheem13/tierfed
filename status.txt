@@ -1,0 +1,29 @@
+=== ARCHITECTURE ===
+cell                n_seeds  fed_auroc_final_mean  fed_auroc_final_std    fed_auroc_final_ci_lo  fed_auroc_final_ci_hi  fed_auroc_
+mlp_fedavg          3        0.7386974817843237    0.0019664581631009975  0.7375360548444938     0.7398414470535459     0.73869748
+mlp_fedper          3        0.7428392943743605    0.0024807407196939376  0.7403353169547323     0.7444928975109076     0.74287870
+mlp_nested          3        0.6934692487375367    0.005557266506943834   0.6895750487673397     0.6968886717538152     0.74913699
+resnet_fedavg       3        0.7309054586787537    0.012201594499604238   0.720274036394385      0.7388900970605138     0.73457383
+resnet_fedper       3        0.7519240764607282    0.0017800861812000612  0.7501525131754678     0.7531107603498027     0.75326776
+resnet_nested       3        0.7166982676916813    0.003679459998535874   0.7124812532479027     0.7189562249299447     0.77250416
+transformer_fedavg  3        0.6672005339030352    0.006569456160656224   0.6607630314807696     0.6738944363582547     0.66805757
+transformer_fedper  3        0.6698746916033063    0.007315039514792496   0.6646161827669128     0.6744121408262611     0.67057285
+transformer_nested  3        0.6569015687281495    0.007772599568793017   0.6497707163325137     0.6620402615961845     0.66714413
+=== TABLES DIR ===
+ablation_architecture_raw.csv
+ablation_architecture_summary.csv
+ablation_tierfed_summary.csv
+auroc_vs_budget.csv
+auroc_vs_budget.png
+benchmark_all_all_summary.csv
+benchmark_diabetes_mlp_noninferiority.json
+benchmark_diabetes_mlp_summary.csv
+benchmark_diabetes_mlp_tests.csv
+benchmark_medmnist_cnn_noninferiority.json
+benchmark_medmnist_cnn_raw.csv
+benchmark_medmnist_cnn_summary.csv
+benchmark_medmnist_cnn_tests.csv
+collected_all_all_raw.csv
+collected_diabetes_mlp_raw.csv
+scaling_raw.csv
+scaling_summary.csv

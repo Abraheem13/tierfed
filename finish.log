@@ -1,0 +1,697 @@
+nohup: ignoring input
+=== compression remainder (CPU) ===
+launching 60 runs with 4 parallel workers (compression / diabetes)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:10:49] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:10:49] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:10:49] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:10:49] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:13:13] INFO   -> AUROC final 0.7361 best 0.7385 PPD 0.0024 | AUPRC 0.3297 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0192
+[14:13:14] INFO   -> AUROC final 0.7315 best 0.7317 PPD 0.0002 | AUPRC 0.3320 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+[14:13:14] INFO   -> AUROC final 0.7273 best 0.7282 PPD 0.0010 | AUPRC 0.3202 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0198
+[14:13:14] INFO   -> AUROC final 0.7382 best 0.7387 PPD 0.0005 | AUPRC 0.3361 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:13:25] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:13:25] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:13:25] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:13:25] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:15:48] INFO   -> AUROC final 0.7469 best 0.7469 PPD 0.0000 | AUPRC 0.3313 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0183
+[14:15:49] INFO   -> AUROC final 0.6892 best 0.7463 PPD 0.0571 | AUPRC 0.2679 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0171
+[14:15:50] INFO   -> AUROC final 0.6990 best 0.7539 PPD 0.0549 | AUPRC 0.2568 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0197
+[14:15:50] INFO   -> AUROC final 0.6936 best 0.7493 PPD 0.0557 | AUPRC 0.2684 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:15:59] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:15:59] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:16:00] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:16:00] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:18:22] INFO   -> AUROC final 0.6954 best 0.7524 PPD 0.0571 | AUPRC 0.2658 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0181
+[14:18:24] INFO   -> AUROC final 0.6893 best 0.7439 PPD 0.0546 | AUPRC 0.2578 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0200
+[14:18:25] INFO   -> AUROC final 0.7401 best 0.7411 PPD 0.0011 | AUPRC 0.3299 | upload 55.0 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0195
+[14:18:27] INFO   -> AUROC final 0.7374 best 0.7380 PPD 0.0006 | AUPRC 0.3381 | upload 55.0 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:18:34] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:18:35] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:18:35] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:18:38] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:20:59] INFO   -> AUROC final 0.7418 best 0.7418 PPD 0.0000 | AUPRC 0.3296 | upload 55.0 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[14:21:00] INFO   -> AUROC final 0.7348 best 0.7361 PPD 0.0012 | AUPRC 0.3247 | upload 55.0 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+[14:21:02] INFO   -> AUROC final 0.7461 best 0.7461 PPD 0.0000 | AUPRC 0.3346 | upload 55.0 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0181
+[14:21:03] INFO   -> AUROC final 0.6873 best 0.7469 PPD 0.0597 | AUPRC 0.2650 | upload 32.2 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0182
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:21:10] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:21:10] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:21:13] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:21:13] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:23:34] INFO   -> AUROC final 0.7001 best 0.7499 PPD 0.0498 | AUPRC 0.2563 | upload 32.2 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0198
+[14:23:36] INFO   -> AUROC final 0.6870 best 0.7454 PPD 0.0584 | AUPRC 0.2634 | upload 32.2 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0171
+[14:23:36] INFO   -> AUROC final 0.6934 best 0.7488 PPD 0.0553 | AUPRC 0.2668 | upload 32.2 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0163
+[14:23:39] INFO   -> AUROC final 0.6895 best 0.7452 PPD 0.0557 | AUPRC 0.2592 | upload 32.2 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0198
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:23:45] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:23:47] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:23:47] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:23:50] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:26:09] INFO   -> AUROC final 0.6987 best 0.7044 PPD 0.0057 | AUPRC 0.2795 | upload 27.5 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[14:26:13] INFO   -> AUROC final 0.7034 best 0.7042 PPD 0.0009 | AUPRC 0.2765 | upload 27.5 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0169
+[14:26:13] INFO   -> AUROC final 0.6949 best 0.7024 PPD 0.0075 | AUPRC 0.2620 | upload 27.5 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0197
+[14:26:15] INFO   -> AUROC final 0.6748 best 0.6866 PPD 0.0119 | AUPRC 0.2403 | upload 27.5 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:26:21] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:26:24] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:26:24] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:26:27] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:28:46] INFO   -> AUROC final 0.7085 best 0.7098 PPD 0.0014 | AUPRC 0.2759 | upload 27.5 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0181
+[14:28:47] INFO   -> AUROC final 0.6784 best 0.7412 PPD 0.0629 | AUPRC 0.2522 | upload 16.1 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0185
+[14:28:50] INFO   -> AUROC final 0.6940 best 0.7452 PPD 0.0512 | AUPRC 0.2466 | upload 16.1 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0195
+[14:28:51] INFO   -> AUROC final 0.6858 best 0.7465 PPD 0.0607 | AUPRC 0.2595 | upload 16.1 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:28:57] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:28:58] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:29:01] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:29:02] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:31:23] INFO   -> AUROC final 0.6875 best 0.7459 PPD 0.0584 | AUPRC 0.2558 | upload 16.1 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0182
+[14:31:24] INFO   -> AUROC final 0.6847 best 0.7401 PPD 0.0554 | AUPRC 0.2526 | upload 16.1 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0195
+[14:31:28] INFO   -> AUROC final 0.6773 best 0.6773 PPD 0.0000 | AUPRC 0.2273 | upload 31.7 MB
+[14:31:28] INFO   -> AUROC final 0.6651 best 0.6656 PPD 0.0006 | AUPRC 0.2309 | upload 31.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:31:35] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:31:35] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:31:39] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:31:39] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:34:03] INFO   -> AUROC final 0.6711 best 0.6711 PPD 0.0000 | AUPRC 0.2357 | upload 31.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0198
+[14:34:03] INFO   -> AUROC final 0.6578 best 0.7001 PPD 0.0423 | AUPRC 0.2228 | upload 18.4 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[14:34:05] INFO   -> AUROC final 0.6678 best 0.6679 PPD 0.0001 | AUPRC 0.2375 | upload 31.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[14:34:06] INFO   -> AUROC final 0.6655 best 0.6655 PPD 0.0000 | AUPRC 0.2351 | upload 31.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:34:14] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:34:14] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:34:16] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:34:17] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[14:36:38] INFO   -> AUROC final 0.6615 best 0.7002 PPD 0.0387 | AUPRC 0.2339 | upload 18.4 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0169
+[14:36:40] INFO   -> AUROC final 0.6746 best 0.7065 PPD 0.0318 | AUPRC 0.2225 | upload 18.4 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0195
+[14:36:41] INFO   -> AUROC final 0.6592 best 0.6993 PPD 0.0401 | AUPRC 0.2207 | upload 18.4 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0182
+[14:36:41] INFO   -> AUROC final 0.6577 best 0.6933 PPD 0.0355 | AUPRC 0.2248 | upload 18.4 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0200
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:36:49] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:36:51] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:36:52] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:36:53] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:39:16] INFO   -> AUROC final 0.6488 best 0.6488 PPD 0.0000 | AUPRC 0.2144 | upload 5.3 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0182
+[14:39:18] INFO   -> AUROC final 0.6527 best 0.6535 PPD 0.0008 | AUPRC 0.2243 | upload 5.3 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0171
+[14:39:19] INFO   -> AUROC final 0.6668 best 0.6694 PPD 0.0026 | AUPRC 0.2133 | upload 5.3 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0195
+[14:39:19] INFO   -> AUROC final 0.6537 best 0.6538 PPD 0.0001 | AUPRC 0.2194 | upload 5.3 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:39:27] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:39:29] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:39:29] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:39:30] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:41:51] INFO   -> AUROC final 0.6689 best 0.7006 PPD 0.0317 | AUPRC 0.2155 | upload 3.0 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0195
+[14:41:51] INFO   -> AUROC final 0.6553 best 0.6565 PPD 0.0012 | AUPRC 0.2162 | upload 5.3 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0181
+[14:41:54] INFO   -> AUROC final 0.6543 best 0.6960 PPD 0.0417 | AUPRC 0.2272 | upload 3.0 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[14:41:55] INFO   -> AUROC final 0.6491 best 0.6922 PPD 0.0431 | AUPRC 0.2143 | upload 3.0 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:42:02] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:42:02] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:42:05] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:42:06] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0185
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:42:52] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[14:42:52] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:43:39] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[14:43:39] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:44:27] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[14:44:28] INFO   -> AUROC final 0.6534 best 0.6892 PPD 0.0358 | AUPRC 0.2204 | upload 3.0 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+[14:44:29] INFO   -> AUROC final 0.6551 best 0.6968 PPD 0.0416 | AUPRC 0.2172 | upload 3.0 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:44:39] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[14:44:39] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:44:54] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0198
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0166
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 74, in run
+    self.history.append(self._evaluate(r, stats, keys))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 92, in _evaluate
+    per_client.append(classification_metrics(y, p))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/metrics.py", line 46, in classification_metrics
+    out["auroc"] = float(roc_auc_score(y_true, p))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/metrics/_ranking.py", line 710, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1087, in check_array
+    _assert_all_finite(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 137, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/sklearn/utils/validation.py", line 186, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0181
+=== arch generalisation: TierFed on resnet/transformer (GPU) ===
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:46:07] INFO      tierfed | diabetes/resnet | seed 42 | 20 clients | 60 rounds | device cuda
+[14:53:17] INFO   -> AUROC final 0.7091 best 0.7230 PPD 0.0138 | AUPRC 0.2843 | upload 495.1 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[14:53:29] INFO      tierfed | diabetes/resnet | seed 43 | 20 clients | 60 rounds | device cuda
+[15:00:39] INFO   -> AUROC final 0.7307 best 0.7395 PPD 0.0088 | AUPRC 0.2924 | upload 491.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[15:00:52] INFO      tierfed | diabetes/resnet | seed 44 | 20 clients | 60 rounds | device cuda
+[15:07:57] INFO   -> AUROC final 0.7200 best 0.7290 PPD 0.0091 | AUPRC 0.2932 | upload 493.4 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0169
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/src/models/networks.py:72: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.body = nn.TransformerEncoder(layer, depth)
+[15:08:09] INFO      tierfed | diabetes/transformer | seed 42 | 20 clients | 60 rounds | device cuda
+[15:26:05] INFO   -> AUROC final 0.6673 best 0.6684 PPD 0.0011 | AUPRC 0.2264 | upload 149.8 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/src/models/networks.py:72: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.body = nn.TransformerEncoder(layer, depth)
+[15:26:29] INFO      tierfed | diabetes/transformer | seed 43 | 20 clients | 60 rounds | device cuda
+[15:44:29] INFO   -> AUROC final 0.6797 best 0.6825 PPD 0.0028 | AUPRC 0.2236 | upload 148.1 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/src/models/networks.py:72: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.body = nn.TransformerEncoder(layer, depth)
+[15:44:50] INFO      tierfed | diabetes/transformer | seed 44 | 20 clients | 60 rounds | device cuda
+[16:02:52] INFO   -> AUROC final 0.6725 best 0.6725 PPD 0.0000 | AUPRC 0.2384 | upload 141.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0169
+=== imaging: dermamnist, alpha=0.1 (GPU) ===
+[16:03:16] INFO       fedavg | medmnist/cnn | seed 42 | 18 clients | 60 rounds | device cuda
+[16:04:00] INFO   -> AUROC final 0.9530 best 0.9868 PPD 0.0338 | AUPRC 0.9994 | upload 1244.9 MB
+[partition] dirichlet: 18 clients | sizes 1/71/3234 | prevalence 0.000-1.000 | label TV 0.4327
+[16:04:11] INFO       fedper | medmnist/cnn | seed 42 | 18 clients | 60 rounds | device cuda
+[16:04:54] INFO   -> AUROC final 0.9853 best 1.0000 PPD 0.0147 | AUPRC 0.9998 | upload 1243.7 MB
+[partition] dirichlet: 18 clients | sizes 1/71/3234 | prevalence 0.000-1.000 | label TV 0.4327
+[16:05:05] INFO      tierfed | medmnist/cnn | seed 42 | 18 clients | 60 rounds | device cuda
+[16:05:48] INFO   -> AUROC final 0.8576 best 0.9750 PPD 0.1175 | AUPRC 0.9979 | upload 336.1 MB
+[partition] dirichlet: 18 clients | sizes 1/71/3234 | prevalence 0.000-1.000 | label TV 0.4327
+[16:05:59] INFO       fedavg | medmnist/cnn | seed 43 | 15 clients | 60 rounds | device cuda
+[16:06:40] INFO   -> AUROC final 0.9520 best 0.9779 PPD 0.0259 | AUPRC 0.9979 | upload 1037.4 MB
+[partition] dirichlet: 15 clients | sizes 7/50/3329 | prevalence 0.000-1.000 | label TV 0.2414
+[16:06:52] INFO       fedper | medmnist/cnn | seed 43 | 15 clients | 60 rounds | device cuda
+[16:07:33] INFO   -> AUROC final 1.0000 best 1.0000 PPD 0.0000 | AUPRC 1.0000 | upload 1036.5 MB
+[partition] dirichlet: 15 clients | sizes 7/50/3329 | prevalence 0.000-1.000 | label TV 0.2414
+[16:07:45] INFO      tierfed | medmnist/cnn | seed 43 | 15 clients | 60 rounds | device cuda
+[16:08:26] INFO   -> AUROC final 0.9495 best 0.9541 PPD 0.0046 | AUPRC 0.9964 | upload 312.2 MB
+[partition] dirichlet: 15 clients | sizes 7/50/3329 | prevalence 0.000-1.000 | label TV 0.2414
+[16:08:37] INFO       fedavg | medmnist/cnn | seed 44 | 11 clients | 60 rounds | device cuda
+[16:09:16] INFO   -> AUROC final nan best nan PPD nan | AUPRC nan | upload 760.7 MB
+[partition] dirichlet: 11 clients | sizes 2/43/2461 | prevalence 0.000-1.000 | label TV 0.4942
+[16:09:28] INFO       fedper | medmnist/cnn | seed 44 | 11 clients | 60 rounds | device cuda
+[16:10:07] INFO   -> AUROC final nan best nan PPD nan | AUPRC nan | upload 760.1 MB
+[partition] dirichlet: 11 clients | sizes 2/43/2461 | prevalence 0.000-1.000 | label TV 0.4942
+[16:10:18] INFO      tierfed | medmnist/cnn | seed 44 | 11 clients | 60 rounds | device cuda
+[16:10:57] INFO   -> AUROC final nan best nan PPD nan | AUPRC nan | upload 218.5 MB
+[partition] dirichlet: 11 clients | sizes 2/43/2461 | prevalence 0.000-1.000 | label TV 0.4942
+[16:11:08] INFO       fedavg | medmnist/cnn | seed 45 | 17 clients | 60 rounds | device cuda
+[16:11:51] INFO   -> AUROC final 0.8596 best 0.9288 PPD 0.0691 | AUPRC 0.9731 | upload 1175.7 MB
+[partition] dirichlet: 17 clients | sizes 1/65/3074 | prevalence 0.000-1.000 | label TV 0.2345
+[16:12:03] INFO       fedper | medmnist/cnn | seed 45 | 17 clients | 60 rounds | device cuda
+[16:12:45] INFO   -> AUROC final 0.9860 best 0.9873 PPD 0.0013 | AUPRC 0.9951 | upload 1174.6 MB
+[partition] dirichlet: 17 clients | sizes 1/65/3074 | prevalence 0.000-1.000 | label TV 0.2345
+[16:12:56] INFO      tierfed | medmnist/cnn | seed 45 | 17 clients | 60 rounds | device cuda
+[16:13:38] INFO   -> AUROC final 0.9267 best 0.9727 PPD 0.0460 | AUPRC 0.9896 | upload 352.4 MB
+[partition] dirichlet: 17 clients | sizes 1/65/3074 | prevalence 0.000-1.000 | label TV 0.2345
+[16:13:49] INFO       fedavg | medmnist/cnn | seed 46 | 20 clients | 60 rounds | device cuda
+[16:14:33] INFO   -> AUROC final 0.7225 best 0.9705 PPD 0.2481 | AUPRC 0.9375 | upload 1383.2 MB
+[partition] dirichlet: 20 clients | sizes 1/76/3151 | prevalence 0.000-1.000 | label TV 0.4027
+[16:14:44] INFO       fedper | medmnist/cnn | seed 46 | 20 clients | 60 rounds | device cuda
+[16:15:29] INFO   -> AUROC final 1.0000 best 1.0000 PPD 0.0000 | AUPRC 1.0000 | upload 1381.9 MB
+[partition] dirichlet: 20 clients | sizes 1/76/3151 | prevalence 0.000-1.000 | label TV 0.4027
+[16:15:40] INFO      tierfed | medmnist/cnn | seed 46 | 20 clients | 60 rounds | device cuda
+[16:16:24] INFO   -> AUROC final 0.9618 best 0.9979 PPD 0.0360 | AUPRC 0.9968 | upload 352.1 MB
+[partition] dirichlet: 20 clients | sizes 1/76/3151 | prevalence 0.000-1.000 | label TV 0.4027
+ALL_DONE
