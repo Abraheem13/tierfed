@@ -27,12 +27,13 @@ class NestedFL(Strategy):
     name = "nested"
 
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
-                 tiers: Mapping[str, str], k_slow: int = 5, k_med: int = 2,
+                 tiers: Mapping[str, str], k_slow: int = 5, k_med: int = 2, warmup: int = 0,
                  private_head: bool = True, schedule: bool = True,
                  fallback_tier: str = "medium", **kw):
         super().__init__(param_names, sizes, **kw)
         self.tiers = dict(tiers)
         self.k = {"slow": int(k_slow), "medium": int(k_med), "fast": 1}
+        self.warmup = int(warmup)
         self.private_head = private_head
         self.use_schedule = schedule
         self.fallback_tier = fallback_tier
@@ -42,6 +43,8 @@ class NestedFL(Strategy):
     def active_tiers(self, r: int) -> List[str]:
         shared = ["slow", "medium"] if self.private_head else ["slow", "medium", "fast"]
         if not self.use_schedule:
+            return shared
+        if r <= self.warmup:
             return shared
         act = [g for g in shared if r == 1 or r % self.k.get(g, 1) == 0]
         if not act:
@@ -92,9 +95,17 @@ def build_strategy(name: str, param_names, sizes, tiers=None, head_keys=None, **
                        max_interval=kw.get("max_interval", 8), **common)
     if name == "scaffold":
         return SCAFFOLD(param_names, sizes, **common)
+    if name == "tierfed":
+        from .adaptive import AdaptiveTierFed
+        return AdaptiveTierFed(param_names, sizes, tiers or {},
+                               warmup=kw.get("warmup", 5),
+                               k_min=kw.get("k_min", 1), k_max=kw.get("k_max", 8),
+                               rho=kw.get("rho", 0.5),
+                               private_head=kw.get("private_head", True), **common)
     if name in ("nested", "nfl", "nested_sched", "nested_nohead"):
         return NestedFL(param_names, sizes, tiers or {},
                         k_slow=kw.get("k_slow", 5), k_med=kw.get("k_med", 2),
+                        warmup=kw.get("warmup", 0),
                         private_head=kw.get("private_head", name != "nested_sched"),
                         schedule=kw.get("schedule", name != "nested_nohead"), **common)
     raise ValueError(f"unknown strategy '{name}'")

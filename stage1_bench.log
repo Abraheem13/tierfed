@@ -1,0 +1,303 @@
+nohup: ignoring input
+launching 60 runs with 6 parallel workers (benchmark / diabetes)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[23:05:31] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[23:07:59] INFO   -> AUROC final 0.7373 best 0.7397 PPD 0.0024 | AUPRC 0.3388 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[23:08:01] INFO   -> AUROC final 0.7409 best 0.7409 PPD 0.0000 | AUPRC 0.3366 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0197
+[23:08:01] INFO   -> AUROC final 0.7249 best 0.7266 PPD 0.0017 | AUPRC 0.3243 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+[23:08:01] INFO   -> AUROC final 0.7429 best 0.7429 PPD 0.0000 | AUPRC 0.3380 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0182
+[23:08:01] INFO   -> AUROC final 0.7325 best 0.7361 PPD 0.0036 | AUPRC 0.3312 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[23:08:02] INFO   -> AUROC final 0.7453 best 0.7453 PPD 0.0000 | AUPRC 0.3541 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0178
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:08:15] INFO      fedprox | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:08:15] INFO       fedavg | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[23:08:15] INFO       fedavg | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[23:08:15] INFO      fedprox | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[23:08:15] INFO       fedavg | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:08:15] INFO       fedavg | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+[23:10:41] INFO   -> AUROC final 0.7413 best 0.7413 PPD 0.0000 | AUPRC 0.3438 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0165
+[23:10:42] INFO   -> AUROC final 0.7460 best 0.7460 PPD 0.0000 | AUPRC 0.3582 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.050-0.160 | label TV 0.0202
+[23:10:43] INFO   -> AUROC final 0.7495 best 0.7495 PPD 0.0000 | AUPRC 0.3415 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.064-0.162 | label TV 0.0163
+[23:10:44] INFO   -> AUROC final 0.7412 best 0.7412 PPD 0.0000 | AUPRC 0.3489 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0150
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:10:53] INFO      fedprox | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:10:53] INFO      fedprox | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:10:54] INFO      fedprox | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:10:56] INFO      fedprox | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[23:11:18] INFO   -> AUROC final 0.7213 best 0.7213 PPD 0.0000 | AUPRC 0.2711 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0193
+[23:11:21] INFO   -> AUROC final 0.7095 best 0.7095 PPD 0.0000 | AUPRC 0.2776 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0180
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:11:30] INFO      fedprox | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:11:32] INFO      fedprox | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[23:13:55] INFO   -> AUROC final 0.7110 best 0.7110 PPD 0.0000 | AUPRC 0.2771 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[23:13:57] INFO   -> AUROC final 0.7136 best 0.7154 PPD 0.0018 | AUPRC 0.2785 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0182
+[23:13:57] INFO   -> AUROC final 0.7059 best 0.7059 PPD 0.0000 | AUPRC 0.2744 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0196
+[23:14:00] INFO   -> AUROC final 0.7156 best 0.7156 PPD 0.0000 | AUPRC 0.2877 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0176
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:14:07] INFO      fedprox | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:14:07] INFO       fedper | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[23:14:07] INFO      fedprox | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:14:11] INFO       fedper | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:14:33] INFO   -> AUROC final 0.7201 best 0.7201 PPD 0.0000 | AUPRC 0.2872 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+[23:14:38] INFO   -> AUROC final 0.7181 best 0.7182 PPD 0.0001 | AUPRC 0.2918 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0204
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:14:45] INFO       fedper | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:14:50] INFO       fedper | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:16:36] INFO   -> AUROC final 0.7505 best 0.7505 PPD 0.0000 | AUPRC 0.3482 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+[23:16:39] INFO   -> AUROC final 0.7452 best 0.7465 PPD 0.0013 | AUPRC 0.3343 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:16:48] INFO       fedper | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:16:50] INFO       fedper | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[23:17:10] INFO   -> AUROC final 0.7183 best 0.7183 PPD 0.0000 | AUPRC 0.2870 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0154
+[23:17:10] INFO   -> AUROC final 0.7147 best 0.7147 PPD 0.0000 | AUPRC 0.2976 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0166
+[23:17:11] INFO   -> AUROC final 0.7451 best 0.7451 PPD 0.0000 | AUPRC 0.3490 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[23:17:17] INFO   -> AUROC final 0.7377 best 0.7377 PPD 0.0000 | AUPRC 0.3248 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0200
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:17:21] INFO       fedper | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[23:17:21] INFO       fedper | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:17:22] INFO       fedper | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:17:28] INFO       fedper | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:19:16] INFO   -> AUROC final 0.7486 best 0.7486 PPD 0.0000 | AUPRC 0.3260 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0182
+[23:19:18] INFO   -> AUROC final 0.7445 best 0.7445 PPD 0.0000 | AUPRC 0.3410 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0174
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:19:28] INFO      fedlama | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:19:29] INFO      fedlama | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:19:46] INFO   -> AUROC final 0.7461 best 0.7461 PPD 0.0000 | AUPRC 0.3427 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0160
+[23:19:48] INFO   -> AUROC final 0.7527 best 0.7527 PPD 0.0000 | AUPRC 0.3604 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+[23:19:49] INFO   -> AUROC final 0.7392 best 0.7407 PPD 0.0015 | AUPRC 0.3398 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0165
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:19:56] INFO   -> AUROC final 0.7468 best 0.7468 PPD 0.0000 | AUPRC 0.3529 | upload 219.0 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0150
+[23:19:57] INFO      fedlama | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:20:00] INFO      fedlama | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:20:00] INFO      fedlama | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:20:07] INFO      fedlama | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[23:21:54] INFO   -> AUROC final 0.6986 best 0.7785 PPD 0.0799 | AUPRC 0.2698 | upload 110.3 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0185
+[23:21:58] INFO   -> AUROC final 0.7671 best 0.7895 PPD 0.0224 | AUPRC 0.3491 | upload 110.9 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0197
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:22:07] INFO      fedlama | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[23:22:09] INFO      fedlama | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[23:22:24] INFO   -> AUROC final 0.7032 best 0.7617 PPD 0.0585 | AUPRC 0.2772 | upload 115.2 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0166
+[23:22:28] INFO   -> AUROC final 0.6985 best 0.7830 PPD 0.0844 | AUPRC 0.2656 | upload 112.8 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0195
+[23:22:29] INFO   -> AUROC final 0.7587 best 0.7746 PPD 0.0158 | AUPRC 0.3462 | upload 111.5 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0164
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:22:34] INFO   -> AUROC final 0.7051 best 0.7886 PPD 0.0835 | AUPRC 0.2837 | upload 108.6 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0175
+[23:22:35] INFO      fedlama | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:22:39] INFO      fedlama | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:22:39] INFO     scaffold | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:22:46] INFO     scaffold | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:24:35] INFO   -> AUROC final 0.7586 best 0.7779 PPD 0.0193 | AUPRC 0.3547 | upload 96.2 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0200
+[23:24:36] INFO   -> AUROC final 0.7064 best 0.7836 PPD 0.0772 | AUPRC 0.2792 | upload 97.6 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.064-0.162 | label TV 0.0160
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:24:46] INFO     scaffold | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:24:46] INFO     scaffold | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[23:25:03] INFO   -> AUROC final 0.6997 best 0.7877 PPD 0.0880 | AUPRC 0.2802 | upload 108.9 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0166
+[23:25:07] INFO   -> AUROC final 0.7406 best 0.7406 PPD 0.0000 | AUPRC 0.3344 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[23:25:08] INFO   -> AUROC final 0.7660 best 0.7757 PPD 0.0097 | AUPRC 0.3637 | upload 109.9 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0153
+[23:25:13] INFO   -> AUROC final 0.7366 best 0.7368 PPD 0.0002 | AUPRC 0.3211 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:25:15] INFO     scaffold | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:25:18] INFO     scaffold | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:25:20] INFO     scaffold | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:25:24] INFO     scaffold | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[23:27:14] INFO   -> AUROC final 0.7305 best 0.7316 PPD 0.0012 | AUPRC 0.3228 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0193
+[23:27:16] INFO   -> AUROC final 0.7361 best 0.7379 PPD 0.0019 | AUPRC 0.3298 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:27:26] INFO     scaffold | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:27:28] INFO     scaffold | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:27:43] INFO   -> AUROC final 0.7467 best 0.7467 PPD 0.0000 | AUPRC 0.3331 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.057-0.164 | label TV 0.0181
+[23:27:46] INFO   -> AUROC final 0.7453 best 0.7453 PPD 0.0000 | AUPRC 0.3340 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+[23:27:46] INFO   -> AUROC final 0.7397 best 0.7397 PPD 0.0000 | AUPRC 0.3408 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0175
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:27:53] INFO   -> AUROC final 0.7481 best 0.7481 PPD 0.0000 | AUPRC 0.3527 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.050-0.160 | label TV 0.0199
+[23:27:54] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:27:57] INFO       nested | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[23:27:57] INFO       nested | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:28:04] INFO       nested | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[23:29:52] INFO   -> AUROC final 0.7442 best 0.7442 PPD 0.0000 | AUPRC 0.3482 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0150
+[23:29:53] INFO   -> AUROC final 0.7408 best 0.7422 PPD 0.0014 | AUPRC 0.3411 | upload 439.3 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:30:03] INFO       nested | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[23:30:03] INFO       nested | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[23:30:22] INFO   -> AUROC final 0.6947 best 0.7554 PPD 0.0608 | AUPRC 0.2667 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0182
+[23:30:23] INFO   -> AUROC final 0.7003 best 0.7522 PPD 0.0519 | AUPRC 0.2521 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0197
+[23:30:25] INFO   -> AUROC final 0.6919 best 0.7460 PPD 0.0541 | AUPRC 0.2645 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0166
+[23:30:30] INFO   -> AUROC final 0.6854 best 0.7414 PPD 0.0560 | AUPRC 0.2571 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:30:33] INFO       nested | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[23:30:34] INFO       nested | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:30:36] INFO       nested | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[23:30:41] INFO       nested | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[23:32:29] INFO   -> AUROC final 0.6904 best 0.7498 PPD 0.0594 | AUPRC 0.2619 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0168
+[23:32:31] INFO   -> AUROC final 0.6962 best 0.7530 PPD 0.0568 | AUPRC 0.2729 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0176
+[23:32:59] INFO   -> AUROC final 0.6975 best 0.7567 PPD 0.0593 | AUPRC 0.2682 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0163
+[23:33:00] INFO   -> AUROC final 0.6983 best 0.7583 PPD 0.0600 | AUPRC 0.2743 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0200
+[23:33:02] INFO   -> AUROC final 0.6905 best 0.7424 PPD 0.0519 | AUPRC 0.2696 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0166
+[23:33:06] INFO   -> AUROC final 0.7002 best 0.7565 PPD 0.0562 | AUPRC 0.2742 | upload 128.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0154
+done: benchmark
