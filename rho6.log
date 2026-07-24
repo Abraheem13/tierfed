@@ -1,0 +1,32 @@
+nohup: ignoring input
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[16:35:51] INFO      tierfed | diabetes/resnet | seed 42 | 20 clients | 60 rounds | device cuda
+[16:43:49] INFO   -> AUROC final 0.7040 best 0.7144 PPD 0.0104 | AUPRC 0.2772 | upload 1212.6 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[16:44:01] INFO      tierfed | diabetes/resnet | seed 43 | 20 clients | 60 rounds | device cuda
+[16:51:22] INFO   -> AUROC final 0.7198 best 0.7379 PPD 0.0181 | AUPRC 0.2814 | upload 1212.6 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0190
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[16:51:34] INFO      tierfed | diabetes/resnet | seed 44 | 20 clients | 60 rounds | device cuda
+[16:59:03] INFO   -> AUROC final 0.7110 best 0.7307 PPD 0.0197 | AUPRC 0.2843 | upload 1212.6 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+[16:59:15] INFO      tierfed | medmnist/cnn | seed 42 | 18 clients | 60 rounds | device cuda
+[17:00:01] INFO   -> AUROC final 0.9868 best 0.9927 PPD 0.0059 | AUPRC 0.9998 | upload 744.0 MB
+[partition] dirichlet: 18 clients | sizes 1/71/3234 | prevalence 0.000-1.000 | label TV 0.4327
+[17:00:13] INFO      tierfed | medmnist/cnn | seed 43 | 15 clients | 60 rounds | device cuda
+[17:00:57] INFO   -> AUROC final 0.9928 best 0.9931 PPD 0.0003 | AUPRC 0.9997 | upload 620.0 MB
+[partition] dirichlet: 15 clients | sizes 7/50/3329 | prevalence 0.000-1.000 | label TV 0.2414
+[17:01:08] INFO      tierfed | medmnist/cnn | seed 44 | 11 clients | 60 rounds | device cuda
+[17:01:49] INFO   -> AUROC final nan best nan PPD nan | AUPRC nan | upload 454.7 MB
+[partition] dirichlet: 11 clients | sizes 2/43/2461 | prevalence 0.000-1.000 | label TV 0.4942
+[17:02:01] INFO      tierfed | medmnist/cnn | seed 45 | 17 clients | 60 rounds | device cuda
+[17:02:46] INFO   -> AUROC final 0.9763 best 0.9801 PPD 0.0038 | AUPRC 0.9943 | upload 702.7 MB
+[partition] dirichlet: 17 clients | sizes 1/65/3074 | prevalence 0.000-1.000 | label TV 0.2345
+[17:02:57] INFO      tierfed | medmnist/cnn | seed 46 | 20 clients | 60 rounds | device cuda
+[17:03:43] INFO   -> AUROC final 0.9964 best 1.0000 PPD 0.0036 | AUPRC 0.9994 | upload 826.7 MB
+[partition] dirichlet: 20 clients | sizes 1/76/3151 | prevalence 0.000-1.000 | label TV 0.4027
+DONE_RHO6
