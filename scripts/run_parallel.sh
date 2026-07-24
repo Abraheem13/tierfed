@@ -20,7 +20,7 @@ CMDS=()
 
 case "$EXP" in
   benchmark)
-    for s in fedavg fedprox fedper fedlama scaffold nested; do
+    for s in fedavg fedprox fedper fedlama scaffold nested tierfed; do
       for seed in $SEEDS; do
         CMDS+=("python -m src.experiments.run_one --dataset $DS --strategy $s --seed $seed \
 --rounds $ROUNDS --clients $CLIENTS --device $DEV --out $OUT --threads 1")
@@ -45,6 +45,13 @@ case "$EXP" in
     for c in none quant8 quant4 topk stc sketch; do for s in fedavg nested; do for seed in 42 43 44 45 46; do
       CMDS+=("python -m src.experiments.run_one --dataset $DS --strategy $s --compressor $c --seed $seed --rounds $ROUNDS --clients $CLIENTS --device $DEV --out $OUT --tag _comp_$c --threads 1")
     done; done; done ;;
+  tierfed)
+    for rho in 0.6 0.4 0.25; do for seed in $SEEDS; do
+      CMDS+=("python -m src.experiments.run_one --dataset $DS --strategy tierfed --seed $seed --rounds $ROUNDS --clients $CLIENTS --device $DEV --out $OUT --tag _tf_rho${rho} --strategy-kwargs '{\"warmup\":5,\"rho\":$rho}' --threads 1")
+    done; done
+    for seed in $SEEDS; do
+      CMDS+=("python -m src.experiments.run_one --dataset $DS --strategy nested --seed $seed --rounds $ROUNDS --clients $CLIENTS --device $DEV --out $OUT --tag _tf_warm --strategy-kwargs '{\"k_slow\":5,\"k_med\":2,\"warmup\":8}' --threads 1")
+    done ;;
   privacy)
     for sg in 0 0.5 1.0 2.0; do for s in fedavg nested; do for seed in 42 43 44 45 46; do
       CMDS+=("python -m src.experiments.run_one --dataset $DS --strategy $s --dp-sigma $sg --seed $seed --rounds $ROUNDS --clients $CLIENTS --device $DEV --out $OUT --tag _dp$sg --threads 1")
