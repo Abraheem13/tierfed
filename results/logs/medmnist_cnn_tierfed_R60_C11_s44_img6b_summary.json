@@ -1,0 +1,156 @@
+{
+  "summary": {
+    "global_auroc_final": 0.3022254520449466,
+    "global_auroc_best": 0.6339529904511854,
+    "global_auroc_best_round": 11.0,
+    "global_auroc_ppd": 0.33172753840623875,
+    "global_auroc_auc_curve": 0.4619823818379775,
+    "global_auroc_last10_mean": 0.30672675699751506,
+    "global_auroc_earlystop_value": 0.6339529904511854,
+    "global_auroc_earlystop_round": 11.0,
+    "global_auprc_final": 0.948810381700531,
+    "global_auprc_best": 0.9821683600773327,
+    "global_auprc_best_round": 11.0,
+    "global_auprc_ppd": 0.033357978376801656,
+    "global_auprc_auc_curve": 0.9668516539333484,
+    "global_auprc_last10_mean": 0.9488115881576501,
+    "global_auprc_earlystop_value": 0.9821683600773327,
+    "global_auprc_earlystop_round": 11.0,
+    "global_f1_final": 0.0,
+    "global_f1_best": 0.0,
+    "global_f1_best_round": 1.0,
+    "global_f1_ppd": 0.0,
+    "global_f1_auc_curve": 0.0,
+    "global_f1_last10_mean": 0.0,
+    "global_f1_earlystop_value": 0.0,
+    "global_f1_earlystop_round": 1.0,
+    "total_upload_mb": 454.67136,
+    "total_download_mb": 454.67136,
+    "rounds": 60.0,
+    "divergence_medium_mean": 0.0004515763770713632,
+    "divergence_medium_final": 3.0087159755799564e-05,
+    "divergence_slow_mean": 6.426802063469117e-05,
+    "divergence_slow_final": 1.001300736589271e-05,
+    "divergence_total_mean": 0.00024289794515022358,
+    "divergence_total_final": 2.7266119701547956e-05,
+    "dispersion_abs_mean": 0.1417175479859306,
+    "dispersion_abs_final": 0.016709786704652174
+  },
+  "strategy": {
+    "strategy": "tierfed",
+    "private_params": [
+      "head.weight",
+      "head.bias"
+    ],
+    "compressor": "none",
+    "dp": {
+      "dp_enabled": 0.0,
+      "dp_sigma": 1.0,
+      "dp_max_norm": 1.0,
+      "dp_delta": 1e-05,
+      "dp_epsilon": Infinity
+    },
+    "warmup": 10,
+    "k_min": 1,
+    "k_max": 8,
+    "final_intervals": {
+      "medium": 2,
+      "slow": 1
+    }
+  },
+  "config": {
+    "dataset": "medmnist",
+    "model": "cnn",
+    "model_kwargs": {},
+    "strategy": "tierfed",
+    "strategy_kwargs": {
+      "warmup": 10,
+      "rho": 0.6
+    },
+    "rounds": 60,
+    "local_epochs": 1,
+    "batch_size": 64,
+    "lr": 0.001,
+    "loss": "weighted_ce",
+    "balanced_sampler": false,
+    "n_clients": 20,
+    "participation": 1.0,
+    "seed": 44,
+    "device": "cuda",
+    "compressor": null,
+    "compressor_kwargs": null,
+    "dp": null,
+    "eval_every": 1,
+    "early_stop_patience": 10,
+    "client_test_frac": 0.2,
+    "out_dir": "results",
+    "tag": "_img6b"
+  },
+  "dataset": {
+    "dataset": "medmnist:dermamnist",
+    "n_train": 7007,
+    "n_test": 2005,
+    "n_features": 2352,
+    "input_shape": [
+      3,
+      28,
+      28
+    ],
+    "n_clients": 11,
+    "prevalence_train": 0.9674611103182532,
+    "prevalence_test": 0.9670822942643391,
+    "modality": "imaging",
+    "flag": "dermamnist",
+    "partition_report": {
+      "n_clients": 11.0,
+      "size_min": 2.0,
+      "size_median": 43.0,
+      "size_max": 2461.0,
+      "size_gini": 0.7161928980110799,
+      "prevalence_min": 0.0,
+      "prevalence_max": 1.0,
+      "prevalence_std": 0.473860836358274,
+      "label_tv_mean": 0.4942370931827021,
+      "scheme": "dirichlet"
+    }
+  },
+  "tier_report": {
+    "slow": {
+      "params": 10272.0,
+      "pct": 3.5646615445478584,
+      "n_tensors": 8.0
+    },
+    "medium": {
+      "params": 277632.0,
+      "pct": 96.34580548441501,
+      "n_tensors": 16.0
+    },
+    "fast": {
+      "params": 258.0,
+      "pct": 0.08953297103712494,
+      "n_tensors": 2.0
+    },
+    "total": {
+      "params": 288162.0,
+      "pct": 100.0,
+      "n_tensors": 26.0
+    }
+  },
+  "dp": {
+    "dp_enabled": 0.0,
+    "dp_sigma": 1.0,
+    "dp_max_norm": 1.0,
+    "dp_delta": 1e-05,
+    "dp_epsilon": Infinity
+  },
+  "schedule": {
+    "warmup": 10.0,
+    "k_min": 1.0,
+    "k_max": 8.0,
+    "rho": 0.6,
+    "K_medium": 2.0,
+    "K_slow": 1.0,
+    "gamma_slow": 1.001300736589271e-05,
+    "gamma_medium": 3.0087159755799564e-05
+  }
+}
