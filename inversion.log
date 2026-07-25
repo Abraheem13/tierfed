@@ -1,0 +1,51 @@
+nohup: ignoring input
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:20:48] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:25:33] INFO   -> AUROC final 0.7381 best 0.7386 PPD 0.0005 | AUPRC 0.3397 | upload 219.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:25:38] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:30:12] INFO   -> AUROC final 0.7381 best 0.7386 PPD 0.0005 | AUPRC 0.3397 | upload 219.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:30:18] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:34:48] INFO   -> AUROC final 0.7381 best 0.7386 PPD 0.0005 | AUPRC 0.3397 | upload 219.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:34:52] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:40:42] INFO   -> AUROC final 0.7381 best 0.7386 PPD 0.0005 | AUPRC 0.3397 | upload 219.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:40:47] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:46:37] INFO   -> AUROC final 0.6911 best 0.7477 PPD 0.0567 | AUPRC 0.2686 | upload 128.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:46:42] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:52:52] INFO   -> AUROC final 0.6650 best 0.7049 PPD 0.0399 | AUPRC 0.2330 | upload 128.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:52:56] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[06:58:37] INFO   -> AUROC final 0.6525 best 0.6865 PPD 0.0340 | AUPRC 0.2154 | upload 128.7 MB
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:58:44] INFO       nested | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cuda
+[07:03:46] INFO   -> AUROC final 0.5953 best 0.6649 PPD 0.0696 | AUPRC 0.1847 | upload 128.7 MB
+[07:03:46] INFO 
+strategy  sigma  n_seeds  fed_auroc_final_mean  fed_auroc_final_std  fed_auroc_final_ci_lo  fed_auroc_final_ci_hi  fed_auprc_final_mean  fed_auprc_final_std  fed_auprc_final_ci_lo  fed_auprc_final_ci_hi  fed_f1_final_mean  fed_f1_final_std  fed_f1_final_ci_lo  fed_f1_final_ci_hi  total_upload_mb_mean  total_upload_mb_std  total_upload_mb_ci_lo  total_upload_mb_ci_hi
+  fedavg    0.0        1              0.738103                  0.0                    NaN                    NaN              0.339748                  0.0                    NaN                    NaN           0.311670               0.0                 NaN                 NaN             219.65760                  0.0                    NaN                    NaN
+  fedavg    0.5        1              0.738103                  0.0                    NaN                    NaN              0.339748                  0.0                    NaN                    NaN           0.311670               0.0                 NaN                 NaN             219.65760                  0.0                    NaN                    NaN
+  fedavg    1.0        1              0.738103                  0.0                    NaN                    NaN              0.339748                  0.0                    NaN                    NaN           0.311670               0.0                 NaN                 NaN             219.65760                  0.0                    NaN                    NaN
+  fedavg    2.0        1              0.738103                  0.0                    NaN                    NaN              0.339748                  0.0                    NaN                    NaN           0.311670               0.0                 NaN                 NaN             219.65760                  0.0                    NaN                    NaN
+  nested    0.0        1              0.691054                  0.0                    NaN                    NaN              0.268582                  0.0                    NaN                    NaN           0.282158               0.0                 NaN                 NaN             128.69632                  0.0                    NaN                    NaN
+  nested    0.5        1              0.665037                  0.0                    NaN                    NaN              0.232988                  0.0                    NaN                    NaN           0.275274               0.0                 NaN                 NaN             128.69632                  0.0                    NaN                    NaN
+  nested    1.0        1              0.652485                  0.0                    NaN                    NaN              0.215379                  0.0                    NaN                    NaN           0.269242               0.0                 NaN                 NaN             128.69632                  0.0                    NaN                    NaN
+  nested    2.0        1              0.595346                  0.0                    NaN                    NaN              0.184696                  0.0                    NaN                    NaN           0.196316               0.0                 NaN                 NaN             128.69632                  0.0                    NaN                    NaN
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183

@@ -1,0 +1,1282 @@
+nohup: ignoring input
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:20:40] INFO      tierfed | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:21:27] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[06:25:37] INFO   -> AUROC final 0.7409 best 0.7409 PPD 0.0000 | AUPRC 0.3338 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:26:01] INFO      tierfed | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:26:47] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[06:30:51] INFO   -> AUROC final 0.7410 best 0.7423 PPD 0.0013 | AUPRC 0.3450 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0182
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:31:13] INFO      tierfed | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:32:03] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[06:36:12] INFO   -> AUROC final 0.7365 best 0.7369 PPD 0.0004 | AUPRC 0.3304 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:36:31] INFO      tierfed | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.054-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:37:18] INFO       fedavg | diabetes/mlp | seed 42 | 20 clients | 60 rounds | device cpu
+[06:41:23] INFO   -> AUROC final 0.7450 best 0.7450 PPD 0.0000 | AUPRC 0.3494 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/799/38875 | prevalence 0.055-0.156 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:41:38] INFO      tierfed | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:42:29] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[06:46:50] INFO   -> AUROC final 0.7426 best 0.7426 PPD 0.0000 | AUPRC 0.3296 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0190
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:47:06] INFO      tierfed | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0198
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:47:50] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[06:52:02] INFO   -> AUROC final 0.7366 best 0.7366 PPD 0.0000 | AUPRC 0.3269 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:52:18] INFO      tierfed | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:52:59] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[06:57:09] INFO   -> AUROC final 0.7434 best 0.7434 PPD 0.0000 | AUPRC 0.3336 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:57:24] INFO      tierfed | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.068-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[06:58:20] INFO       fedavg | diabetes/mlp | seed 43 | 20 clients | 60 rounds | device cpu
+[07:02:45] INFO   -> AUROC final 0.7408 best 0.7411 PPD 0.0003 | AUPRC 0.3309 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 648/790/38888 | prevalence 0.069-0.163 | label TV 0.0192
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:03:09] INFO      tierfed | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:04:03] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[07:07:42] INFO   -> AUROC final 0.7361 best 0.7390 PPD 0.0029 | AUPRC 0.3359 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:07:56] INFO      tierfed | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:08:37] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[07:12:06] INFO   -> AUROC final 0.7381 best 0.7381 PPD 0.0000 | AUPRC 0.3341 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:12:20] INFO      tierfed | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0171
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:13:01] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[07:16:26] INFO   -> AUROC final 0.7351 best 0.7362 PPD 0.0011 | AUPRC 0.3327 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0168
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:16:40] INFO      tierfed | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:17:16] INFO       fedavg | diabetes/mlp | seed 44 | 20 clients | 60 rounds | device cpu
+[07:20:39] INFO   -> AUROC final 0.7408 best 0.7436 PPD 0.0027 | AUPRC 0.3409 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 643/781/38955 | prevalence 0.072-0.163 | label TV 0.0169
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:20:54] INFO      tierfed | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:21:33] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[07:24:53] INFO   -> AUROC final 0.7260 best 0.7260 PPD 0.0000 | AUPRC 0.3232 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:25:15] INFO      tierfed | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0198
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:26:08] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[07:29:30] INFO   -> AUROC final 0.7299 best 0.7299 PPD 0.0000 | AUPRC 0.3260 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:29:45] INFO      tierfed | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0195
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:30:25] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[07:33:51] INFO   -> AUROC final 0.7350 best 0.7350 PPD 0.0000 | AUPRC 0.3222 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0196
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:34:05] INFO      tierfed | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.052-0.163 | label TV 0.0193
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:34:43] INFO       fedavg | diabetes/mlp | seed 45 | 20 clients | 60 rounds | device cpu
+[07:38:00] INFO   -> AUROC final 0.7329 best 0.7329 PPD 0.0000 | AUPRC 0.3168 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 650/797/38870 | prevalence 0.060-0.163 | label TV 0.0198
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:38:15] INFO      tierfed | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0181
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:38:55] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[07:42:23] INFO   -> AUROC final 0.7473 best 0.7480 PPD 0.0007 | AUPRC 0.3409 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0165
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:42:37] INFO      tierfed | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0165
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:43:14] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[07:45:50] INFO   -> AUROC final 0.7415 best 0.7425 PPD 0.0009 | AUPRC 0.3394 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:46:02] INFO      tierfed | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0182
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:46:32] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[07:49:14] INFO   -> AUROC final 0.7431 best 0.7431 PPD 0.0000 | AUPRC 0.3356 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:49:27] INFO      tierfed | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.056-0.164 | label TV 0.0181
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:49:56] INFO       fedavg | diabetes/mlp | seed 46 | 20 clients | 60 rounds | device cpu
+[07:52:24] INFO   -> AUROC final 0.7441 best 0.7447 PPD 0.0006 | AUPRC 0.3356 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/794/38898 | prevalence 0.054-0.164 | label TV 0.0183
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:52:35] INFO      tierfed | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0178
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:53:04] INFO       fedavg | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[07:55:29] INFO   -> AUROC final 0.7458 best 0.7458 PPD 0.0000 | AUPRC 0.3456 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0179
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:55:41] INFO      tierfed | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0175
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:56:10] INFO       fedavg | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[07:58:34] INFO   -> AUROC final 0.7407 best 0.7414 PPD 0.0007 | AUPRC 0.3365 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0178
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:58:49] INFO      tierfed | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0179
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[07:59:32] INFO       fedavg | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[08:01:58] INFO   -> AUROC final 0.7385 best 0.7385 PPD 0.0000 | AUPRC 0.3375 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.051-0.162 | label TV 0.0172
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:02:11] INFO      tierfed | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0175
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:02:40] INFO       fedavg | diabetes/mlp | seed 47 | 20 clients | 60 rounds | device cpu
+[08:05:06] INFO   -> AUROC final 0.7430 best 0.7430 PPD 0.0000 | AUPRC 0.3461 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 646/790/38972 | prevalence 0.049-0.162 | label TV 0.0178
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:05:17] INFO      tierfed | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.064-0.162 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:05:46] INFO       fedavg | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[08:08:12] INFO   -> AUROC final 0.7423 best 0.7423 PPD 0.0000 | AUPRC 0.3337 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:08:24] INFO      tierfed | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.064-0.162 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:08:53] INFO       fedavg | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[08:11:19] INFO   -> AUROC final 0.7529 best 0.7529 PPD 0.0000 | AUPRC 0.3383 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:11:31] INFO      tierfed | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:12:01] INFO       fedavg | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[08:14:26] INFO   -> AUROC final 0.7481 best 0.7481 PPD 0.0000 | AUPRC 0.3388 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:14:38] INFO      tierfed | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0163
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:15:07] INFO       fedavg | diabetes/mlp | seed 48 | 20 clients | 60 rounds | device cpu
+[08:17:34] INFO   -> AUROC final 0.7446 best 0.7446 PPD 0.0000 | AUPRC 0.3427 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 658/784/38861 | prevalence 0.065-0.162 | label TV 0.0161
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:17:46] INFO      tierfed | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0200
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:18:15] INFO       fedavg | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[08:20:41] INFO   -> AUROC final 0.7437 best 0.7437 PPD 0.0000 | AUPRC 0.3462 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:20:53] INFO      tierfed | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.050-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:21:22] INFO       fedavg | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[08:23:48] INFO   -> AUROC final 0.7445 best 0.7445 PPD 0.0000 | AUPRC 0.3566 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:23:59] INFO      tierfed | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:24:29] INFO       fedavg | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[08:26:55] INFO   -> AUROC final 0.7418 best 0.7421 PPD 0.0003 | AUPRC 0.3508 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:27:07] INFO      tierfed | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.051-0.160 | label TV 0.0199
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:27:37] INFO       fedavg | diabetes/mlp | seed 49 | 20 clients | 60 rounds | device cpu
+[08:30:04] INFO   -> AUROC final 0.7469 best 0.7478 PPD 0.0009 | AUPRC 0.3646 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 645/800/38959 | prevalence 0.050-0.160 | label TV 0.0200
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:30:15] INFO      tierfed | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:30:44] INFO       fedavg | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+[08:33:10] INFO   -> AUROC final 0.7384 best 0.7384 PPD 0.0000 | AUPRC 0.3421 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:33:23] INFO      tierfed | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0165
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:33:52] INFO       fedavg | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+[08:36:19] INFO   -> AUROC final 0.7407 best 0.7407 PPD 0.0000 | AUPRC 0.3398 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:36:31] INFO      tierfed | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.067-0.160 | label TV 0.0164
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:37:00] INFO       fedavg | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+[08:39:26] INFO   -> AUROC final 0.7411 best 0.7411 PPD 0.0000 | AUPRC 0.3421 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0166
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:39:38] INFO      tierfed | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0164
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:40:07] INFO       fedavg | diabetes/mlp | seed 50 | 20 clients | 60 rounds | device cpu
+[08:42:33] INFO   -> AUROC final 0.7420 best 0.7420 PPD 0.0000 | AUPRC 0.3424 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 653/792/38963 | prevalence 0.063-0.160 | label TV 0.0165
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:42:45] INFO      tierfed | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0150
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:43:15] INFO       fedavg | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[08:45:41] INFO   -> AUROC final 0.7426 best 0.7426 PPD 0.0000 | AUPRC 0.3503 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0153
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:45:52] INFO      tierfed | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0154
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:46:21] INFO       fedavg | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[08:48:46] INFO   -> AUROC final 0.7429 best 0.7444 PPD 0.0015 | AUPRC 0.3448 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0159
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:48:58] INFO      tierfed | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0150
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:49:27] INFO       fedavg | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[08:51:54] INFO   -> AUROC final 0.7425 best 0.7433 PPD 0.0007 | AUPRC 0.3491 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0154
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:52:06] INFO      tierfed | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 54, in <module>
+    main()
+  File "/home/user/yawarb/tierfed/src/experiments/run_one.py", line 50, in main
+    run_single(cfg)
+  File "/home/user/yawarb/tierfed/src/experiments/runner.py", line 58, in run_single
+    res = server.run()
+          ^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/server.py", line 70, in run
+    self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/adaptive.py", line 101, in aggregate
+    return self.apply_dp(global_state, new, keys, len(client_states))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/strategies/base.py", line 80, in apply_dp
+    delta, _, _ = clip_update(delta, self.dp.max_norm)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/yawarb/tierfed/src/privacy/dp.py", line 20, in clip_update
+    total = torch.sqrt(sum((v.detach().float() ** 2).sum() for v in update.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: sqrt(): argument 'input' (position 1) must be Tensor, not int
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.077-0.157 | label TV 0.0153
+/home/user/yawarb/tierfed/.venv/lib/python3.12/site-packages/ucimlrepo/fetch.py:97: DtypeWarning: Columns (0: payer_code) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(data_url)
+[08:52:35] INFO       fedavg | diabetes/mlp | seed 51 | 20 clients | 60 rounds | device cpu
+[08:54:59] INFO   -> AUROC final 0.7493 best 0.7493 PPD 0.0000 | AUPRC 0.3570 | upload 219.7 MB
+[partition] lpt: 20 clients | sizes 652/799/38945 | prevalence 0.075-0.157 | label TV 0.0150
+DONE_DP
