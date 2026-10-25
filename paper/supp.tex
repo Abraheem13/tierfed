@@ -1,0 +1,47 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,etoolbox,url,hyperref}
+\IfFileExists{generated/numbers.tex}{\input{generated/numbers.tex}}{}
+\newcommand{\runreq}{\textbf{[RUN REQUIRED]}}
+\newcommand{\gen}[1]{\IfFileExists{generated/#1.tex}{\input{generated/#1.tex}}{\runreq}}
+\newcommand{\num}[1]{\ifcsdef{#1}{\csname #1\endcsname}{\runreq}}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\begin{document}
+\title{Supplementary Material: Communication as the Binding Constraint}
+\author{Abraheem Rashid}
+\maketitle
+
+\section{S1. Relation to the superseded version}
+An earlier manuscript (``Nested Federated Learning'' / ``TierFed'' v2) reported results produced by code with the following defects, found in an internal audit and corrected here: (1) differential privacy was applied inside two strategies only and clipped the aggregate rather than each client's update, so FedAvg/FedPer/FedProx ran without noise and the reported budgets were invalid; the TierFed DP runs crashed on local-only rounds and the table was unsupported; (2) the SCAFFOLD baseline was FedAvg with doubled bit accounting; (3) the scalability table contained no TierFed runs and its values were not those of the logs; (4) the architecture sweep compared different depths across methods; (5) the imaging result used an undisclosed configuration on a binarised 97\%-positive task; (6) the inversion attack targeted the fixed schedule at initialisation and was labelled TierFed; (7) the model described (93 inputs) was not the model trained (162 inputs); (8) repeated runs were not deterministic; (9) no patient-level deduplication was performed and one ``missing specialty'' client held 49\% of the data; (10) the greedy controller reached only powers of two. Every item maps to a code change in the released repository (\texttt{ROADMAP.md}, section 0) and to a test.
+
+\section{S2. Derivation of Proposition 1}
+\label{supp:proof}
+We follow the cooperative-SGD framework of Wang and Joshi [JMLR 2021, Thm.~1], which bounds the averaged gradient norm of local-update SGD in terms of the per-round deviation of client iterates from the virtual average. Write the shared parameter as $\theta=(\theta_g)_{g}$ with disjoint blocks. For site $k$ and block $g$ let $\theta^{(t)}_{k,g}$ be the iterate after $t$ local steps since block $g$ was last synchronised and $\bar\theta^{(t)}_g$ the (virtual) average across sites.
+
+\begin{lemma}[Blockwise deviation]
+Under A1--A3, for $\eta\le c_0/(LK_{\max}\tau_{\max})$ and any $t\le K_g\tau_{\max}$,
+\[
+\frac1N\sum_k\mathbb E\big\|\theta^{(t)}_{k,g}-\bar\theta^{(t)}_g\big\|^2\ \le\ c\,\eta^2 t^2\,(\Gamma_g+\sigma_g^2)\ \le\ c\,\eta^2K_g^2\tau_{\max}^2(\Gamma_g+\sigma_g^2).
+\]
+\end{lemma}
+\begin{proof}
+Identical to Lemma 2 of Wang and Joshi restricted to the coordinates of block $g$: the deviation after $t$ steps is a sum of $t$ stochastic-gradient differences, each with second moment bounded by $\Gamma_g+\sigma_g^2$ by (A2)--(A3), and the smoothness term is absorbed by the step-size condition. The restriction to a block is valid because the gradient of block $g$ is bounded blockwise by the same assumptions.
+\end{proof}
+
+The descent-lemma step of the cited theorem bounds $\mathbb E\|\nabla F(\bar\theta_r)\|^2$ by the progress term, the variance term and $L^2$ times the \emph{total} deviation $\frac1N\sum_k\|\theta_k-\bar\theta\|^2$. Because the blocks are disjoint, the total deviation is the sum over $g$ of the blockwise deviations, each bounded by the lemma with its own $K_g$; summing and averaging over rounds gives Proposition~1 of the main text with constants inherited from the cited theorem. We make no claim about the constants beyond their existence. Setting $K_g=1$ for a single block returns the cited bound with $\tau$ local steps.
+
+\textbf{What the controller sees.} By the same lemma the dispersion of the received slices of tier $g$ after $K_g$ rounds is of order $\eta^2K_g^2\tau^2(\Gamma_g+\sigma_g^2)$; normalising by $\sum_j\|\bar\theta_j\|^2$ gives the scale-free $\hat\Gamma_g$ of Eq.~(7) of the main text (the dispersion estimator). The controller therefore minimises $\sum_g K_g^2\hat\Gamma_g$ where $\hat\Gamma_g$ already carries the factor $K_g^2$ of the interval that produced it; it is a feedback loop on a proxy, and its stability is observed (Fig.~4 of the main text), not proved.
+
+\section{S3. Differential-privacy accounting}
+Per-client clipping to $C$ makes the $\ell_2$ sensitivity of the sum $\sum_k\tilde\Delta_k$ to one client exactly $C$. The Gaussian mechanism with standard deviation $\sigma C$ satisfies $(\alpha,\alpha/(2\sigma^2))$-RDP for every $\alpha>1$ [Mironov 2017, Prop.~7]. Composition over the $R_{\mathrm{tx}}$ rounds in which something is transmitted gives $(\alpha,R_{\mathrm{tx}}\alpha/(2\sigma^2))$-RDP, and $(\varepsilon,\delta)$-DP follows with $\varepsilon=\min_\alpha\{R_{\mathrm{tx}}\alpha/(2\sigma^2)+\log(1/\delta)/(\alpha-1)\}$ [Mironov 2017, Prop.~3]. Rounds with no transmission release nothing and are not charged. Full participation is used, so no subsampling amplification applies.
+
+\section{S4. Per-seed tables}
+Every run's final metrics are in \texttt{results/tables/collected\_all\_raw.csv} in the released repository. Total runs at build time: \num{TotalRuns}.
+
+\section{S5. SGD arm}
+Identical schedules with local SGD (\texttt{--optimizer sgd}, learning rate $10^{-2}$) on the main benchmark: \runreq{} (generated when the arm is run).
+
+\section{S6. Excluded sites on the imaging benchmark}
+Number of sites whose patient-grouped held-out split contained a single class (identical for every method, per seed): \runreq{} (read from \texttt{n\_clients\_single\_class\_final} in the logs when the imaging stage has run).
+
+\end{document}

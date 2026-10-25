@@ -1,0 +1,70 @@
+\section{System Model and Problem Statement}
+\label{sec:system}
+
+\subsection{Federation and objective}
+$N$ sites hold private datasets $\mathcal D_k$ of size $n_k$, $n=\sum_k n_k$, $p_k=n_k/n$. The shared objective is $F(\theta)=\sum_k p_k F_k(\theta)$ with $F_k(\theta)=\mathbb E_{\xi\sim\mathcal D_k}[f(\theta;\xi)]$. In round $r$ each participating site initialises the shared part of its model from the broadcast state and performs one local epoch of $\tau_k=\lceil n_k/B\rceil$ optimiser steps with batch size $B$ (Adam in the main experiments; an SGD arm is in the supplement), then returns the shared slice that is due. Table~\ref{tab:notation} collects the notation.
+
+\begin{table}[t]
+\caption{Notation.}
+\label{tab:notation}
+\centering\small
+\begin{tabular}{ll}
+\toprule
+$N$, $n_k$, $p_k$ & sites; local sample count; aggregation weight\\
+$\theta$, $\theta_g$, $w_g$ & shared parameters; tier $g$; its share of the shared payload\\
+$\theta_f$ & private classifier head (never transmitted)\\
+$K_g$, $K_{\max}$, $\tau_g$ & interval of tier $g$; cap; round of its last synchronisation\\
+$\Gamma_g$, $\Gh_g$ & gradient divergence of tier $g$ (A3); measured dispersion proxy\\
+$\rho$ & communication quota (mean payload fraction after warm-up)\\
+$T_w$, $R$, $\tau_k$ & warm-up rounds; rounds; local steps per round at site $k$\\
+$\eta$, $L$, $\sigma_g^2$ & step size; smoothness; per-tier gradient variance\\
+$C$, $\sigma$, $(\varepsilon,\delta)$ & DP clipping norm; noise multiplier; privacy budget\\
+$\delta_{\mathrm{NI}}$ & non-inferiority margin\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tier partition}
+Parameters are partitioned into disjoint tiers $\mathcal G=\{\mathrm s,\mathrm m,\mathrm f\}$ (slow, medium, fast). Membership is structural: parameters are ordered by their position in the forward computation graph and cut at depth fractions $\varphi_1<\varphi_2$, with the classifier head always assigned to the fast tier. For the architectures in this article the model declares the cut explicitly (input projection, hidden blocks, head), which the structural rule reproduces. The fast tier is private, which recovers FedPer-style personalisation as the special case $K_{\mathrm s}=K_{\mathrm m}=1$. The parameter counts and tier shares of every model are taken from the model instantiated on the real data and reported in Section~\ref{sec:setup}, Table~\ref{tab:tiers}.
+
+\subsection{Multi-rate aggregation and payload}
+Let $\mathcal A_r\subseteq\mathcal G$ be the tiers due in round $r$ and $\mathcal S_r$ the participating sites. The server aggregates only the active tiers,
+\begin{equation}
+\theta_g^{(r+1)}=\begin{cases}\sum_{k\in\mathcal S_r} n_k\,\theta_{k,g}^{(r)}\big/\sum_{k\in\mathcal S_r}n_k, & g\in\mathcal A_r,\\ \theta_g^{(r)}, & g\notin\mathcal A_r,\end{cases}
+\label{eq:agg}
+\end{equation}
+and sites keep their own fast tier throughout. With $w_g$ the share of the shared payload carried by tier $g$, the mean payload fraction over $R$ rounds is
+\begin{equation}
+\Pi(\{K_g\})=\frac1R\sum_{r=1}^R\sum_{g\in\mathcal A_r}w_g\ \longrightarrow\ \sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g}.
+\label{eq:payload}
+\end{equation}
+Rounds with $\mathcal A_r=\emptyset$ transmit nothing; these local-only rounds are the mechanism by which a quota below $\min_g w_g$ is realised. The realised fraction differs from $\rho$ because warm-up rounds are always full and the head is never sent; both the target and the realised fraction are reported.
+
+\subsection{Network cost model}
+\label{sec:netmodel}
+The learning job is costed on a link profile $(\beta,\ell,P)$: uplink rate $\beta$ (bit/s), round-trip latency $\ell$, transmit power $P$. Sites upload in parallel on independent links, so a round in which $b_k$ bits are sent by site $k$ costs
+\begin{equation}
+t_r=\max_k \frac{b_k}{\beta}+\ell,\qquad E_r=\sum_k\frac{b_k}{\beta}\,P,
+\label{eq:netcost}
+\end{equation}
+and nothing when no site sends. Communication time and energy are summed over rounds; window compliance is the fraction of rounds whose $t_r$ fits a scheduled window $W$. Table~\ref{tab:profiles} lists the five profiles, chosen to span a cell-edge 5G NR uplink, a mid-cell NR uplink, a 6G sub-THz edge slice target, an LEO satellite uplink and a shared institutional WAN. The model deliberately omits scheduling, fading and retransmission; it is a cost translation of measured bits under stated assumptions, and every method is costed on the same profiles.
+
+\begin{table}[t]
+\caption{Link profiles used by the network cost model (\ref{eq:netcost}). Values are representative targets, not measurements, and are the only assumptions in the network-level results.}
+\label{tab:profiles}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Profile & $\beta$ (Mbit/s) & $\ell$ (ms) & $P$ (W) & $W$ (s)\\
+\midrule
+NR cell edge~\cite{tr38913} & 5 & 30 & 0.2 & 60\\
+NR mid-cell~\cite{tr38913} & 50 & 20 & 0.2 & 60\\
+6G edge slice (target)~\cite{saad2020} & 1000 & 5 & 0.5 & 60\\
+LEO satellite uplink & 10 & 40 & 2.0 & 60\\
+Institutional WAN (wired) & 100 & 10 & 0 & 60\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Problem statement}
+Given a quota $\rho\in(0,1]$ on the mean shared-payload fraction, choose the synchronisation intervals $\{K_g\}$ each round so that the federated model's accuracy is non-inferior to the full-rate personalised baseline while the payload satisfies (\ref{eq:payload}) and the attack surface, measured as in Section~\ref{sec:security}, does not grow.

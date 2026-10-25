@@ -1,0 +1,284 @@
+\section{Results}
+\label{sec:results}
+
+Every table body in this section is generated from the per-seed logs by the released analysis script; cells reading \runreq{} mark runs that had not completed when this version was built. Unless stated otherwise, values are means over ten seeds on Diabetes 130-US with the MLP backbone.
+
+\subsection{Main benchmark}
+\label{sec:results-fixed}
+
+\begin{table*}[t]
+\caption{Main benchmark (Diabetes 130-US, 20 sites, 60 rounds). Final-round federated AUROC (mean $\pm$ SD), AUPRC, early-stopped AUROC, pooled AUROC, cumulative upload per site, number of transmitting rounds, and one-sided non-inferiority $p$-values against FedPer at $\delta_{\mathrm{NI}}=0.01$ on AUROC and AUPRC (Holm-corrected within the family).}
+\label{tab:main}
+\centering\small
+\begin{tabular}{lrcccccccc}
+\toprule
+Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$_{\mathrm{AUROC}}$ $p$ & NI$_{\mathrm{AUPRC}}$ $p$\\
+\midrule
+\gen{main_diabetes_mlp}
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[t]
+\caption{Holm-corrected paired comparisons on final AUROC against FedPer (10 seeds): mean difference, BCa 95\% interval, corrected $p$, paired $d_z$.}
+\label{tab:holm}
+\centering\small
+\begin{tabular}{lcccc c}
+\toprule
+Comparison & $\Delta$ & 95\% CI & $p_{\mathrm{Holm}}$ & $d_z$ & Sig.\\
+\midrule
+\gen{holm_diabetes_mlp}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:main} reports the main benchmark and Table~\ref{tab:holm} the corrected paired contrasts. FedPer reaches \num{diabetesmlpFedperAuroc}~AUROC and is the reference. The fixed three-tier schedule reaches \num{diabetesmlpFixedAuroc}, a difference of \num{diabetesmlpFixedVsFedperDiff} against FedPer, while uploading \num{diabetesmlpFixedUploadMb}~MB. \tierfed{} at $\rho=0.25$ reaches \num{diabetesmlpTierfedAuroc} (\num{diabetesmlpTierfedVsFedperDiff} against FedPer) at \num{diabetesmlpTierfedUploadMb}~MB, a \num{diabetesmlpTierfedUploadSavingPct}\% reduction, transmitting in only part of the rounds. \ifflag{diabetesmlpTierfedNonInferiorAuroc}{It is non-inferior to FedPer on AUROC at the 0.01 margin ($p=\num{diabetesmlpTierfedNiAurocP}$)}{It does not meet the 0.01 non-inferiority margin on AUROC ($p=\num{diabetesmlpTierfedNiAurocP}$)}, and \ifflag{diabetesmlpTierfedNonInferiorAuprc}{also on AUPRC ($p=\num{diabetesmlpTierfedNiAuprcP}$)}{it does not meet the margin on AUPRC ($p=\num{diabetesmlpTierfedNiAuprcP}$); we report this as a limitation rather than restricting the claim to AUROC}. The adaptive-period baselines, AdaComm (\num{diabetesmlpAdacommAuroc}, \num{diabetesmlpAdacommUploadMb}~MB) and LAG (\num{diabetesmlpLagAuroc}, \num{diabetesmlpLagUploadMb}~MB), and the FedLAMA-style per-layer schedule (\num{diabetesmlpFedlamaAuroc}, \num{diabetesmlpFedlamaUploadMb}~MB) are reported on the same footing; SCAFFOLD (\num{diabetesmlpScaffoldAuroc}) carries twice the payload of FedAvg.
+
+\begin{figure}[t]
+\centering\fig{fig_factorial}{0.95\columnwidth}
+\caption{Attribution of the effect: private head $\times$ schedule. Six cells, ten seeds each, error bars one SD.}
+\label{fig:factorial}
+\end{figure}
+
+\begin{table}[t]
+\caption{Factorial attribution (10 seeds): private head $\times$ schedule, with \tierfed{} with and without the private head.}
+\label{tab:factorial}
+\centering\small
+\begin{tabular}{lrccc}
+\toprule
+Cell & $n$ & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{factorial}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:factorial} and Fig.~\ref{fig:factorial} separate the two mechanisms. The schedule-only cell isolates the cost of fixed sparsity from the benefit of the private head, and the \tierfed{}-without-head cell isolates what the controller recovers on its own. Table~\ref{tab:periods} sweeps the fixed schedule's periods so that the negative result is not an artefact of one $(K_{\mathrm s},K_{\mathrm m})$ pair.
+
+\begin{table}[t]
+\caption{Fixed-schedule period sweep $(K_{\mathrm s},K_{\mathrm m})$, 10 seeds.}
+\label{tab:periods}
+\centering\small
+\begin{tabular}{lrcc}
+\toprule
+$(K_{\mathrm s},K_{\mathrm m})$ & $n$ & AUROC & Upload (MB)\\
+\midrule
+\gen{periods}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The budget knob}
+\label{sec:results-budget}
+
+\begin{table}[t]
+\caption{Quota sweep for \tierfed{} (10 seeds): accuracy, upload, realised payload fraction, mean intervals chosen by the exact solver, and the fraction of post-warm-up rounds in which the two shared tiers received \emph{different} intervals.}
+\label{tab:budget}
+\centering\small
+\begin{tabular}{lrcccccc c}
+\toprule
+$\rho$ & $n$ & AUROC & AUPRC & Upload (MB) & Realised & $\bar K_{\mathrm s}$ & $\bar K_{\mathrm m}$ & Differentiated (\%)\\
+\midrule
+\gen{budget}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Exact solver versus greedy doubling at two quotas (10 seeds).}
+\label{tab:solver}
+\centering\small
+\begin{tabular}{lrcc}
+\toprule
+$\rho$ / solver & $n$ & AUROC & Upload (MB)\\
+\midrule
+\gen{solver}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:budget} sweeps $\rho$ and reports, for each quota, how often the controller actually assigned \emph{different} intervals to the two shared tiers. This column is the honest test of the mechanism: if the exact solver returns the same interval for every tier at a given quota, \tierfed{} reduces at that quota to ``synchronise everything every $K$ rounds after warm-up'', and the reader should weigh the divergence-driven story accordingly. Table~\ref{tab:solver} compares the exact solver with the greedy doubling rule (\ref{eq:greedy}), which can only reach powers of two. Fig.~\ref{fig:schedule} shows the intervals the controller chose over training.
+
+\begin{figure}[t]
+\centering\fig{fig_schedule}{0.95\columnwidth}
+\caption{Intervals $K_g$ chosen by the exact solver over rounds at $\rho=0.25$ (mean over seeds).}
+\label{fig:schedule}
+\end{figure}
+
+\begin{figure}[t]
+\centering\fig{fig_frontier}{0.95\columnwidth}
+\caption{Accuracy--communication frontier on Diabetes (10 seeds): every method, every quota and every compressor on one pair of axes.}
+\label{fig:frontier}
+\end{figure}
+
+\subsection{Scheduling and compression compose}
+\label{sec:results-comp}
+
+\begin{table}[t]
+\caption{Scheduling $\times$ compression (10 seeds). \tierfed{} rows use $\rho=0.25$.}
+\label{tab:comp}
+\centering\small
+\begin{tabular}{lrccc}
+\toprule
+Method / compressor & $n$ & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{compression}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:comp} tests (\ref{eq:compose}): the reductions from timing and from message size should multiply, and the accuracy cost of each compressor should be visible on FedAvg and FedPer before it is composed with \tierfed{}. Aggressive sparsifiers are reported at their actual accuracy; a configuration that is cheaper but worse is not an operating point we recommend, and the frontier in Fig.~\ref{fig:frontier} shows which points dominate.
+
+\subsection{Robustness to the local objective and to warm-up}
+
+\begin{table}[t]
+\caption{Local objective sweep, FedPer versus \tierfed{} ($\rho=0.25$), 10 seeds.}
+\label{tab:loss}
+\centering\small
+\begin{tabular}{lrccc}
+\toprule
+Loss / method & $n$ & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{loss}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Warm-up sweep for \tierfed{} ($\rho=0.25$), 10 seeds.}
+\label{tab:warmup}
+\centering\small
+\begin{tabular}{lrccc}
+\toprule
+$T_w$ & $n$ & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{warmup}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Tables~\ref{tab:loss} and~\ref{tab:warmup} vary the class-imbalance loss and the warm-up length. Both FedPer and \tierfed{} are run under every loss so that the comparison is paired.
+
+\subsection{Generalisation across architectures and modality}
+\label{sec:results-arch}
+
+\begin{table}[t]
+\caption{Architectures on Diabetes (5 seeds), every method on the \emph{same} depth and width per row group; parameter count from the instantiated model.}
+\label{tab:arch}
+\centering\small
+\begin{tabular}{lrcccr}
+\toprule
+Backbone / method & $n$ & AUROC & AUPRC & Upload (MB) & Params\\
+\midrule
+\gen{architecture}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{PneumoniaMNIST (CNN, 20 sites, Dirichlet $\alpha=0.3$, 10 seeds). Columns as in Table~\ref{tab:main}.}
+\label{tab:main-img}
+\centering\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrcccccccc}
+\toprule
+Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$_{\mathrm{AUROC}}$ $p$ & NI$_{\mathrm{AUPRC}}$ $p$\\
+\midrule
+\gen{main_medmnist_cnn}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{eICU with true hospital identifiers (30 sites, 10 seeds). Columns as in Table~\ref{tab:main}. Rendered only when the credentialed data were available at build time.}
+\label{tab:main-eicu}
+\centering\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrcccccccc}
+\toprule
+Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$_{\mathrm{AUROC}}$ $p$ & NI$_{\mathrm{AUPRC}}$ $p$\\
+\midrule
+\gen{main_eicu_mlp}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:arch} tests whether the findings depend on the backbone. Every method in a row group is trained on the identical architecture, with the parameter count read from the instantiated model, so upload ratios are comparable within a group. Table~\ref{tab:main-img} reports the imaging benchmark on a natively binary task; the number of sites excluded for single-class held-out splits is the same for every method and is given in the supplement. Table~\ref{tab:main-eicu} reports the benchmark with true hospital identifiers.
+
+\subsection{Network-level cost}
+\label{sec:results-net}
+
+\begin{table}[t]
+\caption{Network cost of the main benchmark under the link profiles of Table~\ref{tab:profiles}: total communication time on cell-edge NR and LEO satellite, on the 6G edge-slice target, uplink energy on cell-edge NR, and the fraction of rounds fitting a 60-s window on cell-edge NR. Means over 10 seeds, computed from measured bits by (\ref{eq:netcost}).}
+\label{tab:network}
+\centering\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & Upload (MB) & $t$ NR-edge (s) & $t$ LEO (s) & $t$ 6G (s) & $E$ NR-edge (J) & Window (\%)\\
+\midrule
+\gen{network_diabetes_mlp}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:network} translates measured bits into what an operator sees. The communication time is dominated by the largest per-round upload on the slowest link; a method that transmits in fewer rounds, or smaller slices, reduces both the time and the energy in proportion, and the window-compliance column shows whether a round fits the scheduled transfer slot at all on a cell-edge link.
+
+\subsection{Attack surface and differential privacy}
+\label{sec:results-privacy}
+
+\begin{table}[t]
+\caption{Attack surface (10 seeds): parameters exposed per transmitting round, update-inversion normalised error and feature correlation on the real transmitted slices (higher error / lower correlation = harder to invert), membership-inference AUC on the deployed models ($0.5$ = no leakage), and upload.}
+\label{tab:attack}
+\centering\small
+\begin{tabular}{lrrcccr}
+\toprule
+Method & $n$ & Params exposed & NMSE $\uparrow$ & Corr.\ $\downarrow$ & MIA AUC $\downarrow$ & Upload (MB)\\
+\midrule
+\gen{attack}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Utility under client-level DP (per-client clipping $C=1$, 10 seeds): $(\varepsilon,\delta=10^{-5})$ from the exact R\'enyi accountant, number of charged (transmitting) rounds, final AUROC and AUPRC.}
+\label{tab:dp}
+\centering\small
+\begin{tabular}{lrrrcc}
+\toprule
+Method / $\sigma$ & $n$ & $\varepsilon$ & Charged rounds & AUROC & AUPRC\\
+\midrule
+\gen{dp}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering\fig{fig_privacy}{0.95\columnwidth}
+\caption{Utility against the DP noise multiplier for every method under the identical mechanism (\ref{eq:dp}).}
+\label{fig:privacy}
+\end{figure}
+
+Table~\ref{tab:attack} reports the attack surface measured on the slices each method actually transmits. Table~\ref{tab:dp} and Fig.~\ref{fig:privacy} report utility under the identical DP mechanism for every method. Two structural facts should be read alongside the numbers. First, a method that transmits in fewer rounds is charged for fewer rounds, so at equal $\sigma$ its $\varepsilon$ is smaller. Second, with per-client clipping at a fixed $C$, a method that transmits fewer parameters per round concentrates the same noise on fewer coordinates, which can cost utility; whether the budget saving or the utility cost dominates is an empirical question that the table answers for this benchmark. The budgets are reported as computed and none of them is claimed to be a meaningful privacy guarantee.
+
+\subsection{Divergence diagnostics and scalability}
+
+\begin{figure}[t]
+\centering\fig{fig_divergence}{0.95\columnwidth}
+\caption{Measured per-tier dispersion $\Gh_g$ over training for \tierfed{}, with the interval that produced each measurement shown in Fig.~\ref{fig:schedule}.}
+\label{fig:divergence}
+\end{figure}
+
+\begin{table}[t]
+\caption{Scalability (Diabetes, Dirichlet partition, 30 rounds, 3 seeds): accuracy, upload per site, seconds per round and peak GPU memory, measured, for 10 to 100 sites.}
+\label{tab:scaling}
+\centering\small
+\begin{tabular}{lrcccc}
+\toprule
+Sites / method & $n$ & AUROC & Upload (MB) & s/round & Peak mem (MB)\\
+\midrule
+\gen{scaling}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Fig.~\ref{fig:divergence} plots the measured dispersion of each tier over training. It is to be read with Fig.~\ref{fig:schedule}, because the dispersion of a tier is measured after the interval the controller assigned to it and scales with that interval (Section~\ref{sec:analysis}). Table~\ref{tab:scaling} reports measured wall-clock, memory and accuracy from 10 to 100 sites with the Dirichlet partition, since the specialty partition cannot produce 100 sites; the controller's solve time is below one millisecond at every size.

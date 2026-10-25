@@ -1,0 +1,37 @@
+\section{Convergence Analysis}
+\label{sec:analysis}
+
+The analysis is for the shared backbone with the private heads frozen at their current values, i.e. $F_k(\theta)=F_k(\theta;\theta_{f,k})$; the personalisation gap this introduces is not bounded and is measured empirically by the FedPer-versus-FedAvg contrast and the factorial of Section~\ref{sec:results-fixed}. We make the standard assumptions of local-SGD analysis~\cite{stich2019,wang2021coop}, stated per tier.
+
+\begin{assumption}[A1--A4]
+Each $F_k$ is $L$-smooth; stochastic gradients are unbiased with per-tier variance $\mathbb E\|\nabla_g f(\theta;\xi)-\nabla_g F_k(\theta)\|^2\le\sigma_g^2$; the per-tier heterogeneity is bounded,
+\begin{equation}
+\frac1N\sum_{k=1}^N\big\|\nabla_gF_k(\theta)-\nabla_gF(\theta)\big\|^2\le\Gamma_g\quad\forall\theta,\ \forall g;
+\label{eq:a3}
+\end{equation}
+and $F\ge F^\star$.
+\end{assumption}
+
+\begin{proposition}[Multi-rate local-SGD bound]
+\label{prop:bound}
+Under A1--A4, with local SGD of step size $\eta$, $\tau_k\in[\tau_{\min},\tau_{\max}]$ local steps per round, and tier $g$ averaged every $K_g$ rounds, there are absolute constants $c_0,c_1,c_2$ such that for $\eta\le c_0/(LK_{\max}\tau_{\max})$,
+\begin{align}
+\frac1R\sum_{r=1}^R\mathbb E\big\|\nabla F(\bar\theta_r)\big\|^2
+&\le \underbrace{\frac{c_1\,(F(\bar\theta_1)-F^\star)}{\eta\,\tau_{\min}R}}_{\text{optimisation}}
++\underbrace{c_1\,\eta L\sum_g\frac{\sigma_g^2}{N}}_{\text{stochastic}}\notag\\
+&\quad+\underbrace{c_2\,\eta^2L^2\sum_g K_g^2\tau_{\max}^2\big(\Gamma_g+\sigma_g^2\big)}_{\text{multi-rate drift}} .
+\label{eq:bound}
+\end{align}
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Apply the perturbed-iterate argument of~\cite{wang2021coop} blockwise. Between two synchronisations of tier $g$ a site takes at most $K_g\tau_{\max}$ local steps on that block, so the squared deviation of its block iterate from the virtual average is bounded by $\eta^2K_g^2\tau_{\max}^2(\Gamma_g+\sigma_g^2)$ up to the constants of the cited theorem; the blocks are disjoint, so the deviations add, and the descent lemma with the step-size condition absorbs the cross terms. Setting $K_g=1$ for a single block recovers the local-SGD rate with $\tau$ local steps. The derivation at the level of the cited theorem is in the supplement.
+\end{proof}
+
+\textbf{The design rule.} The cost of a long interval is $K_g^2\tau_{\max}^2(\Gamma_g+\sigma_g^2)$: quadratic in the interval, linear in heterogeneity. A tier tolerates sparsity if and only if its divergence is small. Because $\Gamma_g$ depends on the data, the architecture and the training stage, no fixed schedule can be correct in general, which is what the negative result of Section~\ref{sec:results-fixed} shows empirically.
+
+\textbf{What the controller observes.} The controller cannot observe $\Gamma_g$. It observes the dispersion (\ref{eq:gammahat}) of the slices it receives, which, by the same argument as in the proof, is itself of order $\eta^2K_g^2\tau^2(\Gamma_g+\sigma_g^2)$ after $K_g$ rounds of local training. $\Gh_g$ is therefore a noisy, scale-free proxy for the drift term of tier $g$ at its current interval. We report $\Gh_g$ together with the interval that produced it (Fig.~\ref{fig:divergence}, Fig.~\ref{fig:schedule}) and we do not claim that $\Gh_g$ estimates $\Gamma_g$.
+
+\textbf{Optimiser.} The bound is for SGD; the benchmark uses Adam with persistent state for every method because that is the solver the baselines were introduced with and that practitioners use. An SGD arm with identical schedules is reported in the supplement so that the reader can check that the ordering of methods does not depend on the local solver.
+
+\textbf{What is not claimed.} Nothing above proves that (\ref{eq:ip}) is the right programme, only that its objective is the shape of an upper bound on the drift term. The controller is evaluated empirically against fixed schedules, FedLAMA-style adaptive intervals, AdaComm and LAG.

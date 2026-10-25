@@ -1,0 +1,17 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\textbf{What the evidence supports.} The negative result is robust: across the period sweep, the factorial and three tabular backbones, a schedule fixed before training synchronises the wrong tier at the wrong time, and the bound says why. The positive result is conditional on the tables: at a given quota, \tierfed{} is or is not non-inferior to FedPer on AUROC and on AUPRC according to the $p$-values generated from the logs, and the abstract and Section~\ref{sec:results-fixed} state whichever is the case. We ask the reader to weigh three columns in particular: the AUPRC non-inferiority test, because AUPRC is the appropriate metric at this prevalence and an AUROC-only claim would be incomplete; the ``differentiated'' column of Table~\ref{tab:budget}, because it says whether the divergence-driven mechanism is doing anything beyond a uniform period at that quota; and the window-compliance column of Table~\ref{tab:network}, because it is the quantity an operator will actually check.
+
+\textbf{Where \tierfed{} does not help.} Any backbone or quota at which Table~\ref{tab:arch} or Table~\ref{tab:budget} shows a deficit against FedPer is reported as such; we do not restrict the claim to the settings that work. On a deep tabular ResNet the three-tier partition may be too coarse for the way residual connections redistribute divergence, and a per-block partition is the natural remedy. Under DP, parameter frugality and noise concentration pull in opposite directions and the table decides which wins. Where the fixed schedule or FedLAMA-style intervals reach a higher \emph{peak} AUROC than their final value, the early-stopped column shows it, and an operator who can afford validation-based stopping should read that column.
+
+\textbf{Limitations.}
+(i) The sites of the tabular benchmark are specialty buckets with a share cap, not hospitals; the eICU table with true hospital identifiers is the proper test and is rendered only when the credentialed data were present at build time.
+(ii) The bound is for SGD and the benchmark uses Adam; the SGD arm in the supplement checks the ordering but does not make the bound apply to Adam.
+(iii) $\Gh_g$ is a dispersion proxy that scales with the interval that produced it; the controller is a feedback loop on that proxy and we have not proved its stability, only measured its behaviour.
+(iv) The network model omits scheduling, fading and retransmission, and its profiles are representative targets rather than measurements.
+(v) The inversion attack is generic and the DP budgets are large; neither result should be read as a privacy guarantee.
+(vi) Full participation is assumed; partial participation adds the usual sampling term to (\ref{eq:bound}) and would permit subsampling amplification in (\ref{eq:rdp}).
+(vii) Ten seeds on two public datasets and one imaging collection is a benchmark, not a clinical validation.
+
+\textbf{Practical guidance.} For a tabular backbone of this size, an operator should set $\rho$ from the window and slice budget through (\ref{eq:compose}) and (\ref{eq:netcost}), keep $T_w=5$ and $K_{\max}=8$, compose with 8-bit quantisation, and read Table~\ref{tab:budget} for the accuracy cost of the chosen quota on this benchmark before transferring the setting to another one.

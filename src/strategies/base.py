@@ -1,12 +1,20 @@
 """Strategy interface.
 
-A Strategy answers three questions each round:
-  send_keys(r)      -- which parameters the server broadcasts / expects back
-  personal_keys()   -- which parameters every client keeps private forever
-  aggregate(...)    -- how returned slices become the next global state
+A Strategy answers, each round r:
+  send_keys(r)              which parameters are broadcast and expected back
+  personal_keys()           which parameters every client keeps private forever
+  client_sends(cid, ...)    whether a given client uploads this round (LAG-style
+                            laziness; every other strategy returns True)
+  local_objective_extra     proximal / control-variate terms for local training
+  after_local(...)          per-client bookkeeping after local training
+  aggregate(...)            how returned slices become the next global state
 
-Communication is accounted exactly: uploaded bits are measured from what the
-compressor actually emitted, not from a nominal parameter count.
+Differential privacy is NOT applied here: the server applies the per-client
+clip-and-noise mechanism uniformly to every strategy (see server.py), which
+fixes the v2 defect in which only two strategies ever saw DP.
+
+Communication is accounted exactly: uploaded bits are what the compressor
+actually emitted for the clients that actually sent.
 """
 from __future__ import annotations
 
@@ -16,7 +24,6 @@ from typing import Dict, List, Mapping, Sequence
 import torch
 
 from ..compression import Compressor, NoCompression
-from ..privacy.dp import DPConfig, add_gaussian_noise, clip_update
 
 
 @dataclass
@@ -32,21 +39,33 @@ class Strategy:
     name = "base"
     #: parameters never transmitted (personalisation tier)
     private: Sequence[str] = ()
+    #: upload multiplier for auxiliary state (SCAFFOLD sends control variates)
+    upload_multiplier: float = 1.0
 
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
-                 compressor: Compressor | None = None, dp: DPConfig | None = None):
+                 compressor: Compressor | None = None, **_):
         self.param_names = list(param_names)
         self.sizes = dict(sizes)
         self.compressor = compressor or NoCompression()
-        self.dp = dp or DPConfig()
         self.history: List[RoundReport] = []
 
     # ---------------- schedule ----------------
     def send_keys(self, r: int) -> List[str]:
-        return [k for k in self.param_names if k not in set(self.private)]
+        priv = set(self.private)
+        return [k for k in self.param_names if k not in priv]
 
     def personal_keys(self) -> List[str]:
         return list(self.private)
+
+    def client_sends(self, cid: int, global_state, client_state, keys, r: int) -> bool:
+        return True
+
+    # ---------------- local training hooks ----------------
+    def local_objective_extra(self, model, global_params, batch_loss, cid: int = -1):
+        return batch_loss
+
+    def after_local(self, cid: int, global_state, client_state, keys, n_steps: int, lr: float):
+        return None
 
     # ---------------- aggregation ----------------
     def aggregate(self, global_state: Dict[str, torch.Tensor],
@@ -55,34 +74,28 @@ class Strategy:
         keys = self.send_keys(r)
         return self._weighted_average(global_state, client_states, weights, keys)
 
+    def observe(self, global_state, client_states, keys, r: int):
+        """Called by the server after aggregation with the raw client slices
+        (before DP noise), for divergence-driven schedulers."""
+        return None
+
     # ---------------- helpers ----------------
-    def _weighted_average(self, global_state, client_states, weights, keys):
+    @staticmethod
+    def _weighted_average(global_state, client_states, weights, keys):
         w = torch.tensor(list(weights), dtype=torch.float32)
         w = w / w.sum().clamp_min(1e-12)
         new = {k: v.clone() for k, v in global_state.items()}
         for k in keys:
-            present = [(cs[k], wi) for cs, wi in zip(client_states, w) if k in cs]
+            present = [(cs[k], float(wi)) for cs, wi in zip(client_states, w) if k in cs]
             if not present:
                 continue
             acc = torch.zeros_like(global_state[k], dtype=torch.float32)
             tw = 0.0
             for v, wi in present:
-                acc += v.float() * float(wi); tw += float(wi)
+                acc += v.float() * wi; tw += wi
             if tw > 0:
                 new[k] = (acc / tw).to(global_state[k].dtype)
         return new
-
-    def apply_dp(self, global_state, aggregated, keys, n_clients, generator=None):
-        """Client-level DP applied to the aggregated update (delta form)."""
-        if not self.dp.enabled:
-            return aggregated
-        delta = {k: aggregated[k].float() - global_state[k].float() for k in keys}
-        delta, _, _ = clip_update(delta, self.dp.max_norm)
-        delta = add_gaussian_noise(delta, self.dp.sigma, self.dp.max_norm, n_clients, generator)
-        out = {k: v.clone() for k, v in aggregated.items()}
-        for k in keys:
-            out[k] = (global_state[k].float() + delta[k]).to(global_state[k].dtype)
-        return out
 
     def measure_upload(self, client_states: List[Dict[str, torch.Tensor]], keys) -> float:
         bits = 0.0
@@ -91,7 +104,7 @@ class Strategy:
                 if k in cs:
                     _, b = self.compressor(cs[k])
                     bits += b
-        return bits
+        return bits * self.upload_multiplier
 
     def compress_client_state(self, state: Dict[str, torch.Tensor], keys):
         out = dict(state)
@@ -100,10 +113,9 @@ class Strategy:
                 out[k], _ = self.compressor(out[k])
         return out
 
-    def local_objective_extra(self, model, global_params, batch_loss):
-        """Hook for proximal / correction terms (FedProx, SCAFFOLD)."""
-        return batch_loss
+    def schedule_table(self, rounds: int) -> Dict[str, float]:
+        return {}
 
     def describe(self) -> Dict[str, object]:
         return {"strategy": self.name, "private_params": list(self.private),
-                "compressor": self.compressor.name, "dp": self.dp.summary(1)}
+                "compressor": self.compressor.name}

@@ -1,35 +1,24 @@
 #!/usr/bin/env bash
-# One-shot environment setup. Usage:  bash scripts/setup_env.sh [conda|venv]
+# One-shot environment setup.  bash scripts/setup_env.sh [venv|conda]
 set -euo pipefail
 MODE="${1:-venv}"
-PYVER=3.11
-
 if [ "$MODE" = "conda" ]; then
-  conda create -y -n nfl python=$PYVER
+  conda create -y -n tierfed python=3.11
   # shellcheck disable=SC1091
-  source "$(conda info --base)/etc/profile.d/conda.sh"
-  conda activate nfl
+  source "$(conda info --base)/etc/profile.d/conda.sh"; conda activate tierfed
 else
-  python$PYVER -m venv .venv || python3 -m venv .venv
+  python3.11 -m venv .venv 2>/dev/null || python3 -m venv .venv
   # shellcheck disable=SC1091
   source .venv/bin/activate
 fi
-
 python -m pip install --upgrade pip wheel
-
-# CUDA 12.1 build; change cu121 -> cu118 for older drivers, or drop the
-# index-url entirely for a CPU-only install.
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-
+# RTX 5080 (Blackwell, sm_120) needs a CUDA 12.8+ build of torch.
+pip install "torch==2.7.1" --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
-
 python - <<'PY'
 import torch
-print("torch", torch.__version__, "| CUDA available:", torch.cuda.is_available())
+print("torch", torch.__version__, "| CUDA:", torch.cuda.is_available())
 if torch.cuda.is_available():
-    print("device:", torch.cuda.get_device_name(0),
-          f"| {torch.cuda.get_device_properties(0).total_memory/2**30:.1f} GiB")
+    print("device:", torch.cuda.get_device_name(0), torch.cuda.get_device_capability(0))
 PY
-
-echo
-echo "Environment ready. Verify with:  python -m pytest tests/ -q"
+echo "Now: python -m pytest tests -q"

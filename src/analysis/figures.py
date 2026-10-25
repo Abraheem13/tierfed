@@ -58,13 +58,13 @@ def trajectory_figure(histories: Dict[str, List[pd.DataFrame]], metric: str = "f
 def factorial_figure(summary: pd.DataFrame, metric: str = "fed_auroc_final_mean",
                      err: str = "fed_auroc_final_std", out="fig_factorial.png"):
     """2x2 attribution: private head x multi-rate schedule."""
-    order = ["head0_sched0_fedavg", "head1_sched0_fedper", "head0_sched1", "head1_sched1_nfl"]
-    labels = ["FedAvg\n(neither)", "FedPer\n(head only)", "NFL-Sched\n(schedule only)", "NFL\n(both)"]
+    order = ["fedavg", "fedper", "sched_only", "fixed", "tierfed_nohead", "tierfed"]
+    labels = ["FedAvg", "FedPer", "Fixed sched.\nonly", "Fixed +\nhead", "TierFed\nno head", "TierFed"]
     d = summary.set_index("cell").reindex(order)
     fig, ax = plt.subplots(figsize=(5.6, 3.4))
     x = np.arange(len(order))
     ax.bar(x, d[metric].values, yerr=d.get(err, pd.Series(np.zeros(len(order)))).values,
-           color=["#cccccc", "#aaaaaa", "#888888", "#444444"], edgecolor="#111111",
+           color=["#cccccc", "#aaaaaa", "#999999", "#777777", "#555555", "#222222"], edgecolor="#111111",
            linewidth=0.7, capsize=4, width=0.62)
     ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8.5)
     ax.set_ylabel(metric.replace("_mean", "").replace("fed_", "").replace("_", " ").upper())
@@ -149,4 +149,21 @@ def load_histories(log_dir: str | Path, pattern: str = "*_history.csv") -> Dict[
         parts = p.stem.split("_")
         key = parts[2] if len(parts) > 2 else p.stem
         out.setdefault(key, []).append(pd.read_csv(p))
+    return out
+
+
+def schedule_figure(runs: List[pd.DataFrame], out="fig_schedule.png"):
+    """Interval K_g chosen by the controller over rounds (mean over seeds)."""
+    cols = [c for c in runs[0].columns if c.startswith("K_")]
+    if not cols:
+        return None
+    fig, ax = plt.subplots(figsize=(6.2, 3.0))
+    for i, col in enumerate(cols):
+        arr = np.vstack([r[col].values for r in runs])
+        ls, mk, c = _style(i)
+        ax.plot(runs[0]["round"].values, np.nanmean(arr, 0), ls, color=c, marker=mk, markersize=3,
+                markevery=max(1, len(runs[0]) // 10), label=col.replace("K_", "$K_{") + "}$")
+    ax.set_xlabel("Communication round"); ax.set_ylabel("Interval $K_g$ (rounds)")
+    ax.grid(alpha=0.25, linewidth=0.5); ax.legend(frameon=False, fontsize=8)
+    fig.savefig(out); plt.close(fig)
     return out

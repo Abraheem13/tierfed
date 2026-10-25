@@ -1,0 +1,61 @@
+\section{\tierfed{}: a Budget-Optimal Controller}
+\label{sec:method}
+
+\subsection{Divergence measurement}
+\tierfed{} estimates the heterogeneity of each tier from the dispersion of the slices it actually receives. For tier $g$ with tensors $j\in g$,
+\begin{equation}
+\Gh_g^{(r)}=\frac{\sum_{j\in g}\frac1{|\mathcal S_r|}\sum_{k\in\mathcal S_r}\big\|\theta_{k,j}^{(r)}-\bar\theta_j^{(r)}\big\|_2^2}{\sum_{j\in g}\big\|\bar\theta_j^{(r)}\big\|_2^2+\epsilon},
+\label{eq:gammahat}
+\end{equation}
+a scale-free ratio that makes tiers of different magnitude comparable. Two properties of this estimator are stated now so that no claim rests on them implicitly. First, it is available only for tiers received in round $r$; for the others the last estimate is carried forward and its age is logged. Second, because the received slices are the result of $K_g\tau_k$ local steps, $\Gh_g$ scales with the interval that produced it (Section~\ref{sec:analysis}); it is a proxy for the drift the bound penalises, not an unbiased estimate of $\Gamma_g$.
+
+\subsection{The integer programme}
+Given a quota $\rho$, the controller solves
+\begin{equation}
+\{K_g^\star\}=\arg\min_{K_g\in\{1,\dots,K_{\max}\}}\ \sum_{g\in\mathcal G_{\mathrm{sh}}}K_g^2\,\Gh_g\quad\text{s.t.}\quad\sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g}\le\rho .
+\label{eq:ip}
+\end{equation}
+With at most three shared tiers and $K_{\max}=8$ the feasible set has at most $8^3=512$ points, so (\ref{eq:ip}) is solved exactly by enumeration in well under a millisecond (Table~\ref{tab:scaling}). We also report the greedy doubling rule of an earlier version of this work, which lengthens the interval of the tier with the smallest marginal bound cost per unit of bandwidth saved,
+\begin{equation}
+g^\star=\arg\min_g\frac{\Gh_g\big[(2K_g)^2-K_g^2\big]}{w_g/K_g-w_g/(2K_g)}=\arg\min_g\frac{6\,\Gh_gK_g^3}{w_g},
+\label{eq:greedy}
+\end{equation}
+and which reaches only powers of two. The closed form exposes the controller's preference: sparsity goes first to tiers with low divergence, a large payload share and a short current interval.
+
+\subsection{Scheduling rule and warm-up}
+Tier $g$ is due when $r-\tau_g\ge K_g^\star$, where $\tau_g$ is the round of its last synchronisation:
+\begin{equation}
+\mathcal A_r=\begin{cases}\mathcal G_{\mathrm{sh}}, & r\le T_w,\\ \{g:\ r-\tau_g\ge K_g^\star\}, & r>T_w.\end{cases}
+\label{eq:due}
+\end{equation}
+Divergence is largest in the earliest rounds (Fig.~\ref{fig:divergence}), which is exactly where a fixed sparse schedule is destroyed, so the first $T_w$ rounds synchronise every shared tier. $T_w=5$ and $K_{\max}=8$ are held fixed across every dataset, architecture, loss and privacy setting in this article; a $T_w$ sweep is in Table~\ref{tab:warmup}.
+
+\begin{algorithm}[t]
+\caption{\tierfed{}: server round $r$}
+\label{alg:tierfed}
+\begin{algorithmic}[1]
+\REQUIRE quota $\rho$, warm-up $T_w$, cap $K_{\max}$, intervals $\{K_g\}$, last-sync $\{\tau_g\}$
+\STATE determine $\mathcal A_r$ by (\ref{eq:due})
+\IF{$\mathcal A_r=\emptyset$} \RETURN \COMMENT{local-only round: zero payload} \ENDIF
+\STATE broadcast $\{\theta_g^{(r)}\}_{g\in\mathcal A_r}$ to $\mathcal S_r$
+\FORALL{$k\in\mathcal S_r$ in parallel}
+\STATE load broadcast tiers; restore private head $\theta_{f,k}$
+\STATE run one local epoch; return (optionally compressed) active tiers
+\ENDFOR
+\STATE (if DP) clip each site's delta to $C$, sum, add $\mathcal N(0,\sigma^2C^2I)$, divide by $|\mathcal S_r|$
+\STATE aggregate active tiers by (\ref{eq:agg})
+\STATE update $\Gh_g$ for $g\in\mathcal A_r$ by (\ref{eq:gammahat}); $\tau_g\leftarrow r$
+\STATE $\{K_g\}\leftarrow$ exact solution of (\ref{eq:ip})
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Composition with compression}
+\tierfed{} controls \emph{when} a tier is sent; a compressor controls \emph{how large} the message is. For a compressor with rate $c\in(0,1]$ bits per parameter relative to float32 the expected upload over $R$ rounds is
+\begin{equation}
+B=R\,|\mathcal S|\,\Pi(\{K_g\})\,c\,32\,d_{\mathrm{sh}}\ \text{bits},
+\label{eq:compose}
+\end{equation}
+with $d_{\mathrm{sh}}$ the shared parameter count; the reduction factors multiply. Section~\ref{sec:results-comp} tests this on five compressors.
+
+\subsection{What the operator sets}
+The only operator-facing quantity is $\rho$. It is a quota on the fraction of the shared model transmitted per round on average, so it maps directly onto a slice allocation or a transfer-window budget through (\ref{eq:compose}) and (\ref{eq:netcost}). The paper reports the mapping $\rho\mapsto$ (upload, communication time, energy) on every link profile so that an operator can read off what a given quota buys.

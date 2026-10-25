@@ -1,0 +1,58 @@
+\section{Experimental Design}
+\label{sec:setup}
+
+\subsection{Data}
+\textbf{Diabetes 130-US Hospitals}~\cite{strack2014} is the main tabular benchmark: 30-day readmission from encounter-level features. Cleaning follows Strack \emph{et al.}: encounters discharged to death or hospice are removed and only the first encounter per patient is kept, which leaves \num{diabetesmlpNTrain} training and \num{diabetesmlpNTest} test encounters from \num{diabetesmlpNPatients} patients, \num{diabetesmlpNFeatures} encoded features, and a positive rate of \num{diabetesmlpPrevalence}\%. The public release carries no hospital identifier, so sites are formed from the medical-specialty column by longest-processing-time bucketing with a client-share cap of 15\%: a specialty larger than the cap, including the ``unknown specialty'' group that covers roughly half of the encounters, is split across clients, patient-grouped, before bucketing. The largest client therefore holds \num{diabetesmlpMaxClientShare}\% of the training data and the mean label total-variation distance between clients is \num{diabetesmlpLabelTv}. We call these clients \emph{sites} rather than hospitals. The train/test split and every per-client held-out split are patient-grouped.
+
+\textbf{eICU-CRD}~\cite{pollard2018} carries a true \texttt{hospitalid}. The released code includes the loader and the reproduction script runs it when the credentialed files are present; Table~\ref{tab:main-eicu} reports it. \textbf{PneumoniaMNIST}~\cite{yang2023medmnist} is the imaging benchmark: a natively binary $28\times28$ collection, partitioned by Dirichlet label skew ($\alpha=0.3$) with a minimum client size of 50 images. Table~\ref{tab:data} summarises; all dataset statistics in this article are read from the run logs.
+
+\begin{table}[t]
+\caption{Dataset characteristics, from the run logs.}
+\label{tab:data}
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+ & Diabetes 130-US & eICU & PneumoniaMNIST\\
+\midrule
+Modality & tabular EHR & tabular EHR & imaging\\
+Train / test rows & \num{diabetesmlpNTrain} / \num{diabetesmlpNTest} & \num{eicumlpNTrain} / \num{eicumlpNTest} & \num{medmnistcnnNTrain} / \num{medmnistcnnNTest}\\
+Patients (train) & \num{diabetesmlpNPatients} & \num{eicumlpNPatients} & --\\
+Features / channels & \num{diabetesmlpNFeatures} & \num{eicumlpNFeatures} & 1\\
+Positive rate (\%) & \num{diabetesmlpPrevalence} & \num{eicumlpPrevalence} & \num{medmnistcnnPrevalence}\\
+Sites & 20 (specialty, capped) & true hospital id & 20 (Dirichlet 0.3)\\
+Largest site share (\%) & \num{diabetesmlpMaxClientShare} & \num{eicumlpMaxClientShare} & \num{medmnistcnnMaxClientShare}\\
+Label TV (mean) & \num{diabetesmlpLabelTv} & \num{eicumlpLabelTv} & \num{medmnistcnnLabelTv}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Models and tiers}
+Four backbones share one architecture table used by every method: an MLP (hidden 128--128--64), a tabular ResNet (width 128, depth 6), an FT-Transformer (width 64, depth 3, 8 heads)~\cite{gorishniy2021} and a small CNN for imaging. Table~\ref{tab:tiers} reports the parameter counts and tier shares of each model as instantiated on the real data.
+
+\begin{table}[t]
+\caption{Automatic tier partition on the real data (from the run logs). The fast tier is the private head.}
+\label{tab:tiers}
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+Architecture & Params & Slow (\%) & Medium (\%) & Fast (\%)\\
+\midrule
+MLP (Diabetes) & \num{diabetesmlpTierTotalParams} & \num{diabetesmlpTierSlowPct} & \num{diabetesmlpTierMediumPct} & \num{diabetesmlpTierFastPct}\\
+CNN (PneumoniaMNIST) & \num{medmnistcnnTierTotalParams} & \num{medmnistcnnTierSlowPct} & \num{medmnistcnnTierMediumPct} & \num{medmnistcnnTierFastPct}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Protocol}
+$R=60$ rounds, 20 sites at full participation, one local epoch, batch 64, Adam at $10^{-3}$ with persistent state, inverse-frequency class weighting, $T_w=5$, $K_{\max}=8$, $\rho=0.25$ unless stated. Baselines use their published defaults (FedProx $\mu=0.01$; FedLAMA-style $\tau=5$, $\phi=2$; AdaComm $\tau_0=8$; LAG $\xi=1$); none were tuned on the test data and neither was \tierfed{}. Because personalised methods hold private heads, every method is evaluated on each site's patient-grouped held-out split with that site's own parameters and the per-site metrics are sample-weighted; sites whose held-out split contains a single class cannot yield an AUROC and are excluded identically for every method, with their count reported. A pooled AUROC over all held-out predictions and the global model's AUROC on the untouched test set are reported alongside. Communication is counted from what the compressor emitted for the sites that actually sent.
+
+\subsection{Determinism}
+Repeated runs of one configuration are bit-identical on the machine that produced the logs (deterministic kernels, single-threaded reductions, seeded loaders); the reproduction script asserts this before any run. An earlier version of this work lacked this guarantee and identical configurations differed by up to 0.006~AUROC, which is larger than the effect it tested.
+
+\subsection{Statistics}
+All comparisons are paired across the ten shared seeds. We report Holm-corrected paired $t$-test $p$-values over the family of all method-versus-FedPer contrasts, BCa bootstrap intervals of the paired difference, and the paired standardised difference $d_z$ with the small-sample correction. Parity is never inferred from a non-significant difference. A one-sided non-inferiority test at margin $\delta_{\mathrm{NI}}=0.01$ is run on \emph{both} final AUROC and final AUPRC,
+\begin{equation}
+t_{\mathrm{NI}}=\frac{\bar d+\delta_{\mathrm{NI}}}{s_d/\sqrt n},\qquad p=1-\mathcal T_{n-1}(t_{\mathrm{NI}}),
+\label{eq:ni}
+\end{equation}
+and the six non-inferiority tests on the main benchmark are Holm-corrected as a family as well. The margin is a reporting convention: 0.01~AUROC is below the between-seed standard deviation of every method in Table~\ref{tab:main}; it has no clinical derivation and we do not claim one. Early-stopped and last-ten-round statistics are reported so that no conclusion depends on the final round alone.

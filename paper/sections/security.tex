@@ -1,0 +1,29 @@
+\section{Threat Model and Privacy Mechanisms}
+\label{sec:security}
+
+\subsection{Threat model}
+We consider an honest-but-curious aggregator and a passive eavesdropper on the uplink, both of whom observe exactly the bytes a site transmits in each round: the broadcast state and the site's returned slice of the active tiers. Neither party observes the private head, local data or local optimiser state. We do not consider Byzantine participants or model poisoning. The attack surface of a method is therefore the sequence of slices it transmits, and we measure it in three ways on every method.
+
+\subsection{Update inversion}
+The adversary reconstructs a batch $\hat x$ from an observed update $\Delta_{\mathcal A}$ restricted to the transmitted tiers by solving
+\begin{equation}
+\hat x=\arg\min_x\ 1-\cos\!\Big(\nabla_{\theta_{\mathcal A}}\ell\big(h_\theta(x),y\big),\ -\Delta_{\mathcal A}\Big),
+\label{eq:inv}
+\end{equation}
+the cosine objective of Geiping \emph{et al.}~\cite{geiping2020} without an image prior, since the inputs are tabular. Unlike a single-batch gradient attack~\cite{zhu2019dlg}, the observed update is the result of a full local epoch of Adam steps, which is the update an aggregator actually sees; this is the update-inversion setting of~\cite{geiping2020}. The attack is run inside training, on the first site's real transmitted slice, in every round in which that site transmits, for every method, so a method that transmits rarely is attacked on the rounds in which it does. Success is the normalised reconstruction error and the feature correlation between each true row and its best-matching reconstruction; lower correlation means a smaller attack surface. The attack is intentionally generic: the aim is a like-for-like comparison of what each method exposes, not the strongest possible adversary.
+
+\subsection{Membership inference}
+Against the deployed (personalised) model of every site we run the loss-threshold attack of Yeom \emph{et al.}~\cite{yeom2018}: the adversary labels a record a training member when the model's loss on it is low. The attack AUC over members and patient-grouped non-members, averaged over sites, measures memorisation of the released model; $0.5$ is no leakage.
+
+\subsection{Client-level differential privacy}
+For client-level DP the server clips every site's returned delta and adds noise to the sum before averaging:
+\begin{equation}
+\tilde\Delta=\frac1{|\mathcal S_r|}\Big(\sum_{k\in\mathcal S_r}\Delta_k\min\big(1,\tfrac{C}{\|\Delta_k\|_2}\big)+\mathcal N(0,\sigma^2C^2I)\Big),
+\label{eq:dp}
+\end{equation}
+the DP-FedAvg mechanism of McMahan \emph{et al.}~\cite{mcmahan2018dp} with uniform weights, so that replacing one site changes the sum by at most $C$ in $\ell_2$. The mechanism is applied by the server to every method identically. Only rounds in which something is transmitted consume budget; the accountant is the exact R\'enyi divergence of the Gaussian mechanism, $\alpha/(2\sigma^2)$ per charged round, composed over charged rounds and converted with the standard bound~\cite{mironov2017},
+\begin{equation}
+\varepsilon=\min_{\alpha>1}\Big\{\frac{R_{\mathrm{tx}}\,\alpha}{2\sigma^2}+\frac{\log(1/\delta)}{\alpha-1}\Big\},\qquad\delta=10^{-5}.
+\label{eq:rdp}
+\end{equation}
+Full participation is used, so no subsampling amplification is claimed. We note that an earlier version of this work clipped the aggregate rather than each site's delta; that mechanism does not bound the sensitivity to one site and its reported budgets were invalid. The budgets reported here are as computed, however large; we do not claim that any of them constitutes meaningful privacy, only that the trade-off is measured correctly.

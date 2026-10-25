@@ -1,0 +1,12 @@
+\section{Conclusion}
+\label{sec:conclusion}
+Fixing a multi-rate synchronisation schedule in advance is unsound because the cost of infrequent synchronisation is governed by a time-varying, data-dependent quantity, the per-tier cross-client divergence. We made that cost explicit in a blockwise local-SGD bound with the local-step count and the observability of the divergence stated plainly, and turned the bound into \tierfed{}, a controller that measures a dispersion proxy online and solves, exactly, the budget-constrained programme that spends a stated communication quota where the bound says it is cheapest. The quota is a network-side quantity that maps onto a slice or window allocation, and we cost every method on five link profiles, evaluate the attack surface of every method on the slices it actually transmits, and report utility under a corrected client-level DP mechanism. Every number in the article is generated from released per-seed logs, including the configurations in which the method does not help.
+
+\section*{Acknowledgment}
+Generative artificial-intelligence tools were used to draft figure layouts and to refactor analysis code; the author reviewed, edited and verified all scientific content, code, numbers and figures. An earlier version of this work was submitted elsewhere under the title ``Nested Federated Learning''; it is superseded by this article, which corrects reporting defects of that version (Supplement, Section~S1).
+
+\section*{Data and Code Availability}
+Diabetes 130-US Hospitals is public (UCI id 296). PneumoniaMNIST is public (MedMNIST v2). eICU-CRD requires credentialed PhysioNet access. Code, per-seed logs, the scripts that generate every table and figure, and the determinism check are at \url{https://github.com/Abraheem13/tierfed}.
+
+\section*{Ethics, Funding and Competing Interests}
+All datasets are de-identified and publicly available under their respective licences; no human-subject data were collected and no ethics approval was required. The author declares no competing interests and no external funding.

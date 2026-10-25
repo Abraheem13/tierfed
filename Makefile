@@ -1,35 +1,36 @@
-.PHONY: setup test benchmark ablation compression privacy scaling figures all clean
+.PHONY: setup test determinism benchmark ablation compression privacy scaling collect figures paper all clean
 
-PY ?= python3
-SEEDS ?= 42 43 44 45 46 47 48 49 50 51
+PY ?= python
 DATASET ?= diabetes
-DEVICE ?= auto
+DEVICE ?= cuda
 
 setup:
-	$(PY) -m pip install -r requirements.txt
+	bash scripts/setup_env.sh venv
 
 test:
-	$(PY) -m pytest tests/ -q
+	$(PY) -m pytest tests -q
+
+determinism:
+	bash scripts/check_determinism.sh $(DATASET) cpu
 
 benchmark:
-	$(PY) -m src.experiments.run_benchmark --dataset $(DATASET) --seeds $(SEEDS) --device $(DEVICE)
-
+	STAGES="2" bash scripts/reproduce_all.sh
 ablation:
-	$(PY) -m src.experiments.run_ablation --kind all --dataset $(DATASET) --seeds $(SEEDS) --device $(DEVICE)
-
-compression:
-	$(PY) -m src.experiments.run_compression --dataset $(DATASET) --device $(DEVICE)
-
+	STAGES="3 4" bash scripts/reproduce_all.sh
 privacy:
-	$(PY) -m src.experiments.run_privacy --dataset $(DATASET) --device $(DEVICE)
-
+	STAGES="5" bash scripts/reproduce_all.sh
 scaling:
-	$(PY) -m src.experiments.run_scaling --dataset $(DATASET) --device $(DEVICE)
-
+	STAGES="6" bash scripts/reproduce_all.sh
+collect:
+	$(PY) -m src.analysis.collect --results results --dataset $(DATASET) --model mlp
 figures:
-	$(PY) -m src.analysis.make_figures
+	$(PY) -m src.analysis.make_figures --results results --dataset $(DATASET) --model mlp
+paper: collect figures
+	$(PY) scripts/claim_check.py paper/generated/flags.json paper/claims.json
+	$(MAKE) -C paper
 
-all: benchmark ablation compression privacy scaling figures
+all:
+	bash scripts/reproduce_all.sh
 
 clean:
-	rm -rf results/logs/* results/tables/* results/figures/* __pycache__ .pytest_cache
+	rm -rf results/logs/* results/tables/* results/determinism __pycache__ .pytest_cache

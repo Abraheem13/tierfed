@@ -1,31 +1,28 @@
-"""TierFed: adaptive multi-rate aggregation with a private head.
+"""TierFed: budget-constrained, divergence-driven multi-rate aggregation.
 
-Design is driven by the Stage-1 diagnosis on Diabetes:
-  * FedPer (private head, full-rate backbone) was the strongest baseline
-    -> the personalisation head works; keep it.
-  * static NFL lost ~0.05 AUROC -> a FIXED sparse schedule starves shared
-    tiers precisely when their cross-client divergence Gamma_g is large
-    (early training), which is exactly the K_g^2 * Gamma_g penalty in the
-    convergence bound (docs/convergence.md).
+Each round the server (i) measures the relative cross-client dispersion
+Gamma_hat_g of every tier it received, (ii) solves
 
-TierFed therefore makes the schedule feedback-controlled by Gamma_g itself:
+    min_{K_g in [1, K_max]}  sum_g K_g^2 Gamma_hat_g   s.t.  sum_g w_g / K_g <= rho
 
-  1. WARMUP: for the first `warmup` rounds every shared tier syncs every
-     round (identical to FedPer), so early convergence is never sacrificed.
-  2. BUDGET-OPTIMAL INTERVALS: given a payload target rho, the server solves
-       min sum_g K_g^2 * Gamma_g   s.t.   sum_g w_g / K_g <= rho
-     greedily each round from FRESH divergence measurements, so sparsity is
-     placed on the tiers where the bound says it is cheapest.
-  3. LOCAL-ONLY ROUNDS: rounds where no tier is due transmit NOTHING; that
-     is the mechanism by which the budget is actually met.
-  4. PRIVATE HEAD: the classifier head is never transmitted (FedPer-style),
-     retaining the personalisation and unlearning properties.
+and (iii) synchronises tier g only when r - tau_g >= K_g. Rounds in which no
+tier is due transmit nothing.
 
-The claim this enables is honest and testable: accuracy non-inferior to
-FedPer (margin 0.01 AUROC, one-sided test) at substantially lower upload.
+v3 changes relative to v2:
+  * the programme is solved EXACTLY by enumeration (|G| <= 3 shared tiers and
+    K_max = 8 give at most 512 points), so "budget-optimal" is literally true
+    for the surrogate; the greedy doubling rule of v2 is kept as `solver=
+    "greedy"` for models with many tiers and is restricted to powers of two,
+    which the paper now states;
+  * the realised payload fraction (including warmup and the private head) is
+    recorded, since rho is a quota on the shared payload after warmup;
+  * Gamma_hat for tiers not received this round is carried forward and the
+    age of each estimate is logged, so the paper can show how stale the
+    controller's inputs are.
 """
 from __future__ import annotations
 
+import itertools
 from typing import Dict, List, Mapping, Sequence
 
 import torch
@@ -38,73 +35,77 @@ class AdaptiveTierFed(Strategy):
 
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
                  tiers: Mapping[str, str], warmup: int = 5,
-                 k_min: int = 1, k_max: int = 8,
-                 rho: float = 0.5,
-                 private_head: bool = True, **kw):
+                 k_min: int = 1, k_max: int = 8, rho: float = 0.25,
+                 solver: str = "exact", private_head: bool = True, **kw):
         super().__init__(param_names, sizes, **kw)
         self.tiers = dict(tiers)
         self.warmup = int(warmup)
         self.k_min, self.k_max = int(k_min), int(k_max)
         self.rho = float(rho)
+        self.solver = solver
         self.private = ([k for k, t in self.tiers.items() if t == "fast"]
                         if private_head else [])
         shared = sorted({t for t in self.tiers.values() if t != "fast"} or {"medium"})
+        if not private_head and "fast" in set(self.tiers.values()):
+            shared = sorted(set(shared) | {"fast"})
         self.shared_tiers = shared
-        self.K: Dict[str, int] = {g: self.k_min for g in shared}   # start dense
+        self.K: Dict[str, int] = {g: self.k_min for g in shared}
         self.last_sync: Dict[str, int] = {g: 0 for g in shared}
         self.gamma: Dict[str, float] = {}
+        self.gamma_age: Dict[str, int] = {}
+        self.K_history: List[Dict[str, int]] = []
 
     # ------------------------------------------------------------------ #
     def active_tiers(self, r: int) -> List[str]:
         if r <= self.warmup:
             return list(self.shared_tiers)
-        # Rounds where no tier is due are pure LOCAL rounds (zero payload) --
-        # that is the mechanism by which the budget rho is actually met.
         return [g for g in self.shared_tiers if (r - self.last_sync[g]) >= self.K[g]]
 
     def send_keys(self, r: int) -> List[str]:
-        act = set(self.active_tiers(r))
-        priv = set(self.private)
+        act = set(self.active_tiers(r)); priv = set(self.private)
         return [k for k in self.param_names
                 if self.tiers.get(k, "medium") in act and k not in priv]
 
     # ------------------------------------------------------------------ #
     def _measure_gamma(self, client_states, keys) -> Dict[str, float]:
-        """Relative client dispersion per tier over the transmitted keys."""
-        num: Dict[str, float] = {}
-        den: Dict[str, float] = {}
+        """Relative client dispersion per tier over the transmitted keys:
+        sum_j mean_k ||theta_kj - mean_j||^2 / (sum_j ||mean_j||^2 + eps)."""
+        num: Dict[str, float] = {}; den: Dict[str, float] = {}
         for k in keys:
             vals = [cs[k].float() for cs in client_states if k in cs]
             if len(vals) < 2:
                 continue
-            stack = torch.stack(vals)
-            mean = stack.mean(0)
+            stack = torch.stack(vals); mean = stack.mean(0)
             d = float(((stack - mean) ** 2).sum(dim=tuple(range(1, stack.dim()))).mean())
-            s = float((mean ** 2).sum()) + 1e-12
+            s = float((mean ** 2).sum())
             g = self.tiers.get(k, "medium")
-            num[g] = num.get(g, 0.0) + d
-            den[g] = den.get(g, 0.0) + s
-        return {g: num[g] / den[g] for g in num}
+            num[g] = num.get(g, 0.0) + d; den[g] = den.get(g, 0.0) + s
+        return {g: num[g] / (den[g] + 1e-12) for g in num}
+
+    def observe(self, global_state, client_states, keys, r):
+        act = set(self.active_tiers(r))
+        gam = self._measure_gamma(client_states, keys)
+        for g in self.shared_tiers:
+            if g in gam:
+                self.gamma[g] = gam[g]; self.gamma_age[g] = 0
+            elif g in self.gamma:
+                self.gamma_age[g] = self.gamma_age.get(g, 0) + 1
+        for g in act:
+            self.last_sync[g] = r
+        if r >= self.warmup and self.gamma:
+            self.K = self._solve()
+        self.K_history.append(dict(self.K))
 
     def aggregate(self, global_state, client_states, weights, r):
         keys = self.send_keys(r)
-        act = set(self.active_tiers(r))
-        gam = self._measure_gamma(client_states, keys)
-        self.gamma.update(gam)
-        # Budget-optimal interval control: choose K to minimise the bound cost
-        # sum_g K_g^2 * Gamma_g subject to mean payload fraction <= rho.
-        if r >= self.warmup and self.gamma:
-            self._optimise_intervals()
-        for g in act:
-            self.last_sync[g] = r
-        new = self._weighted_average(global_state, client_states, weights, keys)
-        return self.apply_dp(global_state, new, keys, len(client_states))
+        return self._weighted_average(global_state, client_states, weights, keys)
 
-    def _tier_weight(self) -> Dict[str, float]:
-        """Share of the SHARED payload carried by each tier."""
+    # ------------------------------------------------------------------ #
+    def tier_weight(self) -> Dict[str, float]:
+        """Share of the SHARED payload carried by each tier (w_g)."""
         priv = set(self.private)
         tot = sum(v for k, v in self.sizes.items() if k not in priv) or 1
-        w: Dict[str, float] = {g: 0.0 for g in self.shared_tiers}
+        w = {g: 0.0 for g in self.shared_tiers}
         for k, v in self.sizes.items():
             if k in priv:
                 continue
@@ -113,17 +114,30 @@ class AdaptiveTierFed(Strategy):
                 w[g] += v / tot
         return w
 
-    def _optimise_intervals(self):
-        """Greedy solve: min sum_g K_g^2 Gamma_g  s.t.  sum_g w_g/K_g <= rho.
-
-        Starting from K=1 (payload 1.0), repeatedly double the interval of the
-        tier whose doubling costs the least additional bound penalty per unit
-        of bandwidth saved, until the payload target is met or all tiers are
-        at k_max. Fresh Gamma estimates are used each time, so intervals grow
-        naturally as training converges and divergence decays.
-        """
-        w = self._tier_weight()
+    def _solve(self) -> Dict[str, int]:
+        w = self.tier_weight()
         gam = {g: max(self.gamma.get(g, 0.0), 1e-12) for g in self.shared_tiers}
+        if self.solver == "greedy":
+            return self._solve_greedy(w, gam)
+        return self._solve_exact(w, gam)
+
+    def _solve_exact(self, w, gam) -> Dict[str, int]:
+        tiers = list(self.shared_tiers)
+        grid = range(self.k_min, self.k_max + 1)
+        best, best_cost = None, None
+        for Ks in itertools.product(grid, repeat=len(tiers)):
+            payload = sum(w[g] / K for g, K in zip(tiers, Ks))
+            feasible = payload <= self.rho + 1e-12
+            cost = sum(gam[g] * K * K for g, K in zip(tiers, Ks))
+            # lexicographic: feasible first, then bound cost, then smaller K (denser)
+            key = (0 if feasible else 1, cost if feasible else payload, sum(Ks))
+            if best_cost is None or key < best_cost:
+                best, best_cost = dict(zip(tiers, Ks)), key
+        return best
+
+    def _solve_greedy(self, w, gam) -> Dict[str, int]:
+        """v2 rule: double the interval of the tier with the least bound cost per
+        unit bandwidth saved; restricted to powers of two."""
         K = {g: self.k_min for g in self.shared_tiers}
         payload = lambda: sum(w[g] / K[g] for g in self.shared_tiers)  # noqa: E731
         while payload() > self.rho:
@@ -139,16 +153,26 @@ class AdaptiveTierFed(Strategy):
             if best is None:
                 break
             K[best] *= 2
-        self.K = K
+        return K
 
     # ------------------------------------------------------------------ #
     def schedule_table(self, rounds: int) -> Dict[str, float]:
-        return {"warmup": float(self.warmup), "k_min": float(self.k_min),
-                "k_max": float(self.k_max), "rho": float(self.rho),
-                **{f"K_{g}": float(v) for g, v in self.K.items()},
-                **{f"gamma_{g}": float(v) for g, v in self.gamma.items()}}
+        out = {"warmup": float(self.warmup), "k_min": float(self.k_min),
+               "k_max": float(self.k_max), "rho": float(self.rho),
+               **{f"K_{g}": float(v) for g, v in self.K.items()},
+               **{f"gamma_{g}": float(v) for g, v in self.gamma.items()},
+               **{f"w_{g}": float(v) for g, v in self.tier_weight().items()}}
+        if self.K_history:
+            for g in self.shared_tiers:
+                ks = [h[g] for h in self.K_history if g in h]
+                out[f"K_{g}_mean"] = float(sum(ks) / len(ks))
+            distinct = len({tuple(sorted(h.items())) for h in self.K_history})
+            out["n_distinct_schedules"] = float(distinct)
+            differentiated = sum(1 for h in self.K_history if len(set(h.values())) > 1)
+            out["frac_rounds_tier_differentiated"] = float(differentiated / len(self.K_history))
+        return out
 
     def describe(self):
-        return {**super().describe(), "warmup": self.warmup,
-                "k_min": self.k_min, "k_max": self.k_max,
+        return {**super().describe(), "warmup": self.warmup, "solver": self.solver,
+                "k_min": self.k_min, "k_max": self.k_max, "rho": self.rho,
                 "final_intervals": dict(self.K)}
