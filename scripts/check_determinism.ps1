@@ -9,7 +9,7 @@ foreach ($rep in @("a", "b")) {
   & $py -m src.experiments.run_one --dataset $Dataset --strategy tierfed --seed 42 --rounds 8 --clients 20 `
       --device $Device --out "$out\$rep" --strategy-kwargs '{\"warmup\":2,\"rho\":0.25}' | Out-Null
 }
-& $py - @"
+$code = @"
 import json, glob, sys
 a = json.load(open(glob.glob('results/determinism/a/logs/*_summary.json')[0]))['summary']
 b = json.load(open(glob.glob('results/determinism/b/logs/*_summary.json')[0]))['summary']
@@ -20,3 +20,5 @@ if max(diff.values()) > 0:
     print('FAIL: repeated runs differ; fix the environment before producing logs'); sys.exit(1)
 print('PASS: repeated runs are bit-identical')
 "@
+$code | & $py -
+exit $LASTEXITCODE
