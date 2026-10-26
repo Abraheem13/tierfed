@@ -210,3 +210,17 @@ def test_network_cost_model():
     assert abs(c["net_nr_cell_edge_comm_time_s"] - (4e6 / 5e6 + 0.03)) < 1e-9
     assert c["net_nr_cell_edge_window_compliance"] == 1.0
     assert set(PROFILES) >= {"nr_cell_edge", "leo_sat", "sixg_slice"}
+
+
+def test_partition_independent_of_hash_seed():
+    """The specialty partition must not depend on PYTHONHASHSEED (v3 determinism bug)."""
+    import json, os, subprocess, sys
+    code = ("import numpy as np, json; from src.data.partition import lpt_group_partition, natural_sites;"
+            "rng=np.random.default_rng(0); g=np.array([f'spec{i}' for i in rng.integers(0,40,3000)]);"
+            "p=lpt_group_partition(g,20,max_share=0.15,seed=0); q=natural_sites(g,min_size=50,max_clients=10);"
+            "print(json.dumps([[int(x) for x in a[:5]] for a in p]+[[int(x) for x in a[:5]] for a in q]))")
+    outs = []
+    for hs in ("1", "12345"):
+        env = {**os.environ, "PYTHONHASHSEED": hs}
+        outs.append(subprocess.check_output([sys.executable, "-c", code], env=env, cwd=os.getcwd()).decode())
+    assert outs[0] == outs[1]

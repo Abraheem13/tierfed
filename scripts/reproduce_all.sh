@@ -8,6 +8,7 @@
 # Approximate cost (60 rounds, 20 clients): MLP run ~3 min CPU / ~2 min GPU,
 # TabResNet ~4 min, FT-Transformer ~20 min GPU, CNN ~4 min GPU.
 set -euo pipefail
+export PYTHONHASHSEED=0
 cd "$(dirname "$0")/.."
 DEV="${DEVICE:-cuda}"
 DS="${DATASET:-diabetes}"

@@ -4,6 +4,7 @@
 # claims are only meaningful if this check passes on the machine that produced
 # the logs.
 set -euo pipefail
+export PYTHONHASHSEED=0
 cd "$(dirname "$0")/.."
 DS="${1:-diabetes}"; DEV="${2:-cpu}"
 OUT=results/determinism

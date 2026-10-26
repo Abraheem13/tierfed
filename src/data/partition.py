@@ -42,7 +42,8 @@ def _report(y: np.ndarray, parts: List[np.ndarray]) -> Dict[str, float]:
 def natural_sites(site_ids: Sequence, min_size: int = 50, max_clients: int | None = None):
     site_ids = np.asarray(site_ids)
     parts, small = [], []
-    order = sorted(set(site_ids.tolist()), key=lambda s: -int((site_ids == s).sum()))
+    # tie-break on the string value: set iteration order depends on PYTHONHASHSEED
+    order = sorted(set(site_ids.tolist()), key=lambda s: (-int((site_ids == s).sum()), str(s)))
     for s in order:
         idx = np.where(site_ids == s)[0]
         (parts if len(idx) >= min_size else small).append(idx)
@@ -105,7 +106,8 @@ def lpt_group_partition(group_col: Sequence, n_clients: int, max_share: float = 
     n = len(gcol)
     cap = max(1, int(max_share * n))
     pieces: List[np.ndarray] = []
-    for g in sorted(set(gcol.tolist()), key=lambda s: -int((gcol == s).sum())):
+    # tie-break on the string value: set iteration order depends on PYTHONHASHSEED
+    for g in sorted(set(gcol.tolist()), key=lambda s: (-int((gcol == s).sum()), str(s))):
         idx = np.where(gcol == g)[0]
         if len(idx) <= cap:
             pieces.append(idx); continue
@@ -118,7 +120,7 @@ def lpt_group_partition(group_col: Sequence, n_clients: int, max_share: float = 
             n_chunks = int(np.ceil(len(idx) / cap))
             for ch in np.array_split(uniq, n_chunks):
                 pieces.append(idx[np.isin(pg, ch)])
-    pieces.sort(key=lambda p: -len(p))
+    pieces.sort(key=lambda p: (-len(p), int(p[0]) if len(p) else 0))
     buckets: List[List[int]] = [[] for _ in range(n_clients)]
     loads = np.zeros(n_clients)
     for p in pieces:

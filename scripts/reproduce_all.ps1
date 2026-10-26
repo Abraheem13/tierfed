@@ -10,6 +10,7 @@ param(
   [string]$Seeds = "42 43 44 45 46 47 48 49 50 51"
 )
 $ErrorActionPreference = "Continue"
+$env:PYTHONHASHSEED = "0"
 $py = (Resolve-Path ".\.venv\Scripts\python.exe").Path
 $seedList = $Seeds -split " "
 function Log($m) { Write-Host ""; Write-Host "=========== $(Get-Date -Format HH:mm:ss) $m ===========" }

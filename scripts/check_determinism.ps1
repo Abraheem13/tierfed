@@ -2,6 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\check_determinism.ps1 [dataset] [device]
 param([string]$Dataset = "diabetes", [string]$Device = "cpu")
 $ErrorActionPreference = "Stop"
+$env:PYTHONHASHSEED = "0"
 $py = ".\.venv\Scripts\python.exe"
 $out = "results\determinism"
 if (Test-Path $out) { Remove-Item -Recurse -Force $out }
