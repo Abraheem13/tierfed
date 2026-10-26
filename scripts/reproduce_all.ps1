@@ -1,8 +1,8 @@
 # Full reproduction on one Windows GPU box (no WSL). Resumable: finished runs are skipped.
 #   powershell -ExecutionPolicy Bypass -File scripts\reproduce_all.ps1
-#   powershell -ExecutionPolicy Bypass -File scripts\reproduce_all.ps1 -Stages 2,3
+#   powershell -ExecutionPolicy Bypass -File scripts\reproduce_all.ps1 -Stages "2 3"
 param(
-  [int[]]$Stages = @(1,2,3,4,5,6,7),
+  [string]$Stages = "1 2 3 4 5 6 7",
   [string]$Device = "cuda",
   [string]$Dataset = "diabetes",
   [string]$Out = "results",
@@ -12,9 +12,11 @@ param(
 $ErrorActionPreference = "Continue"
 $env:PYTHONHASHSEED = "0"
 $py = (Resolve-Path ".\.venv\Scripts\python.exe").Path
-$seedList = $Seeds -split " "
+$seedList = $Seeds -split "[ ,]+"
+$stageList = $Stages -split "[ ,]+"
+Write-Host "stages: $stageList | device: $Device | jobs: $Jobs | seeds: $seedList"
 function Log($m) { Write-Host ""; Write-Host "=========== $(Get-Date -Format HH:mm:ss) $m ===========" }
-function Has($s) { $Stages -contains $s }
+function Has($s) { $stageList -contains "$s" }
 
 # Run a list of argument strings as parallel python processes, at most $Jobs at once.
 function Run-Parallel([string[]]$ArgList) {
