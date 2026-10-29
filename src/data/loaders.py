@@ -99,16 +99,36 @@ DIAB_CATEGORICAL = ["race", "gender", "age", "admission_type_id", "discharge_dis
 
 
 def _load_diabetes_frame(csv: Optional[str]) -> pd.DataFrame:
+    """Read the local CSV if present; otherwise fetch once from the UCI API
+    (with timeout and retries) and cache it as data/raw/diabetic_data.csv so
+    that no later run touches the network."""
     path = Path(csv) if csv else DATA_ROOT / "raw" / "diabetic_data.csv"
     if path.exists():
         return pd.read_csv(path, na_values=["?", "None", "Unknown/Invalid"], low_memory=False)
+    import socket, time
     from ucimlrepo import fetch_ucirepo
-    rep = fetch_ucirepo(id=296)
+    socket.setdefaulttimeout(60)
+    last = None
+    for attempt in range(5):
+        try:
+            rep = fetch_ucirepo(id=296)
+            break
+        except Exception as e:          # transient server drops happen
+            last = e; time.sleep(10 * (attempt + 1))
+    else:
+        raise RuntimeError(f"could not download UCI 296 after 5 attempts: {last}")
     parts = [rep.data.features, rep.data.targets]
     if rep.data.ids is not None:                       # encounter_id, patient_nbr live here
         parts.insert(0, rep.data.ids)
     df = pd.concat(parts, axis=1)
-    return df.replace({"?": np.nan, "None": np.nan, "Unknown/Invalid": np.nan})
+    df = df.replace({"?": np.nan, "None": np.nan, "Unknown/Invalid": np.nan})
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        df.to_csv(tmp, index=False); tmp.replace(path)
+    except Exception:
+        pass
+    return df
 
 
 @register("diabetes")
