@@ -282,6 +282,9 @@ def main(argv=None):
            lambda r: _f(r["rho"], 2))
     family(df, T, W, "solver", tag.str.startswith("_budget_"), ["rho", "solver"], [ns, au, up],
            lambda r: f"{_f(r['rho'], 2)} / {r['solver']}")
+    family(df, T, W, "baselines", tag.str.startswith("_baselines_"), ["tag"],
+           [ns, au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
+           lambda r: r["tag"].replace("_baselines_", "").replace("_", " "))
     family(df, T, W, "factorial", tag.str.startswith("_factorial_"), ["tag"], [ns, au, pr, up],
            lambda r: r["tag"].replace("_factorial_", "").replace("_", " "))
     family(df, T, W, "periods", tag.str.startswith("_periods_"), ["k_slow", "k_med"], [ns, au, up],

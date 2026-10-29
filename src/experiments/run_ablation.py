@@ -23,7 +23,7 @@ TF = {"warmup": 5, "rho": 0.25}
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Ablations")
     ap.add_argument("--kind", default="budget",
-                    choices=["budget", "factorial", "periods", "architecture", "loss", "warmup", "all"])
+                    choices=["budget", "baselines", "factorial", "periods", "architecture", "loss", "warmup", "all"])
     ap.add_argument("--dataset", default="diabetes")
     ap.add_argument("--seeds", nargs="+", type=int, default=list(range(42, 52)))
     ap.add_argument("--rounds", type=int, default=60)
@@ -31,7 +31,7 @@ def main(argv=None):
     ap.add_argument("--device", default="auto")
     ap.add_argument("--out", default="results")
     args = ap.parse_args(argv)
-    kinds = ["budget", "factorial", "periods", "architecture", "loss", "warmup"] if args.kind == "all" else [args.kind]
+    kinds = ["budget", "baselines", "factorial", "periods", "architecture", "loss", "warmup"] if args.kind == "all" else [args.kind]
 
     for kind in kinds:
         if kind == "budget":
@@ -39,6 +39,15 @@ def main(argv=None):
                     for r in (0.15, 0.25, 0.4, 0.6, 0.8)]
             cfgs += [(f"rho{r}_greedy", dict(strategy="tierfed", strategy_kwargs={**TF, "rho": r, "solver": "greedy"}))
                      for r in (0.25, 0.4)]
+        elif kind == "baselines":
+            # fair frontiers for the adaptive-period baselines and SCAFFOLD with its own solver
+            cfgs = [(f"adacomm_tau{t}", dict(strategy="adacomm", strategy_kwargs=dict(tau0=t, max_interval=max(t, 8))))
+                    for t in (2, 4, 8, 16)]
+            cfgs += [(f"lag_xi{x}", dict(strategy="lag", strategy_kwargs=dict(xi=x))) for x in (10, 100, 1000, 10000)]
+            cfgs += [("scaffold_sgd", dict(strategy="scaffold", optimizer="sgd", lr=0.05)),
+                     ("fedavg_sgd", dict(strategy="fedavg", optimizer="sgd", lr=0.05)),
+                     ("fedper_sgd", dict(strategy="fedper", optimizer="sgd", lr=0.05)),
+                     ("tierfed_sgd", dict(strategy="tierfed", optimizer="sgd", lr=0.05, strategy_kwargs=TF))]
         elif kind == "factorial":
             cfgs = [("fedavg", dict(strategy="fedavg")),
                     ("fedper", dict(strategy="fedper")),
