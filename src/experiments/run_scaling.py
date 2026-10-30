@@ -39,6 +39,8 @@ def main(argv=None):
                                       rounds=args.rounds, n_clients=n, seed=seed, device=args.device,
                                       out_dir=args.out, tag=f"_scale{n}"), skip_existing=True)
                 el = time.perf_counter() - t0
+                if not res:
+                    continue
                 mem = torch.cuda.max_memory_allocated() / 2 ** 20 if torch.cuda.is_available() else float("nan")
                 # append timing to the summary file so collect.py can read it
                 from pathlib import Path

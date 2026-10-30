@@ -31,7 +31,9 @@ class FederatedServer:
         self.device, self.cfg = device, cfg
         self.dp = dp or DPConfig()
         self.global_model = model_fn().to(device)
-        self.global_state = clone_state(self.global_model.state_dict())
+        # the global state lives on CPU: client slices arrive on CPU, DP noise and the
+        # schedulers work on CPU, and clients move the broadcast to their own device
+        self.global_state = {k: v.detach().clone().cpu() for k, v in self.global_model.state_dict().items()}
         self.rounds = cfg.get("rounds", 60)
         self.local_epochs = cfg.get("local_epochs", 1)
         self.participation = cfg.get("participation", 1.0)
@@ -123,7 +125,8 @@ class FederatedServer:
     def _attack(self, r, cs, keys, client) -> Dict[str, float]:
         """Gradient-inversion attack on the ACTUAL transmitted slice of this round."""
         model = self.model_fn().to(self.device)
-        model.load_state_dict({**client.model.state_dict(), **{k: self.global_state[k].to(self.device) for k in keys}})
+        model.load_state_dict({**{k: v.to(self.device) for k, v in client.model.state_dict().items()},
+                               **{k: self.global_state[k].to(self.device) for k in keys}})
         delta = {k: (cs[k].float() - self.global_state[k].float()) for k in keys}
         idx = self.local_tr[client.cid][: self.cfg.get("attack_batch", 8)]
         x_true = torch.as_tensor(self.dataset.x_train[idx], dtype=torch.float32)

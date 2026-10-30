@@ -39,7 +39,8 @@ def classification_metrics(y_true, p, threshold: float = 0.5) -> Dict[str, float
     p = np.asarray(p, dtype=float)
     keys = ("auroc", "auprc", "auprc_lift", "f1", "f1_best", "f1_best_threshold",
             "ece", "brier", "prevalence")
-    if y_true.size == 0 or len(np.unique(y_true)) < 2:
+    if y_true.size == 0 or len(np.unique(y_true)) < 2 or not np.all(np.isfinite(p)):
+        # single-class split, or the model diverged (non-finite predictions): report NaN
         return {k: float("nan") for k in keys}
     prevalence = float(y_true.mean())
     out: Dict[str, float] = {}

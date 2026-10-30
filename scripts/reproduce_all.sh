@@ -55,6 +55,8 @@ if has 3; then
   python -m src.experiments.run_ablation --kind baselines --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
   python -m src.experiments.run_ablation --kind factorial --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
   python -m src.experiments.run_ablation --kind warmup    --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
+  python -m src.experiments.run_ablation --kind periods   --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
+  python -m src.experiments.run_ablation --kind loss      --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
   python -m src.experiments.run_compression               --dataset "$DS" --seeds $SEEDS --device cpu --out "$OUT"
 fi
 

@@ -49,7 +49,22 @@ def run_tag(cfg: Dict, n_clients: int) -> str:
             f"_C{n_clients}_s{cfg['seed']}{tag}")
 
 
-def run_single(cfg: Dict, skip_existing: bool = False) -> Dict:
+def run_single(cfg: Dict, skip_existing: bool = False, robust: bool = True) -> Dict:
+    """Run one configuration. With robust=True (the drivers' default) an exception
+    is logged with its traceback and an empty dict is returned, so a stage
+    continues; the failure is visible as a missing *_summary.json."""
+    if robust:
+        try:
+            return _run_single(cfg, skip_existing)
+        except Exception:
+            import traceback
+            log.error("run failed: %s\n%s", {k: cfg.get(k) for k in ("dataset", "model", "strategy", "seed", "tag", "compressor")},
+                      traceback.format_exc())
+            return {}
+    return _run_single(cfg, skip_existing)
+
+
+def _run_single(cfg: Dict, skip_existing: bool = False) -> Dict:
     cfg = {**DEFAULTS, **(cfg or {})}
     set_seed(cfg["seed"])
     device = get_device(cfg["device"])

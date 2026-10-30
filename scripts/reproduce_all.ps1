@@ -60,6 +60,8 @@ if (Has 3) {
   & $py -m src.experiments.run_ablation --kind baselines --dataset $Dataset --seeds $seedList --device cpu --out $Out
   & $py -m src.experiments.run_ablation --kind factorial --dataset $Dataset --seeds $seedList --device cpu --out $Out
   & $py -m src.experiments.run_ablation --kind warmup    --dataset $Dataset --seeds $seedList --device cpu --out $Out
+  & $py -m src.experiments.run_ablation --kind periods   --dataset $Dataset --seeds $seedList --device cpu --out $Out
+  & $py -m src.experiments.run_ablation --kind loss      --dataset $Dataset --seeds $seedList --device cpu --out $Out
   & $py -m src.experiments.run_compression               --dataset $Dataset --seeds $seedList --device cpu --out $Out
 }
 
