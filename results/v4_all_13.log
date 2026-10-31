@@ -1,0 +1,180 @@
+[01:04:57] INFO     fedavg | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_fedavg_R60_C4_s44_real
+[01:05:01] INFO   -> AUROC final 0.8042 best 0.8313 | AUPRC 0.8374 | upload 28.4 MB | tx rounds 60
+[01:05:01] INFO    fedprox | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_fedprox_R60_C4_s44_real
+[01:05:04] INFO   -> AUROC final 0.8044 best 0.8294 | AUPRC 0.8384 | upload 28.4 MB | tx rounds 60
+[01:05:04] INFO     fedper | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_fedper_R60_C4_s44_real
+[01:05:05] INFO   -> AUROC final 0.8133 best 0.8279 | AUPRC 0.8448 | upload 28.3 MB | tx rounds 60
+[01:05:06] INFO      fixed | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_fixed_R60_C4_s44_real
+[01:05:07] INFO   -> AUROC final 0.8191 best 0.8240 | AUPRC 0.8581 | upload 7.6 MB | tx rounds 16
+[01:05:07] INFO    tierfed | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_tierfed_R60_C4_s44_real
+[01:05:09] INFO   -> AUROC final 0.8131 best 0.8243 | AUPRC 0.8468 | upload 8.5 MB | tx rounds 18
+[01:05:09] INFO    adacomm | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_adacomm_R60_C4_s44_real
+[01:05:11] INFO   -> AUROC final 0.7835 best 0.8206 | AUPRC 0.8219 | upload 4.3 MB | tx rounds 9
+[01:05:11] INFO        lag | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_lag_R60_C4_s44_real
+[01:05:14] INFO   -> AUROC final 0.7944 best 0.8249 | AUPRC 0.8287 | upload 28.4 MB | tx rounds 60
+[01:05:14] INFO    fedlama | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_fedlama_R60_C4_s44_real
+[01:05:16] INFO   -> AUROC final 0.8099 best 0.8320 | AUPRC 0.8410 | upload 20.9 MB | tx rounds 60
+[01:05:16] INFO   scaffold | heart/mlp | seed 44 | 4 clients | 60 rounds | device cpu | heart_mlp_scaffold_R60_C4_s44_real
+[01:05:18] INFO   -> AUROC final 0.7052 best 0.7329 | AUPRC 0.7704 | upload 56.9 MB | tx rounds 60
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'fedavg', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'fedprox', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'fedper', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'fixed', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'tierfed', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'adacomm', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'lag', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'fedlama', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
+[01:05:18] ERROR run failed: {'dataset': 'eicu_demo', 'model': None, 'strategy': 'scaffold', 'seed': 44, 'tag': '_real', 'compressor': None}
+Traceback (most recent call last):
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 59, in run_single
+    return _run_single(cfg, skip_existing)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\experiments\runner.py", line 73, in _run_single
+    ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\base.py", line 108, in load_dataset
+    return REGISTRY[name](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 206, in load_eicu_demo
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\athawerani\Documents\Abraheem_work\paper3\temp\tierfed-import\src\data\loaders.py", line 224, in load_eicu
+    raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+ValueError: fewer than two hospitals with >= 80 stays
+
