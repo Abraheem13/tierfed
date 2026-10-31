@@ -1,0 +1,714 @@
+{
+  "summary": {
+    "fed_auroc_final": 0.6099474482371658,
+    "fed_auroc_best": 0.640320824939318,
+    "fed_auroc_best_round": 9.0,
+    "fed_auroc_ppd": 0.03037337670215212,
+    "fed_auroc_auc_curve": 0.6262699348368308,
+    "fed_auroc_last10_mean": 0.6113025642494152,
+    "fed_auroc_earlystop_value": 0.640320824939318,
+    "fed_auroc_earlystop_round": 9.0,
+    "fed_auprc_final": 0.15728539952928122,
+    "fed_auprc_best": 0.17826631503289533,
+    "fed_auprc_best_round": 8.0,
+    "fed_auprc_ppd": 0.02098091550361411,
+    "fed_auprc_auc_curve": 0.16537263348956024,
+    "fed_auprc_last10_mean": 0.15881670149588006,
+    "fed_auprc_earlystop_value": 0.17826631503289533,
+    "fed_auprc_earlystop_round": 8.0,
+    "fed_f1_final": 0.2002367674324659,
+    "fed_f1_best": 0.22476660424698608,
+    "fed_f1_best_round": 4.0,
+    "fed_f1_ppd": 0.024529836814520173,
+    "fed_f1_auc_curve": 0.20830670065086954,
+    "fed_f1_last10_mean": 0.2008081580114242,
+    "fed_f1_earlystop_value": 0.22476660424698608,
+    "fed_f1_earlystop_round": 4.0,
+    "fed_f1_best_final": 0.23810762950813036,
+    "fed_f1_best_best": 0.25424613492688164,
+    "fed_f1_best_best_round": 8.0,
+    "fed_f1_best_ppd": 0.01613850541875128,
+    "fed_f1_best_auc_curve": 0.24418939157234182,
+    "fed_f1_best_last10_mean": 0.2396190920806159,
+    "fed_f1_best_earlystop_value": 0.25424613492688164,
+    "fed_f1_best_earlystop_round": 8.0,
+    "fed_ece_final": 0.33000886326923307,
+    "fed_ece_best": 0.408624111916069,
+    "fed_ece_best_round": 1.0,
+    "fed_ece_ppd": 0.07861524864683594,
+    "fed_ece_auc_curve": 0.35102417430170013,
+    "fed_ece_last10_mean": 0.34129720110803524,
+    "fed_ece_earlystop_value": 0.408624111916069,
+    "fed_ece_earlystop_round": 1.0,
+    "fed_brier_final": 0.20604228317096954,
+    "fed_brier_best": 0.24514006787621115,
+    "fed_brier_best_round": 1.0,
+    "fed_brier_ppd": 0.03909778470524161,
+    "fed_brier_auc_curve": 0.20932699284909903,
+    "fed_brier_last10_mean": 0.2101238634198678,
+    "fed_brier_earlystop_value": 0.24514006787621115,
+    "fed_brier_earlystop_round": 1.0,
+    "pooled_auroc_final": 0.609190260568997,
+    "pooled_auroc_best": 0.6424791389925865,
+    "pooled_auroc_best_round": 9.0,
+    "pooled_auroc_ppd": 0.03328887842358941,
+    "pooled_auroc_auc_curve": 0.6270585318116499,
+    "pooled_auroc_last10_mean": 0.6107469879983956,
+    "pooled_auroc_earlystop_value": 0.6424791389925865,
+    "pooled_auroc_earlystop_round": 9.0,
+    "pooled_auprc_final": 0.1429295388796738,
+    "pooled_auprc_best": 0.16300512803812187,
+    "pooled_auprc_best_round": 7.0,
+    "pooled_auprc_ppd": 0.020075589158448065,
+    "pooled_auprc_auc_curve": 0.1519107959474773,
+    "pooled_auprc_last10_mean": 0.14455037225005757,
+    "pooled_auprc_earlystop_value": 0.16300512803812187,
+    "pooled_auprc_earlystop_round": 7.0,
+    "global_auroc_final": 0.6168113061842493,
+    "global_auroc_best": 0.639911528970128,
+    "global_auroc_best_round": 12.0,
+    "global_auroc_ppd": 0.023100222785878755,
+    "global_auroc_auc_curve": 0.6311086590091901,
+    "global_auroc_last10_mean": 0.6203886004656802,
+    "global_auroc_earlystop_value": 0.639911528970128,
+    "global_auroc_earlystop_round": 12.0,
+    "global_auprc_final": 0.1558702311931076,
+    "global_auprc_best": 0.1727878716029712,
+    "global_auprc_best_round": 12.0,
+    "global_auprc_ppd": 0.0169176404098636,
+    "global_auprc_auc_curve": 0.16556697024251474,
+    "global_auprc_last10_mean": 0.15988909544028237,
+    "global_auprc_earlystop_value": 0.1727878716029712,
+    "global_auprc_earlystop_round": 12.0,
+    "global_f1_final": 0.21228070175438596,
+    "global_f1_best": 0.23245060949978982,
+    "global_f1_best_round": 14.0,
+    "global_f1_ppd": 0.020169907745403864,
+    "global_f1_auc_curve": 0.2204713719165445,
+    "global_f1_last10_mean": 0.21272134554919536,
+    "global_f1_earlystop_value": 0.23245060949978982,
+    "global_f1_earlystop_round": 14.0,
+    "total_upload_mb": 2007.2544,
+    "total_download_mb": 2007.2544,
+    "rounds": 60.0,
+    "rounds_transmitting": 60.0,
+    "realised_payload_fraction": 1.0,
+    "n_clients_single_class_final": 0.0,
+    "divergence_fast_mean": 0.0048161428041160505,
+    "divergence_fast_final": 0.008971680875219804,
+    "divergence_medium_mean": 0.001742560724873546,
+    "divergence_medium_final": 0.0030538497383784044,
+    "dispersion_abs_mean": 3.3618385157474706,
+    "dispersion_abs_final": 5.877711710135372,
+    "divergence_total_mean": 0.001848585358937915,
+    "divergence_total_final": 0.0030855312230145975,
+    "divergence_slow_mean": 0.004645941827072741,
+    "divergence_slow_final": 0.0035697273901753855,
+    "net_nr_cell_edge_comm_time_s": 162.38035200000007,
+    "net_nr_cell_edge_energy_j": 642.3214080000001,
+    "net_nr_cell_edge_window_compliance": 1.0,
+    "net_nr_typical_comm_time_s": 17.25803519999999,
+    "net_nr_typical_energy_j": 64.23214079999997,
+    "net_nr_typical_window_compliance": 1.0,
+    "net_sixg_slice_comm_time_s": 1.1029017599999988,
+    "net_sixg_slice_energy_j": 8.029017599999996,
+    "net_sixg_slice_window_compliance": 1.0,
+    "net_leo_sat_comm_time_s": 82.69017600000008,
+    "net_leo_sat_energy_j": 3211.6070400000012,
+    "net_leo_sat_window_compliance": 1.0,
+    "net_hospital_wan_comm_time_s": 8.629017599999996,
+    "net_hospital_wan_energy_j": 0.0,
+    "net_hospital_wan_window_compliance": 1.0
+  },
+  "round_bits": [
+    {
+      "round": 1,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 2,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 3,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 4,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 5,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 6,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 7,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 8,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 9,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 10,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 11,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 12,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 13,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 14,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 15,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 16,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 17,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 18,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 19,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 20,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 21,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 22,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 23,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 24,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 25,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 26,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 27,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 28,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 29,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 30,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 31,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 32,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 33,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 34,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 35,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 36,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 37,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 38,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 39,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 40,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 41,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 42,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 43,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 44,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 45,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 46,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 47,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 48,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 49,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 50,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 51,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 52,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 53,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 54,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 55,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 56,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 57,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 58,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 59,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    },
+    {
+      "round": 60,
+      "upload_bits": 267633920.0,
+      "download_bits": 267633920.0,
+      "max_client_bits": 13381696.0,
+      "n_senders": 20.0
+    }
+  ],
+  "attack": [],
+  "strategy": {
+    "strategy": "fedavg",
+    "private_params": [],
+    "compressor": "none"
+  },
+  "dp": {
+    "dp_enabled": 0.0,
+    "dp_sigma": 1.0,
+    "dp_max_norm": 1.0,
+    "dp_delta": 1e-05,
+    "dp_rounds_charged": 0.0,
+    "dp_epsilon": Infinity
+  },
+  "config": {
+    "dataset": "diabetes",
+    "dataset_kwargs": null,
+    "model": "resnet",
+    "model_kwargs": null,
+    "strategy": "fedavg",
+    "strategy_kwargs": {},
+    "rounds": 60,
+    "local_epochs": 1,
+    "batch_size": 64,
+    "lr": 0.001,
+    "optimizer": "adam",
+    "loss": "weighted_ce",
+    "balanced_sampler": false,
+    "n_clients": 20,
+    "participation": 1.0,
+    "seed": 42,
+    "device": "cuda",
+    "compressor": null,
+    "compressor_kwargs": null,
+    "dp": null,
+    "eval_every": 1,
+    "early_stop_patience": 10,
+    "client_test_frac": 0.2,
+    "out_dir": "results",
+    "attack_every": 0,
+    "attack_steps": 300,
+    "attack_batch": 8,
+    "membership_inference": false,
+    "tag": "_architecture_resnet_fedavg",
+    "model_kwargs_effective": {
+      "dim": 128,
+      "depth": 6,
+      "dropout": 0.2
+    }
+  },
+  "dataset": {
+    "dataset": "diabetes",
+    "n_train": 55992,
+    "n_test": 13998,
+    "n_features": 160,
+    "input_shape": [
+      160
+    ],
+    "n_clients": 20,
+    "n_patients_train": 55992,
+    "prevalence_train": 0.08970924417773968,
+    "prevalence_test": 0.09015573653379054,
+    "n_numeric": 8,
+    "n_categorical": 12,
+    "deduplicated": true,
+    "n_encounters_after_cleaning": 69990,
+    "has_patient_id": true,
+    "partition_report": {
+      "n_clients": 20.0,
+      "size_min": 769.0,
+      "size_median": 1319.0,
+      "size_max": 6738.0,
+      "size_max_share": 0.12033861980282898,
+      "size_gini": 0.4435490784397771,
+      "prevalence_min": 0.06987028301886793,
+      "prevalence_max": 0.10519480519480519,
+      "prevalence_std": 0.010300343535312489,
+      "label_tv_mean": 0.00905120907657522,
+      "n_single_class_clients": 0.0,
+      "scheme": "lpt"
+    },
+    "partition": "lpt",
+    "seed": 42,
+    "patient_grouped_split": true
+  },
+  "tier_report": {
+    "slow": {
+      "params": 20608.0,
+      "pct": 4.928044995193434,
+      "n_tensors": 2.0
+    },
+    "medium": {
+      "params": 397312.0,
+      "pct": 95.01025878931938,
+      "n_tensors": 38.0
+    },
+    "fast": {
+      "params": 258.0,
+      "pct": 0.06169621548718488,
+      "n_tensors": 2.0
+    },
+    "total": {
+      "params": 418178.0,
+      "pct": 100.0,
+      "n_tensors": 42.0
+    }
+  },
+  "tiers": {
+    "stem.weight": "slow",
+    "stem.bias": "slow",
+    "body.0.norm.weight": "medium",
+    "body.0.norm.bias": "medium",
+    "body.0.fc1.weight": "medium",
+    "body.0.fc1.bias": "medium",
+    "body.0.fc2.weight": "medium",
+    "body.0.fc2.bias": "medium",
+    "body.1.norm.weight": "medium",
+    "body.1.norm.bias": "medium",
+    "body.1.fc1.weight": "medium",
+    "body.1.fc1.bias": "medium",
+    "body.1.fc2.weight": "medium",
+    "body.1.fc2.bias": "medium",
+    "body.2.norm.weight": "medium",
+    "body.2.norm.bias": "medium",
+    "body.2.fc1.weight": "medium",
+    "body.2.fc1.bias": "medium",
+    "body.2.fc2.weight": "medium",
+    "body.2.fc2.bias": "medium",
+    "body.3.norm.weight": "medium",
+    "body.3.norm.bias": "medium",
+    "body.3.fc1.weight": "medium",
+    "body.3.fc1.bias": "medium",
+    "body.3.fc2.weight": "medium",
+    "body.3.fc2.bias": "medium",
+    "body.4.norm.weight": "medium",
+    "body.4.norm.bias": "medium",
+    "body.4.fc1.weight": "medium",
+    "body.4.fc1.bias": "medium",
+    "body.4.fc2.weight": "medium",
+    "body.4.fc2.bias": "medium",
+    "body.5.norm.weight": "medium",
+    "body.5.norm.bias": "medium",
+    "body.5.fc1.weight": "medium",
+    "body.5.fc1.bias": "medium",
+    "body.5.fc2.weight": "medium",
+    "body.5.fc2.bias": "medium",
+    "norm.weight": "medium",
+    "norm.bias": "medium",
+    "head.weight": "fast",
+    "head.bias": "fast"
+  },
+  "network": {
+    "net_nr_cell_edge_comm_time_s": 162.38035200000007,
+    "net_nr_cell_edge_energy_j": 642.3214080000001,
+    "net_nr_cell_edge_window_compliance": 1.0,
+    "net_nr_typical_comm_time_s": 17.25803519999999,
+    "net_nr_typical_energy_j": 64.23214079999997,
+    "net_nr_typical_window_compliance": 1.0,
+    "net_sixg_slice_comm_time_s": 1.1029017599999988,
+    "net_sixg_slice_energy_j": 8.029017599999996,
+    "net_sixg_slice_window_compliance": 1.0,
+    "net_leo_sat_comm_time_s": 82.69017600000008,
+    "net_leo_sat_energy_j": 3211.6070400000012,
+    "net_leo_sat_window_compliance": 1.0,
+    "net_hospital_wan_comm_time_s": 8.629017599999996,
+    "net_hospital_wan_energy_j": 0.0,
+    "net_hospital_wan_window_compliance": 1.0
+  },
+  "schedule": {}
+}
