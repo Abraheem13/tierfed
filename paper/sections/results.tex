@@ -152,29 +152,67 @@ Method & Upload (MB) & $t$ NR-edge (s) & $t$ LEO (s) & $t$ 6G (s) & $E$ NR-edge 
 
 Table~\ref{tab:network} translates measured bits into what an operator sees. On a cell-edge NR uplink the total communication time of the job falls from \num{NetCellEdgeFedper}~s for FedPer to \num{NetCellEdgeTierfed}~s for \tierfed{}. The model is small, so every method fits the 60-s window on every link profile; the absolute times matter less than the proportional reductions, which carry over to larger models with the same schedule.
 
-\subsection{Attack surface and differential privacy}
-\label{sec:results-privacy}
-
+\subsection{A wide model on emulated links}
+\label{sec:results-emu}
 \begin{table}[t]
-\caption{Utility under client-level DP (per-client clipping $C=1$, 10 seeds): $(\varepsilon,\delta=10^{-5})$ from the exact R\'enyi accountant, number of charged (transmitting) rounds, final AUROC and AUPRC. The same mechanism is applied to every method.}
-\label{tab:dp}
+\caption{Wide MLP (\num{wideParams} parameters) on Diabetes (3 seeds): accuracy and upload.}
+\label{tab:wide}
 \centering\small
-\begin{tabular}{lrrrcc}
+\begin{tabular}{lrccrr}
 \toprule
-Method / $\sigma$ & $n$ & $\varepsilon$ & Charged rounds & AUROC & AUPRC\\
+Method & $n$ & AUROC & AUPRC & Upload (MB) & Params\\
 \midrule
-\gen{dp}
+\gen{wide}
 \bottomrule
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-\centering\fig{fig_privacy}{0.95\columnwidth}
-\caption{Utility against the DP noise multiplier for every method under the identical mechanism (\ref{eq:dp}).}
-\label{fig:privacy}
-\end{figure}
+\begin{table*}[t]
+\caption{Trace-driven socket emulation of the wide-MLP runs: total emulated upload time (real TCP over paced loopback links), the analytic model's prediction from (\ref{eq:netcost}), their relative difference, total compute time of the slowest site, and wall-clock time to reach AUROC 0.60 and 0.62 (``never'' if not reached in 60 rounds). Means over seeds; the cell-edge profile was emulated for one seed.}
+\label{tab:emu}
+\centering\small
+\begin{tabular}{llrrrrrrr}
+\toprule
+Profile & Method & $n$ & Emulated (s) & Analytic (s) & Diff.\ (\%) & Compute (s) & $t_{0.60}$ (s) & $t_{0.62}$ (s)\\
+\midrule
+\gen{emulation}
+\bottomrule
+\end{tabular}
+\end{table*}
 
-Table~\ref{tab:dp} and Fig.~\ref{fig:privacy} contain the clearest effect in this study. Under client-level DP, every transmitting round is a release that the accountant charges for and into which noise is injected, so the number of transmitting rounds sets both the budget and the cumulative noise. At $\sigma=1$, full-rate FedAvg collapses to \num{dpFedavgSigmaOneAuroc} and FedPer reaches \num{dpFedperSigmaOneAuroc}, both at $\varepsilon=\num{dpFedperSigmaOneEps}$; \tierfed{} reaches \num{dpTierfedSigmaOneAuroc} at $\varepsilon=\num{dpTierfedSigmaOneEps}$ (\tierfed{} minus FedPer \num{dpTfVsFedperSigmaOneDiff}, $p=\num{dpTfVsFedperSigmaOneP}$). At $\sigma=2$ the margin over FedPer is \num{dpTfVsFedperSigmaTwoDiff} ($p=\num{dpTfVsFedperSigmaTwoP}$) at less than half the budget. Against AdaComm, the strongest round-sparse baseline, the comparison is mixed and we report it as such: level at $\sigma=0.5$ (\num{dpTfVsAdacommSigmaHalfDiff}, $p=\num{dpTfVsAdacommSigmaHalfP}$) and $\sigma=1$ (\num{dpTfVsAdacommSigmaOneDiff}, $p=\num{dpTfVsAdacommSigmaOneP}$), better at $\sigma=2$ (\num{dpTfVsAdacommSigmaTwoDiff}, $p=\num{dpTfVsAdacommSigmaTwoP}$), and worse at $\sigma=4$ (\num{dpTfVsAdacommSigmaFourDiff}, $p=\num{dpTfVsAdacommSigmaFourP}$), where AdaComm's eight releases incur less noise than \tierfed{}'s eighteen. The operational reading is that, under DP, the number of rounds a site transmits is the dominant design variable, and a communication quota is also a privacy quota. None of the budgets reported is claimed to constitute meaningful privacy; they are reported as computed so that the trade-off is measured correctly.
+With a model of \num{wideParams} parameters, one full-rate upload per site is several megabytes and the link, not computation, dominates the round on every constrained profile (Table~\ref{tab:emu}). The analytic model agrees with real paced TCP to within \num{emuMaxAbsRelErrPct}\% on every run, so the costs reported in Table~\ref{tab:network} are not an artefact of the formula; the residual is the RTT term, which the analytic model charges in full and the emulator as a one-way delay, plus transport overhead. On the 50-Mbit/s NR profile the emulated upload time is \num{emuNrTypicalFedperUploadS}~s for FedPer and \num{emuNrTypicalTierfedUploadS}~s for \tierfed{}, and the wall-clock time to AUROC 0.60 is \num{emuNrTypicalFedperTtZeropSix}~s against \num{emuNrTypicalTierfedTtZeropSix}~s (AdaComm \num{emuNrTypicalAdacommTtZeropSix}~s, fixed period \num{emuNrTypicalFixedTtZeropSix}~s). Accuracy of the wide model is in Table~\ref{tab:wide}: \tierfed{} \num{wideTierfedAuroc}, FedPer \num{wideFedperAuroc}, fixed period \num{wideFixedAuroc}, AdaComm \num{wideAdacommAuroc}.
+
+\subsection{Attack surface and differential privacy}
+\label{sec:results-privacy}
+
+\begin{table}[t]
+\caption{Matched-privacy comparison (10 seeds, $C=1$, $\delta=10^{-5}$). Every method is run at the same target $\varepsilon^\star$ with Poisson client sampling at rate $q$; its noise multiplier $\sigma$ is calibrated to its own number of planned releases with the subsampled-Gaussian accountant (\ref{eq:rdp}). Achieved $\varepsilon$, final-round AUROC and AUPRC, and upload. Only data-independent schedules are eligible (Section~\ref{sec:security-dp}).}
+\label{tab:dp}
+\centering\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrrccr}
+\toprule
+$q$ / $\varepsilon^\star$ / Method & $n$ & $\sigma$ & Releases & $\varepsilon$ & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{dpmatched}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Sensitivity of \tierfed{}-DP to its prior $\lambda$ in (\ref{eq:jdp}) at $q=1$, $\varepsilon^\star=4$ (10 seeds): chosen interval, calibrated $\sigma$, releases, AUROC, upload.}
+\label{tab:dplambda}
+\centering\small
+\begin{tabular}{lrrrrcr}
+\toprule
+$\lambda$ & $n$ & $K$ & $\sigma$ & Releases & AUROC & Upload (MB)\\
+\midrule
+\gen{dplambda}
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:dp} compares methods at equal privacy rather than equal noise. A full-rate method makes 60 releases and must use a large $\sigma$ to meet $\varepsilon^\star$; the fixed period makes \num{dpmQHalfEpsFourFixedRel} and \tierfed{}-DP chooses its own release count from (\ref{eq:jdp}) (\num{dpmQHalfEpsFourTierfedDpRel} at $q=0.5$, $\varepsilon^\star=4$, with $\sigma=\num{dpmQHalfEpsFourTierfedDpSigma}$ against \num{dpmQHalfEpsFourFedperSigma} for FedPer). At $q=0.5$ and $\varepsilon^\star=4$, \tierfed{}-DP reaches \num{dpmQHalfEpsFourTierfedDpAuroc} AUROC against \num{dpmQHalfEpsFourFedperAuroc} for FedPer (difference \num{dpmQHalfEpsFourTfdpVsFedperDiff}, $p=\num{dpmQHalfEpsFourTfdpVsFedperP}$), \num{dpmQHalfEpsFourFedavgAuroc} for FedAvg (\num{dpmQHalfEpsFourTfdpVsFedavgDiff}, $p=\num{dpmQHalfEpsFourTfdpVsFedavgP}$) and \num{dpmQHalfEpsFourFixedAuroc} for the fixed period (\num{dpmQHalfEpsFourTfdpVsFixedDiff}, $p=\num{dpmQHalfEpsFourTfdpVsFixedP}$). Across the budget grid, \tierfed{}-DP is \ifflag{dpmQHalfEpsOneTfdpVsFedperBetter}{significantly better than}{not significantly better than} FedPer at $\varepsilon^\star=1$, \ifflag{dpmQHalfEpsTwoTfdpVsFedperBetter}{better}{not significantly better} at $\varepsilon^\star=2$ and \ifflag{dpmQHalfEpsEightTfdpVsFedperBetter}{better}{not significantly better} at $\varepsilon^\star=8$; against the fixed period it is \ifflag{dpmQHalfEpsFourTfdpVsFixedBetter}{better}{\ifflag{dpmQHalfEpsFourTfdpVsFixedWorse}{worse}{level}} at $\varepsilon^\star=4$. Without amplification ($q=1$, $\varepsilon^\star=4$) the corresponding AUROCs are \num{dpmQOneEpsFourTierfedDpAuroc} and \num{dpmQOneEpsFourFedperAuroc}. The planner's choice moves with $\lambda$ as intended (Table~\ref{tab:dplambda}): a larger noise weight selects longer intervals and fewer releases. Because the prior on heterogeneity is flat, \tierfed{}-DP always selects equal intervals for both tiers; its value under DP is that it picks the period, and therefore $\sigma$, from the budget before training, not that it differentiates tiers. The adaptive schedulers are absent from this table by construction: their release patterns depend on client data and are not covered by the accountant. The earlier equal-$\sigma$ comparison that included them is in the Supplement (Section~S3) with that caveat. None of the budgets is claimed to be strong privacy for a 20-site federation.
 
 \begin{table}[t]
 \caption{Attack surface (10 seeds): parameters exposed per transmitting round, update-inversion normalised error and feature correlation on the real transmitted slices, membership-inference AUC on the deployed models ($0.5$ = no leakage), and upload.}
@@ -252,6 +290,27 @@ Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$
 \tierfed{} matches or exceeds FedPer under every class-imbalance loss (Table~\ref{tab:loss}; e.g.\ LDAM \num{lossLdamTierfedAuroc} versus \num{lossLdamFedperAuroc}). A longer warm-up buys a small gain at a proportional cost in bytes (Table~\ref{tab:warmup}; $T_w=20$: \num{warmupWarmTwoZeroAuroc} at \num{warmupWarmTwoZeroUploadMb}~MB). On the six-block tabular ResNet, \tierfed{} reaches \num{architectureResnetTierfedAuroc} at \num{architectureResnetTierfedUploadMb}~MB against \num{architectureResnetFedperAuroc} at \num{architectureResnetFedperUploadMb}~MB for FedPer, and on the FT-Transformer \num{architectureTransformerTierfedAuroc} at \num{architectureTransformerTierfedUploadMb}~MB against \num{architectureTransformerFedperAuroc} at \num{architectureTransformerFedperUploadMb}~MB (Table~\ref{tab:arch}). As on the MLP, the fixed multi-rate schedule is at least as accurate as \tierfed{} on every backbone (ResNet \num{architectureResnetFixedAuroc} at \num{architectureResnetFixedUploadMb}~MB; FT-Transformer \num{architectureTransformerFixedAuroc} at \num{architectureTransformerFixedUploadMb}~MB), while \tierfed{} uploads less. The FT-Transformer rows other than the fixed schedule were trained on GPU with the fused attention kernel, which is not bit-deterministic; they are reported over five seeds with that caveat.
 
 On PneumoniaMNIST (Table~\ref{tab:main-img}) the picture differs from the tabular benchmark and we report it as it is. The two methods that share the classifier head are the most accurate, FedAvg (\num{medmnistcnnFedavgAuroc}) and the FedLAMA-style schedule (\num{medmnistcnnFedlamaAuroc}); \tierfed{} reaches \num{medmnistcnnTierfedAuroc} at \num{medmnistcnnTierfedUploadMb}~MB against \num{medmnistcnnFedperAuroc} at \num{medmnistcnnFedperUploadMb}~MB for FedPer, and is \ifflag{medmnistcnnTierfedNonInferiorAuroc}{non-inferior}{not non-inferior} to FedPer at the 0.01 margin ($p=\num{medmnistcnnTierfedNiAurocP}$). Under strong label skew the private head is a liability rather than an asset: both head-private methods trail the head-sharing ones and FedPer has a large between-seed spread. A schedule that keeps the head private should therefore not be used for this kind of task without a shared head.
+
+\subsection{Real institutions}
+\label{sec:results-real}
+\begin{table}[t]
+\caption{Benchmarks with one client per real institution (10 seeds, no DP): Fed-Heart-Disease (4 institutions) and the eICU-CRD demo (\num{realEicuDemoClients} hospitals). AUROC, AUPRC, upload and transmitting rounds.}
+\label{tab:real}
+\centering\small
+\begin{tabular}{lrccrr}
+\toprule
+Method & $n$ & AUROC & AUPRC & Upload (MB) & Tx rounds\\
+\midrule
+\multicolumn{6}{l}{\emph{Fed-Heart-Disease}}\\
+\gen{realheart}
+\midrule
+\multicolumn{6}{l}{\emph{eICU-CRD demo}}\\
+\gen{realeicudemo}
+\bottomrule
+\end{tabular}
+\end{table}
+
+On the four heart-disease institutions, \tierfed{} reaches \num{realHeartTierfedAuroc} AUROC against \num{realHeartFedperAuroc} for FedPer (difference \num{realHeartTfVsFedperDiff}, $p=\num{realHeartTfVsFedperP}$) and \num{realHeartFedavgAuroc} for FedAvg (\num{realHeartTfVsFedavgDiff}, $p=\num{realHeartTfVsFedavgP}$). On the eICU demo hospitals it reaches \num{realEicuDemoTierfedAuroc} against \num{realEicuDemoFedperAuroc} for FedPer (\num{realEicuDemoTfVsFedperDiff}, $p=\num{realEicuDemoTfVsFedperP}$), the fixed period \num{realEicuDemoFixedAuroc} and AdaComm \num{realEicuDemoAdacommAuroc}. Both federations are small (the heart data has a few hundred patients per institution), so between-seed variance is large and these benchmarks test whether the ordering of methods on the specialty-bucket sites survives real institutional heterogeneity; they are not clinical results. DP was not run on them: with 4 to \num{realEicuDemoClients} clients the client-level Gaussian mechanism needs noise of the order of the whole aggregate.
 
 \subsection{Scalability}
 

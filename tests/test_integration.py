@@ -34,9 +34,10 @@ def test_determinism():
         assert a[k] == b[k], f"{k} differs between identical runs"
 
 
-@pytest.mark.parametrize("strategy", ["fedavg", "fedper", "tierfed"])
+@pytest.mark.parametrize("strategy", ["fedavg", "fedper", "fixed", "tierfed_dp"])
 def test_dp_is_applied_to_every_strategy(strategy):
-    kw = {"warmup": 1, "rho": 0.3} if strategy == "tierfed" else {}
+    # v4: data-dependent schedulers (adaptive tierfed, adacomm, lag, fedlama) are refused under DP
+    kw = {"warmup": 1, "rounds": BASE["rounds"], "epsilon": 4.0} if strategy == "tierfed_dp" else {}
     plain = run_single({**BASE, "strategy": strategy, "strategy_kwargs": kw})["summary"]
     noisy = run_single({**BASE, "strategy": strategy, "strategy_kwargs": kw,
                         "dp": dict(enabled=True, sigma=5.0, max_norm=0.1)})

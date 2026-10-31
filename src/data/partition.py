@@ -137,7 +137,7 @@ def build_partition(scheme: str, y, n_clients: int, seed: int = 0, site_ids=None
     if scheme in ("natural", "site", "hospital"):
         if site_ids is None:
             raise ValueError("natural partition needs site_ids")
-        parts = natural_sites(site_ids, min_size=min_size, max_clients=n_clients)
+        parts = natural_sites(site_ids, min_size=min_size, max_clients=n_clients or None)
     elif scheme in ("dirichlet", "label_skew"):
         parts = dirichlet_label_skew(y, n_clients, alpha, seed, min_size=min_size, groups=patient_groups)
     elif scheme in ("quantity", "size_skew"):

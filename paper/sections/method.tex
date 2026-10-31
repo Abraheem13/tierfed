@@ -59,3 +59,12 @@ with $d_{\mathrm{sh}}$ the shared parameter count; the reduction factors multipl
 
 \subsection{What the operator sets}
 The only operator-facing quantity is $\rho$. It is a quota on the fraction of the shared model transmitted per round on average, so it maps directly onto a slice allocation or a transfer-window budget through (\ref{eq:compose}) and (\ref{eq:netcost}). The paper reports the mapping $\rho\mapsto$ (upload, communication time, energy) on every link profile so that an operator can read off what a given quota buys.
+
+\subsection{Planning under a privacy budget (\tierfed{}-DP)}
+\label{sec:method-dp}
+Under client-level DP the set of rounds in which a site transmits is visible to the aggregator and to an eavesdropper. A schedule computed from client updates, as in adaptive \tierfed{}, AdaComm, LAG or FedLAMA, is therefore itself a data-dependent release that the Gaussian accountant does not cover (Section~\ref{sec:security-dp}). \tierfed{}-DP removes this channel by planning the schedule \emph{before} training from public quantities only: the target $(\varepsilon^\star,\delta)$, the sampling rate $q$, the horizon $R$, the warm-up $T_w$, the tier shares $w_g$ and the quota $\rho$. For every candidate $K\in\{1,\dots,K_{\max}\}^{|\mathcal G|}$ it computes the release set $\mathcal R(K)=\{r\le R:\ \exists g,\ r\le T_w\ \text{or}\ (r-T_w)\bmod K_g=0\}$, the smallest noise multiplier $\sigma(K)$ for which $|\mathcal R(K)|$ releases of the subsampled Gaussian mechanism are $(\varepsilon^\star,\delta)$-DP, and the surrogate
+\begin{equation}
+J(K)=\sum_g w_g K_g^2\;+\;\lambda\,\frac{1}{R}\sum_{r\in\mathcal R(K)}\Big(\sum_{g\ \text{due at}\ r} w_g\Big)\,\sigma(K)^2,
+\label{eq:jdp}
+\end{equation}
+the drift term of (\ref{eq:bound}) with a flat, data-free heterogeneity prior plus the noise energy injected into the shared model per round. Fewer releases need less noise per release, since $\sigma^2$ grows roughly linearly with the release count at fixed $\varepsilon^\star$, but drift more; (\ref{eq:jdp}) trades the two, subject to the byte quota $\frac1R\sum_r\sum_{g\ \text{due}}w_g\le\rho$. The minimiser is found by enumeration ($K_{\max}^{|\mathcal G|}=64$ candidates) and the server is told $\sigma(K)$. The single prior $\lambda$ absorbs the unknown smoothness and heterogeneity constants of the bound; we report its sensitivity rather than tune it. Because $\gamma$ is flat, \tierfed{}-DP chooses equal intervals for both shared tiers; it is a privacy-aware \emph{period} planner, not a per-tier one, and we say so in the results.

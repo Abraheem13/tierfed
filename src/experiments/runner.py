@@ -21,6 +21,7 @@ log = get_logger()
 # One architecture table shared by EVERY strategy, so sweeps are like-for-like.
 ARCH = {
     "mlp": dict(hidden=(128, 128, 64), dropout=0.3),
+    "mlp_wide": dict(hidden=(1024, 1024, 512), dropout=0.3),
     "resnet": dict(dim=128, depth=6, dropout=0.2),
     "transformer": dict(dim=64, depth=3, heads=8, dropout=0.1),
     "cnn": dict(width=32, dropout=0.2),

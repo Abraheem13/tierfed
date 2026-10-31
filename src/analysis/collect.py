@@ -33,7 +33,7 @@ NET = ["net_nr_cell_edge_comm_time_s", "net_nr_typical_comm_time_s", "net_sixg_s
        "net_nr_cell_edge_energy_j", "net_leo_sat_energy_j", "net_nr_cell_edge_window_compliance"]
 NAMES = {"fedavg": "FedAvg", "fedprox": "FedProx", "scaffold": "SCAFFOLD", "fedper": "FedPer",
          "fedlama": "FedLAMA", "adacomm": "AdaComm", "lag": "LAG", "fixed": "Fixed schedule",
-         "tierfed": "TierFed"}
+         "tierfed": "TierFed", "tierfed_dp": "TierFed-DP"}
 RUN_REQUIRED = r"\textbf{[RUN REQUIRED]} \\"
 
 
@@ -58,6 +58,9 @@ def load_summaries(log_dir) -> pd.DataFrame:
         row["dp_sigma"] = dp.get("dp_sigma", 0.0) if dp.get("dp_enabled") else 0.0
         row["dp_epsilon"] = dp.get("dp_epsilon") if dp.get("dp_enabled") else None
         row["dp_rounds_charged"] = dp.get("dp_rounds_charged")
+        row["dp_q"] = dp.get("dp_sample_rate", 1.0) if dp.get("dp_enabled") else None
+        row["dp_target_eps"] = dp.get("dp_target_epsilon") if dp.get("dp_enabled") else None
+        row["lam"] = sk.get("lam")
         tr = d.get("tier_report") or {}
         for t in ("slow", "medium", "fast", "total"):
             if t in tr:
@@ -71,7 +74,7 @@ def load_summaries(log_dir) -> pd.DataFrame:
         sch = d.get("schedule") or {}
         for k in ("K_slow", "K_medium", "K_slow_mean", "K_medium_mean", "n_distinct_schedules",
                   "frac_rounds_tier_differentiated", "gamma_slow", "gamma_medium", "w_slow", "w_medium",
-                  "mean_interval", "tau_final"):
+                  "mean_interval", "tau_final", "planned_sigma", "planned_releases"):
             if k in sch:
                 row[f"sched_{k}"] = sch[k]
         row.update(d.get("summary", {}))
@@ -308,7 +311,8 @@ def main(argv=None):
            lambda r: str(int(r["warmup"])))
     comp = family(df, T, W, "compression", tag.str.startswith("_comp_"), ["strategy", "compressor"],
                   [ns, au, pr, up], lambda r: f"{NAMES.get(r['strategy'], r['strategy'])} / {r['compressor']}")
-    family(df, T, W, "dp", tag.str.startswith("_dp"), ["strategy", "dp_sigma"],
+    legacy_dp = tag.str.startswith("_dp") & ~tag.str.startswith("_dpe")
+    family(df, T, W, "dp", legacy_dp, ["strategy", "dp_sigma"],
            [ns, lambda r: _f(r.get("dp_epsilon_mean"), 1), lambda r: _f(r.get("dp_rounds_charged_mean"), 0), au, pr],
            lambda r: f"{NAMES.get(r['strategy'], r['strategy'])} / {_f(r['dp_sigma'], 1)}",
            metrics=[m for m in METRICS if m in df] + ["dp_epsilon", "dp_rounds_charged"])
@@ -336,7 +340,7 @@ def main(argv=None):
     sig = {0.5: "SigmaHalf", 1.0: "SigmaOne", 2.0: "SigmaTwo", 4.0: "SigmaFour"}
     num_word = lambda x: {"0.15": "Fifteen", "0.25": "TwentyFive", "0.4": "Forty", "0.6": "Sixty", "0.8": "Eighty"}.get(str(x), str(x))  # noqa: E731
     if not df.empty:
-        dpd = df[tag.str.startswith("_dp")]
+        dpd = df[tag.str.startswith("_dp") & ~tag.str.startswith("_dpe")]
         if not dpd.empty:
             _mac("dp", dpd, lambda i: f"{dpd.loc[i,'strategy']} {sig.get(float(dpd.loc[i,'dp_sigma']), 'Sigma')}")
             for s_, sw in sig.items():
@@ -393,10 +397,125 @@ def main(argv=None):
         W.num("NetCellEdgeFedper", _f(mb[mb.strategy == "fedper"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
         W.num("NetCellEdgeTierfed", _f(mb[mb.strategy == "tierfed"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
 
+    v4_families(df, tag, T, W, R)
     W.finish()
     print(f"collected {len(df)} runs -> {T} and {a.paper}")
     missing = [p.name for p in Path(a.paper).glob("*.tex") if "RUN REQUIRED" in p.read_text()]
     print("tables still waiting for runs:", missing if missing else "none")
+
+
+# --------------------------------------------------------------------------- #
+def _paired(W, piv, a, b, name, nd=3):
+    if a not in piv or b not in piv:
+        return
+    d = (piv[a] - piv[b]).dropna()
+    if len(d) < 2:
+        return
+    from scipy import stats as sps
+    p = sps.ttest_rel(piv.loc[d.index, a], piv.loc[d.index, b]).pvalue
+    W.num(name + "Diff", f"{d.mean():+.{nd}f}"); W.num(name + "P", _p(p))
+    W.flag(name + "Better", bool(d.mean() > 0 and p < 0.05))
+    W.flag(name + "Worse", bool(d.mean() < 0 and p < 0.05))
+
+
+_W = {1.0: "One", 2.0: "Two", 4.0: "Four", 8.0: "Eight", 0.5: "Half", 0.1: "Tenth", 10.0: "Ten"}
+
+
+def v4_families(df, tag, T, W, R):
+    """Matched-epsilon DP, real-site benchmarks, wide model + socket emulation."""
+    au = lambda r: f"{_f(r.get('fed_auroc_final_mean'))} $\\pm$ {_f(r.get('fed_auroc_final_std'))}"  # noqa: E731
+    pr = lambda r: _f(r.get("fed_auprc_final_mean"), 3)      # noqa: E731
+    up = lambda r: _f(r.get("total_upload_mb_mean"), 1)      # noqa: E731
+    ns = lambda r: str(int(r["n_seeds"]))                    # noqa: E731
+    sig = lambda r: _f(r.get("dp_sigma_mean"), 2)            # noqa: E731
+    rel = lambda r: _f(r.get("dp_rounds_charged_mean"), 0)   # noqa: E731
+    eps = lambda r: _f(r.get("dp_epsilon_mean"), 2)          # noqa: E731
+    extra = [m for m in METRICS if m in df] + ["dp_epsilon", "dp_rounds_charged", "dp_sigma", "total_upload_mb"]
+    nm = lambda s: NAMES.get(s, s)                           # noqa: E731
+
+    m = tag.str.startswith("_dpe") & ~tag.str.contains("_lam")
+    family(df, T, W, "dpmatched", m, ["dp_q", "dp_target_eps", "strategy"],
+           [ns, sig, rel, eps, au, pr, up],
+           lambda r: f"{_f(r['dp_q'], 1)} / {_f(r['dp_target_eps'], 0)} / {nm(r['strategy'])}",
+           metrics=extra)
+    sub = df[m]
+    for (q, e), g in sub.groupby(["dp_q", "dp_target_eps"]):
+        key = "dpm" + ("QHalf" if float(q) < 1 else "QOne") + "Eps" + _W.get(float(e), "X")
+        for s_, gs in g.groupby("strategy"):
+            k2 = key + s_.title().replace("_", "")
+            W.num(k2 + "Auroc", _f(gs["fed_auroc_final"].mean()))
+            W.num(k2 + "Sigma", _f(gs["dp_sigma"].mean(), 2))
+            W.num(k2 + "Rel", _f(gs["dp_rounds_charged"].mean(), 0))
+            W.num(k2 + "UploadMb", _f(gs["total_upload_mb"].mean(), 1))
+        piv = g.pivot_table(index="seed", columns="strategy", values="fed_auroc_final")
+        for o in ("fedavg", "fedper", "fixed"):
+            _paired(W, piv, "tierfed_dp", o, key + "TfdpVs" + o.title())
+        _paired(W, piv, "fixed", "fedper", key + "FixedVsFedper")
+    lm = tag.str.startswith("_dpe") & (tag.str.contains("_lam") | (df["strategy"] == "tierfed_dp")) \
+        & (df["dp_q"].astype(float) == 1.0) & (df["dp_target_eps"].astype(float) == 4.0)
+    lam_df = df[lm & (df["strategy"] == "tierfed_dp")].copy()
+    if not lam_df.empty:
+        lam_df["lam"] = lam_df["lam"].fillna(1.0)
+    family(lam_df if not lam_df.empty else df, T, W, "dplambda",
+           pd.Series(True, index=lam_df.index) if not lam_df.empty else pd.Series(False, index=df.index),
+           ["lam"], [ns, lambda r: _f(r.get("sched_K_slow_mean"), 0), sig, rel, au, up],
+           lambda r: _f(r["lam"], 1), metrics=extra + ["sched_K_slow"])
+
+    for ds in ("heart", "eicu_demo", "eicu"):
+        mk = (df["dataset"] == ds) & (tag == "_real")
+        fam = "real" + ds.replace("_", "")
+        family(df, T, W, fam, mk, ["strategy"],
+               [ns, au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
+               lambda r: nm(r["strategy"]))
+        g = df[mk]
+        if g.empty:
+            continue
+        key = "real" + _safe(ds.replace("_", " ").title())
+        W.num(key + "Clients", str(int(g["n_clients"].iloc[0])))
+        W.num(key + "Ntrain", str(int(g["ds_n_train"].iloc[0])) if g["ds_n_train"].notna().any() else "--")
+        for s_, gs in g.groupby("strategy"):
+            W.num(key + s_.title() + "Auroc", _f(gs["fed_auroc_final"].mean()))
+            W.num(key + s_.title() + "UploadMb", _f(gs["total_upload_mb"].mean(), 2))
+        piv = g.pivot_table(index="seed", columns="strategy", values="fed_auroc_final")
+        for o in piv.columns:
+            if o != "tierfed":
+                _paired(W, piv, "tierfed", o, key + "TfVs" + o.title())
+
+    wide = df[tag == "_wide"]
+    family(df, T, W, "wide", tag == "_wide", ["strategy"],
+           [ns, au, pr, up, lambda r: f"{int(r.get('tier_total_params_mean', 0)):,}"],
+           lambda r: nm(r["strategy"]), metrics=[m for m in METRICS + NET if m in df] + ["tier_total_params"])
+    if not wide.empty:
+        W.num("wideParams", f"{int(wide['tier_total_params'].iloc[0]):,}")
+        for s_, gs in wide.groupby("strategy"):
+            W.num("wide" + s_.title() + "Auroc", _f(gs["fed_auroc_final"].mean()))
+            W.num("wide" + s_.title() + "UploadMb", _f(gs["total_upload_mb"].mean(), 0))
+
+    emu = [json.loads(p.read_text()) for p in sorted((R / "emulation").glob("*.json"))] if (R / "emulation").exists() else []
+    if not emu:
+        W.table("emulation", None); return
+    e = pd.DataFrame(emu)
+    e["relerr"] = (e["analytic_upload_s"] - e["emu_upload_s"]) / e["emu_upload_s"].where(e["emu_upload_s"] > 0)
+    tcols = [c for c in e.columns if c.startswith("tt_")]
+    agg = e.groupby(["profile", "strategy"]).agg(
+        n=("seed", "count"), emu=("emu_upload_s", "mean"), ana=("analytic_upload_s", "mean"),
+        rel=("relerr", "mean"), comp=("compute_s", "mean"), **{c: (c, "mean") for c in tcols}).reset_index()
+    order = {"hospital_wan": 0, "nr_typical": 1, "nr_cell_edge": 2}
+    agg = agg.sort_values(["profile", "strategy"], key=lambda c: c.map(order).fillna(9) if c.name == "profile" else c)
+    agg.to_csv(T / "emulation.csv", index=False)
+    lines = []
+    for _, r in agg.iterrows():
+        tt = [("never" if not np.isfinite(r[c]) else _f(r[c], 0)) for c in tcols]
+        lines.append(" & ".join([r["profile"].replace("_", r"\_"), nm(r["strategy"]), str(int(r["n"])),
+                                 _f(r["emu"], 1), _f(r["ana"], 1), _f(100 * r["rel"], 1), _f(r["comp"], 0)] + tt) + r" \\")
+    W.table("emulation", "\n".join(lines) + "\n")
+    W.num("emuMaxAbsRelErrPct", _f(100 * e["relerr"].abs().max(), 1))
+    for (pf, s_), g in e.groupby(["profile", "strategy"]):
+        k = "emu" + _safe(pf.replace("_", " ").title()) + s_.title()
+        W.num(k + "UploadS", _f(g["emu_upload_s"].mean(), 0))
+        for c in tcols:
+            v = g[c].mean()
+            W.num(k + "Tt" + _safe(c.replace("tt_", "").replace(".", "p").replace("_s", "")), "never" if not np.isfinite(v) else _f(v, 0))
 
 
 if __name__ == "__main__":

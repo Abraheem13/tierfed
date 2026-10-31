@@ -19,11 +19,13 @@ from .base import Strategy
 class FedAvg(Strategy):
     """McMahan et al. 2017: sample-weighted average of every parameter each round."""
     name = "fedavg"
+    dp_safe = True
 
 
 class FedProx(Strategy):
     """Li et al. 2020: FedAvg plus a proximal term (mu/2)||theta - theta_global||^2."""
     name = "fedprox"
+    dp_safe = True
 
     def __init__(self, *a, mu: float = 0.01, **kw):
         super().__init__(*a, **kw)
@@ -45,6 +47,7 @@ class FedProx(Strategy):
 class FedPer(Strategy):
     """Arivazhagan et al. 2019: shared backbone every round, private classifier head."""
     name = "fedper"
+    dp_safe = True
 
     def __init__(self, param_names, sizes, head_keys: Sequence[str], **kw):
         super().__init__(param_names, sizes, **kw)

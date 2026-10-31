@@ -15,6 +15,7 @@ from .base import Strategy
 
 class FixedSchedule(Strategy):
     name = "fixed"
+    dp_safe = True
 
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
                  tiers: Mapping[str, str], k_slow: int = 5, k_med: int = 2, warmup: int = 0,
@@ -68,7 +69,7 @@ NestedFL = FixedSchedule
 def build_strategy(name: str, param_names, sizes, tiers=None, head_keys=None, **kw) -> Strategy:
     """Factory used by every experiment script."""
     from .baselines import LAG, SCAFFOLD, AdaComm, FedAvg, FedLAMA, FedPer, FedProx
-    from .adaptive import AdaptiveTierFed
+    from .adaptive import AdaptiveTierFed, PrivacyPlannedTierFed
     name = name.lower()
     common = {k: kw[k] for k in ("compressor",) if k in kw}
     if name == "fedavg":
@@ -94,6 +95,12 @@ def build_strategy(name: str, param_names, sizes, tiers=None, head_keys=None, **
                                k_min=kw.get("k_min", 1), k_max=kw.get("k_max", 8),
                                rho=kw.get("rho", 0.25), solver=kw.get("solver", "exact"),
                                private_head=kw.get("private_head", True), **common)
+    if name == "tierfed_dp":
+        return PrivacyPlannedTierFed(param_names, sizes, tiers or {}, rounds=kw.get("rounds", 60),
+                                     warmup=kw.get("warmup", 5), epsilon=kw.get("epsilon", 4.0),
+                                     delta=kw.get("delta", 1e-5), q=kw.get("q", 1.0),
+                                     k_max=kw.get("k_max", 8), rho=kw.get("rho", 1.0), lam=kw.get("lam", 1.0),
+                                     private_head=kw.get("private_head", True), **common)
     if name in ("fixed", "nested", "nfl", "nested_sched", "nested_nohead"):
         return FixedSchedule(param_names, sizes, tiers or {},
                              k_slow=kw.get("k_slow", 5), k_med=kw.get("k_med", 2),

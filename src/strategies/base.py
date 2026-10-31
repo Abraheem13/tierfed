@@ -41,6 +41,9 @@ class Strategy:
     private: Sequence[str] = ()
     #: upload multiplier for auxiliary state (SCAFFOLD sends control variates)
     upload_multiplier: float = 1.0
+    #: True if the transmission schedule does not depend on client data, so it
+    #: may be run under client-level DP without leaking through the schedule
+    dp_safe: bool = False
 
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
                  compressor: Compressor | None = None, **_):
@@ -134,6 +137,11 @@ class Strategy:
             bits += b
             out[k] = (reference[k].float() + q.float()).to(state[k].dtype)
         return out, bits * self.upload_multiplier
+
+    def planned_release_rounds(self, rounds: int) -> List[int]:
+        """Rounds in which something is transmitted, known before training for
+        data-independent schedules (used to calibrate sigma to a target epsilon)."""
+        return [r for r in range(1, rounds + 1) if self.send_keys(r)]
 
     def schedule_table(self, rounds: int) -> Dict[str, float]:
         return {}

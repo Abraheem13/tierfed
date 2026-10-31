@@ -6,6 +6,10 @@ diabetes   : UCI Diabetes 130-US Hospitals, Strack et al. (2014) cleaning
              share-capped specialty partition. (v2 skipped the dedup because the
              UCI API returns patient_nbr in `ids`, not `features`.)
 eicu       : eICU-CRD with the TRUE hospitalid (credentialed PhysioNet access).
+eicu_demo  : the open eICU-CRD demo subset (PhysioNet, ODbL), TRUE hospitalid.
+heart      : UCI Heart Disease, four real institutions (Cleveland, Hungarian
+             Institute of Cardiology, University Hospitals Zurich/Basel, VA Long
+             Beach) as in FLamby Fed-Heart-Disease (du Terrail et al., 2022).
 mimic      : MIMIC-IV admissions cohort, sites = admission location.
 medmnist   : MedMNIST v2; default PneumoniaMNIST, which is natively binary
              (v2 binarised the 7-class DermaMNIST into a 97%-positive task).
@@ -164,13 +168,60 @@ def load_diabetes(n_clients: int = 20, partition: str = "lpt", seed: int = 0,
 
 
 # --------------------------------------------------------------------------- #
+def _fetch(url: str, path: Path, tries: int = 5) -> Path:
+    """Download once to `path` (atomic), with retries; later runs read the cache."""
+    if path.exists():
+        return path
+    import time, urllib.request
+    path.parent.mkdir(parents=True, exist_ok=True)
+    last = None
+    for attempt in range(tries):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r:
+                data = r.read()
+            tmp = path.with_suffix(path.suffix + ".tmp")
+            tmp.write_bytes(data); tmp.replace(path)
+            return path
+        except Exception as e:
+            last = e; time.sleep(5 * (attempt + 1))
+    raise RuntimeError(f"could not download {url}: {last}")
+
+
+EICU_DEMO_URL = "https://physionet.org/files/eicu-crd-demo/2.0.1/patient.csv.gz"
+
+
+def _eicu_frame(root: Path, demo: bool) -> pd.DataFrame:
+    if demo:
+        f = _fetch(EICU_DEMO_URL, root / "patient.csv.gz")
+        return pd.read_csv(f, compression="gzip", low_memory=False)
+    f = root / "patient.csv"
+    if not f.exists() and (root / "patient.csv.gz").exists():
+        return pd.read_csv(root / "patient.csv.gz", compression="gzip", low_memory=False)
+    return pd.read_csv(f, low_memory=False)
+
+
+@register("eicu_demo")
+def load_eicu_demo(n_clients: int = 0, partition: str = "natural", seed: int = 0,
+                   root: Optional[str] = None, min_site: int = 80, target: str = "mortality", **kw):
+    return load_eicu(n_clients=n_clients, partition=partition, seed=seed,
+                     root=root or str(DATA_ROOT / "eicu_demo"), min_site=min_site,
+                     target=target, demo=True, **kw)
+
+
 @register("eicu")
 def load_eicu(n_clients: int = 30, partition: str = "natural", seed: int = 0,
               root: Optional[str] = None, min_site: int = 200,
-              target: str = "mortality", **_) -> FederatedDataset:
+              target: str = "mortality", demo: bool = False, **_) -> FederatedDataset:
+    """Features are admission-time only (no outcome-derived offsets). Hospitals
+    with fewer than `min_site` stays are DROPPED rather than pooled, so every
+    client is one real hospital."""
     root = Path(root) if root else DATA_ROOT / "eicu"
-    pat = pd.read_csv(root / "patient.csv", low_memory=False)
-    pat = pat[pat["age"].notna()].reset_index(drop=True)
+    pat = _eicu_frame(root, demo)
+    pat = pat[pat["age"].notna() & pat["hospitaldischargestatus"].notna()].reset_index(drop=True)
+    counts = pat["hospitalid"].value_counts()
+    pat = pat[pat["hospitalid"].isin(counts[counts >= min_site].index)].reset_index(drop=True)
+    if pat["hospitalid"].nunique() < 2:
+        raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
     pat["age_num"] = pd.to_numeric(pat["age"].astype(str).str.replace("> 89", "90", regex=False),
                                    errors="coerce").fillna(65)
     if target == "mortality":
@@ -185,9 +236,49 @@ def load_eicu(n_clients: int = 30, partition: str = "natural", seed: int = 0,
     pat[num] = pat[num].fillna(pat[num].median(numeric_only=True))
     x = _encode(pat, num, cat)
     patients = pat["uniquepid"].values if "uniquepid" in pat else None
-    return _split_and_partition(x, y, "eicu", {"target": target, "true_site_ids": True},
-                                n_clients, partition, seed, site_ids=pat["hospitalid"].values,
-                                patient_groups=patients, min_size=min_site)
+    name = "eicu_demo" if demo else "eicu"
+    meta = {"target": target, "true_site_ids": True, "n_hospitals": int(pat["hospitalid"].nunique()),
+            "n_stays": int(len(pat)), "min_site": int(min_site), "prevalence": float(y.mean())}
+    # the global split is patient-grouped, so a site can lose a few stays; use a
+    # partition floor below min_site so that no real hospital is merged away
+    return _split_and_partition(x, y, name, meta, n_clients, partition, seed,
+                                site_ids=pat["hospitalid"].values, patient_groups=patients,
+                                min_size=max(10, min_site // 2))
+
+
+HEART_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.{}.data"
+HEART_SITES = ["cleveland", "hungarian", "switzerland", "va"]
+HEART_COLS = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang",
+              "oldpeak", "slope", "ca", "thal", "num"]
+
+
+@register("heart")
+def load_heart(n_clients: int = 4, partition: str = "natural", seed: int = 0,
+               root: Optional[str] = None, **_) -> FederatedDataset:
+    """Fed-Heart-Disease: 13 clinical features, target = any angiographic disease
+    (num > 0), one client per institution. Missing values ('?') are imputed with
+    the pooled median (label-free, as for the other tabular loaders); `ca` and
+    `thal` are mostly missing outside Cleveland, so missingness indicators are added."""
+    root = Path(root) if root else DATA_ROOT / "heart"
+    frames = []
+    for site in HEART_SITES:
+        f = _fetch(HEART_URL.format(site), root / f"processed.{site}.data")
+        df = pd.read_csv(f, header=None, names=HEART_COLS, na_values=["?"])
+        df["site"] = site
+        frames.append(df)
+    df = pd.concat(frames, ignore_index=True)
+    y = (pd.to_numeric(df["num"], errors="coerce").fillna(0) > 0).astype(int).values
+    num = ["age", "trestbps", "chol", "thalach", "oldpeak", "ca"]
+    cat = ["sex", "cp", "fbs", "restecg", "exang", "slope", "thal"]
+    for c in num:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+        df[c + "_missing"] = df[c].isna().astype(float)
+    df[num] = df[num].fillna(df[num].median(numeric_only=True))
+    df[cat] = df[cat].astype(str).replace("nan", "missing")
+    x = _encode(df, num + [c + "_missing" for c in num], cat)
+    meta = {"n_sites": 4, "true_site_ids": True, "n_patients": int(len(df)), "prevalence": float(y.mean())}
+    return _split_and_partition(x, y, "heart", meta, n_clients, partition, seed,
+                                site_ids=df["site"].values, min_size=10)
 
 
 @register("mimic")

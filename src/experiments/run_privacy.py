@@ -42,7 +42,8 @@ def main(argv=None):
         for sigma in args.sigmas:
             for seed in args.seeds:
                 dp = dict(enabled=True, sigma=sigma, max_norm=args.clip, delta=1e-5)
-                run_single(dict(dataset=args.dataset, strategy=strat, strategy_kwargs=skw, dp=dp,
+                # legacy v3 table: data-dependent schedulers allowed, disclosed as not covered by the accountant
+                run_single(dict(dataset=args.dataset, strategy=strat, strategy_kwargs=skw, dp=dp, allow_unsafe_dp=True,
                                 rounds=args.rounds, n_clients=args.clients, seed=seed,
                                 device=args.device, out_dir=args.out, tag=f"_dp{sigma}"), skip_existing=True)
 

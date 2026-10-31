@@ -55,6 +55,21 @@ on first use. `eicu`/`mimic` need credentialed PhysioNet access; place
 `patient.csv` / `admissions.csv` under `data/eicu/` and `data/mimic/` and the
 eICU stage runs automatically.
 
+## v4 experiments (matched-epsilon DP, real institutions, wide model + link emulation)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run_v4.ps1          # all parts; -Part emu|dp|real for one
+powershell -ExecutionPolicy Bypass -File scripts\check_v4.ps1        # progress
+```
+
+* `run_dp_matched`: FedAvg, FedPer, fixed period and TierFed-DP at the same target epsilon,
+  Poisson client sampling, sigma calibrated per method (subsampled-Gaussian RDP accountant).
+  Data-dependent schedulers (adaptive TierFed, AdaComm, LAG, FedLAMA, SCAFFOLD) are refused under DP.
+* `run_realsites`: UCI Heart Disease (4 institutions) and the open eICU-CRD demo (one client per hospital).
+  Both download once into `data/`. Full eICU-CRD: put `patient.csv` in `data/eicu` (credentialed).
+* `run_emulation`: ~1.8M-parameter `mlp_wide`; every run's logged per-client upload bytes are replayed
+  over paced loopback TCP (`src/netemu.py`) for time-to-target. Application-layer, not netem.
+
 ## Reporting rules we hold ourselves to
 
 * Non-inferiority is a one-sided test at a stated margin on **both** AUROC and

@@ -107,6 +107,8 @@ def build_model(name: str, input_shape, n_classes: int = 2, **kw) -> nn.Module:
     name = (name or "mlp").lower()
     if name == "mlp":
         return NestedMLP(in_dim, kw.get("hidden", (128, 128, 64)), n_classes, kw.get("dropout", 0.3))
+    if name == "mlp_wide":     # ~1.8M parameters on Diabetes; same tiering as mlp
+        return NestedMLP(in_dim, kw.get("hidden", (1024, 1024, 512)), n_classes, kw.get("dropout", 0.3))
     if name in ("resnet", "tabresnet"):
         return TabularResNet(in_dim, kw.get("dim", 128), kw.get("depth", 6), n_classes, kw.get("dropout", 0.2))
     if name in ("transformer", "ft_transformer"):

@@ -176,3 +176,88 @@ class AdaptiveTierFed(Strategy):
         return {**super().describe(), "warmup": self.warmup, "solver": self.solver,
                 "k_min": self.k_min, "k_max": self.k_max, "rho": self.rho,
                 "final_intervals": dict(self.K)}
+
+
+class PrivacyPlannedTierFed(Strategy):
+    """TierFed-DP: a privacy- and byte-budgeted schedule planned BEFORE training.
+
+    Under client-level DP the set of transmitting rounds is observable, so a
+    schedule computed from client updates (adaptive TierFed, AdaComm, LAG,
+    FedLAMA) is itself a data-dependent release that the accountant does not
+    cover. TierFed-DP therefore plans offline, from public quantities only:
+    the privacy target (epsilon, delta), the client-sampling rate q, the number
+    of rounds R, the warm-up T_w, the tier sizes d_g and the byte quota rho.
+
+    For every candidate interval pair (K_s, K_m) in {1..K_max}^2 it computes the
+    resulting release rounds, the noise multiplier sigma(K) that makes the run
+    exactly epsilon-DP for that number of releases (exact subsampled-Gaussian
+    RDP accountant), and the surrogate
+
+        J(K) = sum_g w_g K_g^2  +  lam * (1/R) sum_r (d_tx(r)/d) * sigma(K)^2,
+
+    i.e. the multi-rate drift term of the bound (with a flat, data-free
+    heterogeneity prior) plus the noise energy injected into the shared model
+    per round. Fewer releases need less noise per release (sigma^2 grows roughly
+    linearly with the release count) but drift more; J trades the two. The
+    pair minimising J subject to the byte quota is used, and the server is told
+    sigma. lam is the single prior (it absorbs the unknown smoothness and
+    heterogeneity constants of the bound); its sensitivity is reported.
+    """
+    name = "tierfed_dp"
+    dp_safe = True
+
+    def __init__(self, param_names, sizes, tiers, rounds: int = 60, warmup: int = 5,
+                 epsilon: float = 4.0, delta: float = 1e-5, q: float = 1.0,
+                 k_max: int = 8, rho: float = 1.0, lam: float = 1.0,
+                 private_head: bool = True, **kw):
+        super().__init__(param_names, sizes, **kw)
+        from ..privacy.dp import calibrate_sigma
+        self.tiers = dict(tiers)
+        self.private = [k for k, t in self.tiers.items() if t == "fast"] if private_head else []
+        self.shared_tiers = sorted({t for t in self.tiers.values() if t != "fast"} or {"medium"})
+        self.R, self.Tw, self.k_max, self.rho, self.lam = int(rounds), int(warmup), int(k_max), float(rho), float(lam)
+        self.eps, self.delta, self.q = float(epsilon), float(delta), float(q)
+        priv = set(self.private)
+        tot = sum(v for k, v in self.sizes.items() if k not in priv) or 1
+        self.w = {g: sum(v for k, v in self.sizes.items() if self.tiers.get(k) == g and k not in priv) / tot
+                  for g in self.shared_tiers}
+        best = None
+        self.candidates = []
+        for Ks in itertools.product(range(1, self.k_max + 1), repeat=len(self.shared_tiers)):
+            K = dict(zip(self.shared_tiers, Ks))
+            due = [[g for g in self.shared_tiers if r <= self.Tw or (r - self.Tw) % K[g] == 0]
+                   for r in range(1, self.R + 1)]
+            frac = [sum(self.w[g] for g in d) for d in due]
+            releases = sum(1 for f in frac if f > 0)
+            payload = sum(frac) / self.R
+            if payload > self.rho + 1e-12 or releases == 0:
+                continue
+            sigma = calibrate_sigma(self.eps, releases, self.q, self.delta)
+            drift = sum(self.w[g] * K[g] ** 2 for g in self.shared_tiers)
+            noise = sum(frac) / self.R * sigma ** 2
+            J = drift + self.lam * noise
+            self.candidates.append((J, K, sigma, releases, payload))
+            if best is None or J < best[0]:
+                best = (J, K, sigma, releases, payload)
+        if best is None:
+            raise ValueError("no schedule satisfies the byte quota")
+        self.J, self.K, self.planned_sigma, self.planned_releases, self.planned_payload = best
+
+    def due(self, r: int):
+        return [g for g in self.shared_tiers if r <= self.Tw or (r - self.Tw) % self.K[g] == 0]
+
+    def send_keys(self, r: int):
+        act = set(self.due(r)); priv = set(self.private)
+        return [k for k in self.param_names if self.tiers.get(k, "medium") in act and k not in priv]
+
+    def planned_release_rounds(self, rounds: int):
+        return [r for r in range(1, rounds + 1) if self.send_keys(r)]
+
+    def schedule_table(self, rounds: int):
+        return {"K_slow": float(self.K.get("slow", 0)), "K_medium": float(self.K.get("medium", 0)),
+                "planned_sigma": self.planned_sigma, "planned_releases": float(self.planned_releases),
+                "planned_payload": self.planned_payload, "lam": self.lam, "J": self.J,
+                "target_epsilon": self.eps, "q": self.q}
+
+    def describe(self):
+        return {**super().describe(), **self.schedule_table(self.R)}

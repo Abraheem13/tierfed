@@ -8,6 +8,8 @@ aggregate).
 """
 from __future__ import annotations
 
+import time
+
 from typing import Callable, Dict, List
 
 import numpy as np
@@ -15,7 +17,7 @@ import torch
 
 from .client import Client
 from .metrics import TrajectoryStats, classification_metrics, weighted_average
-from .privacy.dp import DPConfig, private_aggregate
+from .privacy.dp import DPConfig, calibrate_sigma, private_aggregate
 from .privacy.inversion import attack_update
 from .privacy.membership import membership_inference
 from .theory.divergence import DivergenceTracker
@@ -51,10 +53,35 @@ class FederatedServer:
         self.divergence = DivergenceTracker()
         self.attack_rows: List[Dict[str, float]] = []
         self.noise_gen = torch.Generator(device="cpu").manual_seed(self.seed + 7919)
+        # Poisson client sampling (each site independently with prob. q) is used
+        # whenever DP subsampling amplification is claimed, or when asked for.
+        self.poisson = (self.dp.enabled and self.dp.sample_rate < 1.0) or cfg.get("participation_mode") == "poisson"
+        self.q = self.dp.sample_rate if self.dp.enabled and self.dp.sample_rate < 1.0 else float(self.participation)
+        self.planned_releases = None
+        self.dp_safe = False
+        if self.dp.enabled:
+            # Under client-level DP the transmission schedule is observable. A
+            # schedule computed from client updates is a data-dependent release the
+            # accountant does not cover, so only data-independent schedules are run
+            # (allow_unsafe_dp reproduces the v3 equal-sigma table, disclosed as flawed).
+            if not getattr(strategy, "dp_safe", False) and not cfg.get("allow_unsafe_dp", False):
+                raise ValueError(f"strategy '{strategy.name}' chooses its schedule from client "
+                                 "updates and is not covered by the DP accountant")
+            self.dp_safe = bool(getattr(strategy, "dp_safe", False))
+            if self.dp_safe:
+                self.planned_releases = strategy.planned_release_rounds(self.rounds)
+            if self.dp.target_epsilon:
+                if self.planned_releases is None:
+                    raise ValueError("target_epsilon requires a data-independent schedule")
+                self.dp.sigma = calibrate_sigma(float(self.dp.target_epsilon), len(self.planned_releases),
+                                                self.dp.sample_rate, self.dp.delta)
 
     # ------------------------------------------------------------------ #
     def _sample(self, r: int) -> List[int]:
         n = len(self.clients)
+        if self.poisson:
+            rng = np.random.default_rng(self.seed * 1000 + r)
+            return [k for k in range(n) if rng.random() < self.q]
         m = max(1, int(round(self.participation * n)))
         if m >= n:
             return list(range(n))
@@ -72,11 +99,13 @@ class FederatedServer:
             self.download_bits += dl_bits
 
             states, weights, stats, senders = [], [], [], []
-            per_client_bits = []
+            per_client_bits, compute_s = [], []
             for cid in sel:
                 c = self.clients[cid]
                 c.set_parameters(self.global_state, keys)
+                t0 = time.perf_counter()
                 s = c.train(self.strategy, payload if keys else None, self.local_epochs, self.seed)
+                compute_s.append(time.perf_counter() - t0)
                 c.stash_private(priv)
                 raw = c.get_slice(keys)
                 self.strategy.after_local(cid, self.global_state, raw, keys, s["steps"], s["lr"])
@@ -98,17 +127,29 @@ class FederatedServer:
             self.upload_bits += ul_bits
             self.round_bits.append({"round": r, "upload_bits": ul_bits, "download_bits": float(dl_bits),
                                     "max_client_bits": float(max(per_client_bits) if per_client_bits else 0.0),
-                                    "n_senders": float(len(senders))})
-            if hasattr(self.strategy, "observe_loss"):
+                                    "n_senders": float(len(senders)), "n_selected": float(len(sel)),
+                                    "compute_s_max": float(max(compute_s) if compute_s else 0.0),
+                                    "client_bits": [float(b) for b in per_client_bits]})
+            if hasattr(self.strategy, "observe_loss") and stats:
                 self.strategy.observe_loss(r, float(np.mean([s["loss"] for s in stats])))
 
             dp_info = {}
-            if keys and states and self.dp.enabled:
+            if self.dp.enabled and keys and (states or self.dp_safe):
+                # A planned release happens even if Poisson sampling drew nobody
+                # (noise-only update), so the accountant's release count is exact.
+                denom = self.q * len(self.clients) if self.poisson else None
                 self.global_state, dp_info = private_aggregate(
-                    self.global_state, states, keys, self.dp.max_norm, self.dp.sigma, self.noise_gen)
+                    self.global_state, states, keys, self.dp.max_norm, self.dp.sigma, self.noise_gen,
+                    denominator=denom)
                 self.dp_rounds += 1
-                # schedulers still see the raw (pre-noise) slices for their diagnostics
-                self.strategy.observe(self.global_state, states, keys, r)
+                dp_info["dp_cohort"] = float(len(states))
+                if self.dp_safe:
+                    # DP-safe strategies never see raw client slices
+                    self.strategy.observe(self.global_state, [], keys, r)
+                else:
+                    self.strategy.observe(self.global_state, states, keys, r)
+            elif self.dp.enabled:
+                pass   # nothing transmitted: no release, no budget
             else:
                 self.global_state = self.strategy.aggregate(self.global_state, states, weights, r)
                 self.strategy.observe(self.global_state, states, keys, r)
