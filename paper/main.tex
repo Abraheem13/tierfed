@@ -20,7 +20,7 @@
 % ---------------------------------------------------------------------------
 \IfFileExists{generated/numbers.tex}{\input{generated/numbers.tex}}{}
 \newcommand{\runreq}{\textbf{\textcolor{red}{[RUN REQUIRED]}}}
-\newcommand{\gen}[1]{\IfFileExists{generated/#1.tex}{\input{generated/#1.tex}}{\runreq}}
+\makeatletter\newcommand{\gen}[1]{\@@input generated/#1.tex }\makeatother % collect.py always writes every table (RUN REQUIRED if no runs)
 \newcommand{\num}[1]{\ifcsdef{#1}{\csname #1\endcsname}{\runreq}}
 % \ifflag{<flag>}{<text if true>}{<text if false>}; unknown flag -> [RUN REQUIRED]
 \newcommand{\ifflag}[3]{\ifcsdef{flag#1}{\ifcsstring{flag#1}{true}{#2}{#3}}{\runreq}}
@@ -33,13 +33,13 @@
 
 \begin{document}
 
-\title{Communication as the Binding Constraint: Budget-Optimal Multi-Rate Federated Learning for Clinical Prediction over Bandwidth-Limited Links}
+\title{Fewer Rounds, Fewer Bytes, Smaller Privacy Budgets: Communication-Budgeted Federated Learning for Clinical Prediction over Constrained Links}
 
 \author{Abraheem~Rashid
 \thanks{A.~Rashid is with the Department of Computer Science, Brunel University London, Uxbridge UB8~3PH, U.K. (e-mail: 2546393@brunel.ac.uk).}
 \thanks{Code, per-seed logs and the scripts that generate every table of this article are available at \url{https://github.com/Abraheem13/tierfed}.}}
 
-\markboth{IEEE Transactions on Network and Service Management}{Rashid: Budget-Optimal Multi-Rate Federated Learning over Bandwidth-Limited Links}
+\markboth{IEEE Transactions on Network and Service Management}{Rashid: Communication-Budgeted Federated Learning over Constrained Links}
 
 \maketitle
 

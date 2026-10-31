@@ -28,7 +28,7 @@ Tier $g$ is due when $r-\tau_g\ge K_g^\star$, where $\tau_g$ is the round of its
 \mathcal A_r=\begin{cases}\mathcal G_{\mathrm{sh}}, & r\le T_w,\\ \{g:\ r-\tau_g\ge K_g^\star\}, & r>T_w.\end{cases}
 \label{eq:due}
 \end{equation}
-Divergence is largest in the earliest rounds (Fig.~\ref{fig:divergence}), which is exactly where a fixed sparse schedule is destroyed, so the first $T_w$ rounds synchronise every shared tier. $T_w=5$ and $K_{\max}=8$ are held fixed across every dataset, architecture, loss and privacy setting in this article; a $T_w$ sweep is in Table~\ref{tab:warmup}.
+Divergence is largest in the earliest rounds, so the first $T_w$ rounds synchronise every shared tier. $T_w=5$ and $K_{\max}=8$ are held fixed across every dataset, architecture, loss and privacy setting in this article; a $T_w$ sweep is in Table~\ref{tab:warmup}.
 
 \begin{algorithm}[t]
 \caption{\tierfed{}: server round $r$}

@@ -2,7 +2,7 @@
 \usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,etoolbox,url,hyperref}
 \IfFileExists{generated/numbers.tex}{\input{generated/numbers.tex}}{}
 \newcommand{\runreq}{\textbf{[RUN REQUIRED]}}
-\newcommand{\gen}[1]{\IfFileExists{generated/#1.tex}{\input{generated/#1.tex}}{\runreq}}
+\makeatletter\newcommand{\gen}[1]{\@@input generated/#1.tex }\makeatother % collect.py always writes every table (RUN REQUIRED if no runs)
 \newcommand{\num}[1]{\ifcsdef{#1}{\csname #1\endcsname}{\runreq}}
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
@@ -12,7 +12,7 @@
 \maketitle
 
 \section{S1. Relation to the superseded version}
-An earlier manuscript (``Nested Federated Learning'' / ``TierFed'' v2) reported results produced by code with the following defects, found in an internal audit and corrected here: (1) differential privacy was applied inside two strategies only and clipped the aggregate rather than each client's update, so FedAvg/FedPer/FedProx ran without noise and the reported budgets were invalid; the TierFed DP runs crashed on local-only rounds and the table was unsupported; (2) the SCAFFOLD baseline was FedAvg with doubled bit accounting; (3) the scalability table contained no TierFed runs and its values were not those of the logs; (4) the architecture sweep compared different depths across methods; (5) the imaging result used an undisclosed configuration on a binarised 97\%-positive task; (6) the inversion attack targeted the fixed schedule at initialisation and was labelled TierFed; (7) the model described (93 inputs) was not the model trained (162 inputs); (8) repeated runs were not deterministic; (9) no patient-level deduplication was performed and one ``missing specialty'' client held 49\% of the data; (10) the greedy controller reached only powers of two. Every item maps to a code change in the released repository (\texttt{ROADMAP.md}, section 0) and to a test.
+An earlier manuscript (``Nested Federated Learning'' / ``TierFed'' v2) reported results produced by code with the following defects, found in an internal audit and corrected here: (1) differential privacy was applied inside two strategies only and clipped the aggregate rather than each client's update, so FedAvg/FedPer/FedProx ran without noise and the reported budgets were invalid; the TierFed DP runs crashed on local-only rounds and the table was unsupported; (2) the SCAFFOLD baseline was FedAvg with doubled bit accounting; (3) the scalability table contained no TierFed runs and its values were not those of the logs; (4) the architecture sweep compared different depths across methods; (5) the imaging result used an undisclosed configuration on a binarised 97\%-positive task; (6) the inversion attack targeted the fixed schedule at initialisation and was labelled TierFed; (7) the model described (93 inputs) was not the model trained (162 inputs); (8) repeated runs were not deterministic; (9) no patient-level deduplication was performed and one ``missing specialty'' client held 49\% of the data; (10) the greedy controller reached only powers of two; (11) the fixed multi-rate schedule sent a fallback tier whenever no tier was due, which made its medium-tier period ineffective; (12) compressors were applied to raw weights instead of updates. Items (1)--(10) were found in an audit of the earlier manuscript and items (11)--(12) during the v3 runs; all affected runs were deleted and rerun. With these corrections the earlier central finding, that fixed multi-rate schedules lose about 0.05~AUROC to personalised baselines, does not reproduce and is retracted. Every item maps to a code change in the released repository (\texttt{ROADMAP.md}, section 0) and to a test.
 
 \section{S2. Derivation of Proposition 1}
 \label{supp:proof}
@@ -39,7 +39,7 @@ Per-client clipping to $C$ makes the $\ell_2$ sensitivity of the sum $\sum_k\til
 Every run's final metrics are in \texttt{results/tables/collected\_all\_raw.csv} in the released repository. Total runs at build time: \num{TotalRuns}.
 
 \section{S5. SGD arm}
-Identical schedules with local SGD (\texttt{--optimizer sgd}, learning rate $10^{-2}$) on the main benchmark: \runreq{} (generated when the arm is run).
+The SGD arm (learning rate $5\times10^{-2}$) is reported in Table~VI of the main text (baseline sweeps).
 
 \section{S6. Excluded sites on the imaging benchmark}
 Number of sites whose patient-grouped held-out split contained a single class (identical for every method, per seed): \runreq{} (read from \texttt{n\_clients\_single\_class\_final} in the logs when the imaging stage has run).

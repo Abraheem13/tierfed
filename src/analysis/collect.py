@@ -34,7 +34,7 @@ NET = ["net_nr_cell_edge_comm_time_s", "net_nr_typical_comm_time_s", "net_sixg_s
 NAMES = {"fedavg": "FedAvg", "fedprox": "FedProx", "scaffold": "SCAFFOLD", "fedper": "FedPer",
          "fedlama": "FedLAMA", "adacomm": "AdaComm", "lag": "LAG", "fixed": "Fixed schedule",
          "tierfed": "TierFed"}
-RUN_REQUIRED = r"\textbf{[RUN REQUIRED]}"
+RUN_REQUIRED = r"\textbf{[RUN REQUIRED]} \\"
 
 
 # --------------------------------------------------------------------------- #
@@ -96,11 +96,21 @@ def _p(x):
         return "--"
     if np.isnan(x):
         return "--"
-    return "$<10^{-4}$" if x < 1e-4 else f"{x:.3f}"
+    if x < 1e-4:
+        return r"\ensuremath{<10^{-4}}"
+    return r"\ensuremath{<0.001}" if x < 1e-3 else f"{x:.3f}"
+
+
+_DIG = dict(zip("0123456789", ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]))
+
+
+def _safe(name: str) -> str:
+    """LaTeX command names allow letters only: spell digits out, drop the rest."""
+    return re.sub(r"[^A-Za-z]", "", re.sub(r"\d", lambda m: _DIG[m.group()], name))
 
 
 def _macro(name: str, value: str) -> str:
-    name = re.sub(r"[^A-Za-z]", "", name)
+    name = _safe(name)
     return f"\\newcommand{{\\{name}}}{{{value}}}\n"
 
 
@@ -117,7 +127,7 @@ class TexWriter:
         self.numbers.append(_macro(name, value))
 
     def flag(self, name: str, value: bool):
-        self.flags[re.sub(r"[^A-Za-z]", "", name)] = "true" if value else "false"
+        self.flags[_safe(name)] = "true" if value else "false"
 
     def finish(self):
         txt = "".join(self.numbers)
@@ -293,7 +303,7 @@ def main(argv=None):
            [ns, au, pr, up, lambda r: f"{int(r.get('tier_total_params_mean', 0)):,}"],
            lambda r: f"{r['model']} / {NAMES.get(r['strategy'], r['strategy'])}")
     family(df, T, W, "loss", tag.str.startswith("_loss_"), ["loss", "strategy"], [ns, au, pr, up],
-           lambda r: f"{r['loss']} / {NAMES.get(r['strategy'], r['strategy'])}")
+           lambda r: f"{ {'weighted_ce': 'Inverse-frequency CE', 'focal': 'Focal', 'ldam': 'LDAM', 'cb': 'Class-balanced'}.get(r['loss'], str(r['loss']).replace('_', ' ')) } / {NAMES.get(r['strategy'], r['strategy'])}")
     family(df, T, W, "warmup", tag.str.startswith("_warmup_"), ["warmup"], [ns, au, pr, up],
            lambda r: str(int(r["warmup"])))
     comp = family(df, T, W, "compression", tag.str.startswith("_comp_"), ["strategy", "compressor"],
@@ -311,6 +321,77 @@ def main(argv=None):
     family(df, T, W, "scaling", tag.str.startswith("_scale"), ["n_clients", "strategy"],
            [ns, au, up, lambda r: _f(r.get("s_per_round_mean"), 2), lambda r: _f(r.get("peak_mem_mb_mean"), 0)],
            lambda r: f"{int(r['n_clients'])} / {NAMES.get(r['strategy'], r['strategy'])}")
+
+    # ---------------- prose macros for the ablation families ----------------
+    def _mac(prefix, sub, key_fn):
+        for k, g in sub.groupby(key_fn):
+            name = prefix + "".join(w[:1].upper() + w[1:] for w in str(k).replace("_", " ").split())
+            W.num(name + "Auroc", _f(g["fed_auroc_final"].mean()))
+            W.num(name + "Auprc", _f(g["fed_auprc_final"].mean(), 3))
+            W.num(name + "UploadMb", _f(g["total_upload_mb"].mean(), 1))
+            W.num(name + "TxRounds", _f(g["rounds_transmitting"].mean(), 0))
+            W.num(name + "Seeds", str(len(g)))
+            if "dp_epsilon" in g and g["dp_epsilon"].notna().any():
+                W.num(name + "Eps", _f(g["dp_epsilon"].astype(float).mean(), 1))
+    sig = {0.5: "SigmaHalf", 1.0: "SigmaOne", 2.0: "SigmaTwo", 4.0: "SigmaFour"}
+    num_word = lambda x: {"0.15": "Fifteen", "0.25": "TwentyFive", "0.4": "Forty", "0.6": "Sixty", "0.8": "Eighty"}.get(str(x), str(x))  # noqa: E731
+    if not df.empty:
+        dpd = df[tag.str.startswith("_dp")]
+        if not dpd.empty:
+            _mac("dp", dpd, lambda i: f"{dpd.loc[i,'strategy']} {sig.get(float(dpd.loc[i,'dp_sigma']), 'Sigma')}")
+            for s_, sw in sig.items():
+                piv = dpd[dpd.dp_sigma.astype(float) == s_].pivot_table(index="seed", columns="strategy", values="fed_auroc_final")
+                if "tierfed" not in piv:
+                    continue
+                for o in piv.columns:
+                    if o == "tierfed":
+                        continue
+                    d = (piv["tierfed"] - piv[o]).dropna()
+                    if len(d) >= 2:
+                        from scipy import stats as sps
+                        p = sps.ttest_rel(piv.loc[d.index, "tierfed"], piv.loc[d.index, o]).pvalue
+                        nm = "dpTfVs" + o.title() + sw
+                        W.num(nm + "Diff", f"{d.mean():+.3f}"); W.num(nm + "P", _p(p))
+                        W.flag(nm + "Better", bool(d.mean() > 0 and p < 0.05))
+                        W.flag(nm + "Worse", bool(d.mean() < 0 and p < 0.05))
+        cp = df[tag.str.startswith("_comp_")]
+        if not cp.empty:
+            _mac("comp", cp, lambda i: f"{cp.loc[i,'strategy']} {cp.loc[i,'tag'].replace('_comp_','')}")
+        pr = df[tag.str.startswith("_periods_")]
+        if not pr.empty:
+            _mac("periods", pr, lambda i: pr.loc[i, "tag"].replace("_periods_", "").replace("ks", "Ks").replace("km", "Km").replace("_", " "))
+        bu = df[tag.str.startswith("_budget_")]
+        if not bu.empty:
+            _mac("budget", bu, lambda i: "rho " + num_word(bu.loc[i, "rho"]) + (" greedy" if "greedy" in bu.loc[i, "tag"] else ""))
+            for k, g in bu.groupby("tag"):
+                name = "budgetRho" + num_word(g["rho"].iloc[0]) + ("Greedy" if "greedy" in k else "")
+                if "sched_frac_rounds_tier_differentiated" in g:
+                    W.num(name + "DiffPct", _f(100 * g["sched_frac_rounds_tier_differentiated"].mean(), 0))
+        for fam in ("_baselines_", "_factorial_", "_warmup_", "_loss_", "_architecture_"):
+            sub = df[tag.str.startswith(fam)]
+            if not sub.empty:
+                _mac(fam.strip("_"), sub, lambda i, sub=sub, fam=fam: sub.loc[i, "tag"].replace(fam, "").replace("_", " "))
+        at = df[tag == "_attack"]
+        if not at.empty:
+            for s_, g in at.groupby("strategy"):
+                nm = "attack" + s_.title()
+                for col, mn in (("inversion_feature_corr_mean", "Corr"), ("mia_auc_mean", "Mia"), ("inversion_nmse_mean", "Nmse")):
+                    if col in g:
+                        W.num(nm + mn, _f(g[col].mean(), 3))
+        # paired contrasts of TierFed against every other method on the main benchmark
+        mb = df[(df.dataset == a.dataset) & (df.model == a.model) & (tag == "") & (df.get("compressor", "none").fillna("none") == "none")]
+        piv = mb.pivot_table(index="seed", columns="strategy", values="fed_auroc_final")
+        if "tierfed" in piv:
+            from scipy import stats as sps
+            for o in piv.columns:
+                if o == "tierfed":
+                    continue
+                d = (piv["tierfed"] - piv[o]).dropna()
+                if len(d) >= 2:
+                    p = sps.ttest_rel(piv.loc[d.index, "tierfed"], piv.loc[d.index, o]).pvalue
+                    W.num("mainTfVs" + o.title() + "Diff", f"{d.mean():+.4f}"); W.num("mainTfVs" + o.title() + "P", _p(p))
+        W.num("NetCellEdgeFedper", _f(mb[mb.strategy == "fedper"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
+        W.num("NetCellEdgeTierfed", _f(mb[mb.strategy == "tierfed"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
 
     W.finish()
     print(f"collected {len(df)} runs -> {T} and {a.paper}")
