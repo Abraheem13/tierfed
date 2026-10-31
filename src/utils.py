@@ -25,6 +25,14 @@ def set_seed(seed: int, deterministic: bool = True) -> None:
     if deterministic:
         os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
         torch.backends.cudnn.deterministic = True
+        # fused attention kernels (flash / memory-efficient) are non-deterministic
+        # on CUDA; force the math kernel so transformer runs are reproducible
+        try:
+            torch.backends.cuda.enable_flash_sdp(False)
+            torch.backends.cuda.enable_mem_efficient_sdp(False)
+            torch.backends.cuda.enable_math_sdp(True)
+        except AttributeError:
+            pass
         torch.backends.cudnn.benchmark = False
         try:
             torch.use_deterministic_algorithms(True, warn_only=True)

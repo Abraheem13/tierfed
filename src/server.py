@@ -84,8 +84,7 @@ class FederatedServer:
                 if not keys or not self.strategy.client_sends(cid, self.global_state, raw, keys, r):
                     per_client_bits.append(0.0)
                     continue
-                cs = self.strategy.compress_client_state(raw, keys)
-                bits = self.strategy.measure_upload([cs], keys)
+                cs, bits = self.strategy.compress_client_state(raw, keys, reference=self.global_state, cid=cid)
                 per_client_bits.append(bits)
                 states.append(cs); weights.append(c.n); senders.append(cid)
                 if attack_every and r > 1 and cid == sel[0]:

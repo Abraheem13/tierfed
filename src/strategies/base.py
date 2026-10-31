@@ -98,20 +98,42 @@ class Strategy:
         return new
 
     def measure_upload(self, client_states: List[Dict[str, torch.Tensor]], keys) -> float:
+        """Bits of uncompressed float32 slices (used when no compressor is set)."""
         bits = 0.0
         for cs in client_states:
             for k in keys:
                 if k in cs:
-                    _, b = self.compressor(cs[k])
-                    bits += b
+                    bits += cs[k].numel() * 32
         return bits * self.upload_multiplier
 
-    def compress_client_state(self, state: Dict[str, torch.Tensor], keys):
+    def compress_client_state(self, state: Dict[str, torch.Tensor], keys,
+                              reference: Dict[str, torch.Tensor] | None = None, cid: int = -1):
+        """Compress what a client actually transmits: the UPDATE relative to the
+        broadcast `reference`, with per-client error feedback (the residual of the
+        previous compression is added before compressing, Seide et al. 2014;
+        Sattler et al. 2020). Returns (reconstructed_state, bits_sent).
+
+        With the identity compressor this returns the state unchanged and the
+        float32 bit count. An earlier version compressed raw weights, which is
+        not what a communication-efficient client sends."""
         out = dict(state)
+        if self.compressor.name == "none" or reference is None:
+            return out, self.measure_upload([state], keys)
+        if not hasattr(self, "_residual"):
+            self._residual: Dict[int, Dict[str, torch.Tensor]] = {}
+        res = self._residual.setdefault(cid, {})
+        bits = 0.0
         for k in keys:
-            if k in out:
-                out[k], _ = self.compressor(out[k])
-        return out
+            if k not in out:
+                continue
+            delta = out[k].float() - reference[k].float()
+            if k in res:
+                delta = delta + res[k]
+            q, b = self.compressor(delta)
+            res[k] = delta - q.float()
+            bits += b
+            out[k] = (reference[k].float() + q.float()).to(state[k].dtype)
+        return out, bits * self.upload_multiplier
 
     def schedule_table(self, rounds: int) -> Dict[str, float]:
         return {}

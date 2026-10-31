@@ -86,6 +86,11 @@ def test_fixed_factorial_cells_distinct():
     full = build_strategy("fixed", names, sizes, tiers=t, head_keys=head, private_head=True, schedule=True)
     assert sched.personal_keys() == [] and set(full.personal_keys()) == set(head)
     assert len({len(full.send_keys(r)) for r in range(1, 11)}) > 1
+    # no fallback: with K_slow=5, K_med=2, round 3 has nothing due and is local-only
+    sched = build_strategy("fixed", names, sizes, tiers=t, head_keys=head, k_slow=5, k_med=2)
+    assert sched.send_keys(3) == []
+    medium_rounds = sum(1 for r in range(1, 61) if any(t[k] == "medium" for k in sched.send_keys(r)))
+    assert medium_rounds == 31            # r=1 plus the 30 even rounds
 
 
 def test_fedlama_cumulative_share_rule():
@@ -97,6 +102,18 @@ def test_fedlama_cumulative_share_rule():
         s.observe(g, cs, names, r)
     assert len(set(s.intervals.values())) > 1
     assert all(s.intervals[n] > 1 for n in names if "stem" in n)   # low-discrepancy, large layer -> long
+
+
+def test_compression_acts_on_update_with_error_feedback():
+    _, t, names, sizes = _mlp()
+    s = build_strategy("fedavg", names, sizes, compressor=build_compressor("topk"))
+    ref = {n: torch.randn(v) for n, v in sizes.items()}
+    upd = {n: ref[n] + 0.01 * torch.randn(v) for n, v in sizes.items()}
+    out, bits = s.compress_client_state(upd, names, reference=ref, cid=0)
+    for n in names:   # reconstruction stays close to the client's weights, not a pruned weight vector
+        assert (out[n] - upd[n]).abs().max() < 0.1
+    assert bits < sum(v * 32 for v in sizes.values())
+    assert s._residual[0]                              # error-feedback residual is kept
 
 
 def test_scaffold_changes_training_objective():

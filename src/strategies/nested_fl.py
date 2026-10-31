@@ -19,7 +19,7 @@ class FixedSchedule(Strategy):
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
                  tiers: Mapping[str, str], k_slow: int = 5, k_med: int = 2, warmup: int = 0,
                  private_head: bool = True, schedule: bool = True,
-                 fallback_tier: str = "medium", **kw):
+                 fallback_tier: str | None = None, **kw):
         super().__init__(param_names, sizes, **kw)
         self.tiers = dict(tiers)
         self.k = {"slow": int(k_slow), "medium": int(k_med), "fast": 1}
@@ -34,8 +34,12 @@ class FixedSchedule(Strategy):
         if not self.use_schedule or r <= self.warmup or r == 1:
             return shared
         act = [g for g in shared if r % self.k.get(g, 1) == 0]
-        if not act:
-            act = [self.fallback_tier] if self.fallback_tier in shared else [shared[-1]]
+        # v3: rounds in which no tier is due are local-only (zero payload), exactly
+        # as in TierFed. An earlier version sent a fallback tier in such rounds,
+        # which made the medium-tier period ineffective; it is kept only as an
+        # explicit opt-in (fallback_tier="medium") for reproducing that version.
+        if not act and self.fallback_tier in shared:
+            act = [self.fallback_tier]
         return act
 
     def send_keys(self, r: int) -> List[str]:
