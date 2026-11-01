@@ -33,6 +33,7 @@ def test_planner_is_data_free_and_meets_quota():
     names, sizes = ["a", "b", "c"], {"a": 1000, "b": 1000, "c": 100}
     tiers = {"a": "slow", "b": "medium", "c": "fast"}
     p = PrivacyPlannedTierFed(names, sizes, tiers, rounds=20, warmup=2, epsilon=4, q=0.5, rho=0.5, lam=1.0)
+    assert 0.0 < p.J < 2.0   # scale-free objective: both terms in [0, 1]
     assert p.dp_safe and p.planned_payload <= 0.5 + 1e-12
     assert len(p.planned_release_rounds(20)) == p.planned_releases
     hi = PrivacyPlannedTierFed(names, sizes, tiers, rounds=20, warmup=2, epsilon=4, q=0.5, lam=100.0)

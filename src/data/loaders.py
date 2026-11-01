@@ -221,7 +221,8 @@ def load_eicu(n_clients: int = 30, partition: str = "natural", seed: int = 0,
     counts = pat["hospitalid"].value_counts()
     pat = pat[pat["hospitalid"].isin(counts[counts >= min_site].index)].reset_index(drop=True)
     if pat["hospitalid"].nunique() < 2:
-        raise ValueError(f"fewer than two hospitals with >= {min_site} stays")
+        top = counts.sort_values(ascending=False).head(8).to_dict()
+        raise ValueError(f"fewer than two hospitals with >= {min_site} stays; largest hospitals: {top}")
     pat["age_num"] = pd.to_numeric(pat["age"].astype(str).str.replace("> 89", "90", regex=False),
                                    errors="coerce").fillna(65)
     if target == "mortality":

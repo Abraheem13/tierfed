@@ -24,7 +24,7 @@ def main(argv=None):
     ap.add_argument("--datasets", nargs="+", default=["heart", "eicu_demo"])
     ap.add_argument("--seeds", nargs="+", type=int, default=list(range(42, 52)))
     ap.add_argument("--rounds", type=int, default=60)
-    ap.add_argument("--min-site", type=int, default=80, help="eICU: minimum stays per hospital")
+    ap.add_argument("--min-site", type=int, default=40, help="eICU: minimum stays per hospital")
     ap.add_argument("--device", default="auto")
     ap.add_argument("--out", default="results")
     a = ap.parse_args(argv)

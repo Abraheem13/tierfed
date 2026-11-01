@@ -422,7 +422,7 @@ def _paired(W, piv, a, b, name, nd=3):
     W.flag(name + "Worse", bool(d.mean() < 0 and p < 0.05))
 
 
-_W = {1.0: "One", 2.0: "Two", 4.0: "Four", 8.0: "Eight", 0.5: "Half", 0.1: "Tenth", 10.0: "Ten"}
+_W = {1.0: "One", 2.0: "Two", 4.0: "Four", 8.0: "Eight", 0.5: "Half", 0.1: "Tenth", 10.0: "Ten", 0.3: "ThreeTenths", 3.0: "Three"}
 
 
 def v4_families(df, tag, T, W, R):
@@ -437,33 +437,56 @@ def v4_families(df, tag, T, W, R):
     extra = [m for m in METRICS if m in df] + ["dp_epsilon", "dp_rounds_charged", "dp_sigma", "total_upload_mb"]
     nm = lambda s: NAMES.get(s, s)                           # noqa: E731
 
+    # method key: fixed periods are distinguished by K
+    mkey = df["strategy"].astype(str).where(df["strategy"] != "fixed",
+                                            "fixed" + df["k_slow"].fillna(0).astype(float).astype(int).astype(str))
+    df = df.assign(mkey=mkey)
+    mlabel = {"fixed4": "Fixed $K=4$", "fixed8": "Fixed $K=8$"}
+    nm2 = lambda k: mlabel.get(k, NAMES.get(k, k))                      # noqa: E731
     m = tag.str.startswith("_dpe") & ~tag.str.contains("_lam")
-    family(df, T, W, "dpmatched", m, ["dp_q", "dp_target_eps", "strategy"],
-           [ns, sig, rel, eps, au, pr, up],
-           lambda r: f"{_f(r['dp_q'], 1)} / {_f(r['dp_target_eps'], 0)} / {nm(r['strategy'])}",
-           metrics=extra)
-    sub = df[m]
-    for (q, e), g in sub.groupby(["dp_q", "dp_target_eps"]):
-        key = "dpm" + ("QHalf" if float(q) < 1 else "QOne") + "Eps" + _W.get(float(e), "X")
-        for s_, gs in g.groupby("strategy"):
-            k2 = key + s_.title().replace("_", "")
-            W.num(k2 + "Auroc", _f(gs["fed_auroc_final"].mean()))
-            W.num(k2 + "Sigma", _f(gs["dp_sigma"].mean(), 2))
-            W.num(k2 + "Rel", _f(gs["dp_rounds_charged"].mean(), 0))
-            W.num(k2 + "UploadMb", _f(gs["total_upload_mb"].mean(), 1))
-        piv = g.pivot_table(index="seed", columns="strategy", values="fed_auroc_final")
-        for o in ("fedavg", "fedper", "fixed"):
-            _paired(W, piv, "tierfed_dp", o, key + "TfdpVs" + o.title())
-        _paired(W, piv, "fixed", "fedper", key + "FixedVsFedper")
-    lm = tag.str.startswith("_dpe") & (tag.str.contains("_lam") | (df["strategy"] == "tierfed_dp")) \
-        & (df["dp_q"].astype(float) == 1.0) & (df["dp_target_eps"].astype(float) == 4.0)
-    lam_df = df[lm & (df["strategy"] == "tierfed_dp")].copy()
-    if not lam_df.empty:
+    _Q = {0.2: "QFifth", 0.5: "QHalf", 1.0: "QOne"}
+    for N in sorted(df.loc[m, "n_clients"].dropna().unique()):
+        mN = m & (df["n_clients"] == N)
+        family(df, T, W, f"dpmatched{int(N)}", mN, ["dp_q", "dp_target_eps", "mkey"],
+               [ns, sig, rel, eps, au, pr, up],
+               lambda r: f"{_f(r['dp_q'], 1)} / {_f(r['dp_target_eps'], 0)} / {nm2(r['mkey'])}",
+               metrics=extra)
+        sub = df[mN]
+        for (q, e), g in sub.groupby(["dp_q", "dp_target_eps"]):
+            key = f"dpm{_safe('N' + str(int(N)))}" + _Q.get(float(q), "Q") + "Eps" + _W.get(float(e), "X")
+            for s_, gs in g.groupby("mkey"):
+                k2 = key + _safe(s_.title().replace("_", ""))
+                W.num(k2 + "Auroc", _f(gs["fed_auroc_final"].mean()))
+                W.num(k2 + "Auprc", _f(gs["fed_auprc_final"].mean(), 3))
+                W.num(k2 + "Sigma", _f(gs["dp_sigma"].mean(), 2))
+                W.num(k2 + "Rel", _f(gs["dp_rounds_charged"].mean(), 0))
+                W.num(k2 + "UploadMb", _f(gs["total_upload_mb"].mean(), 1))
+                if "sched_K_slow" in gs:
+                    W.num(k2 + "K", _f(gs["sched_K_slow"].mean(), 0))
+            piv = g.pivot_table(index="seed", columns="mkey", values="fed_auroc_final")
+            for o in ("fedavg", "fedper", "fixed4", "fixed8"):
+                _paired(W, piv, "tierfed_dp", o, key + "TfdpVs" + _safe(o.title()))
+            _paired(W, piv, "fixed8", "fedper", key + "FixedEightVsFedper")
+            _paired(W, piv, "fixed4", "fedper", key + "FixedFourVsFedper")
+            _paired(W, piv, "fixed8", "fixed4", key + "FixedEightVsFixedFour")
+    for N in sorted(df.loc[tag.str.startswith("_dpe"), "n_clients"].dropna().unique()):
+        lm = tag.str.startswith("_dpe") & (df["strategy"] == "tierfed_dp") & (df["n_clients"] == N)
+        lam_df = df[lm].copy()
         lam_df["lam"] = lam_df["lam"].fillna(1.0)
-    family(lam_df if not lam_df.empty else df, T, W, "dplambda",
-           pd.Series(True, index=lam_df.index) if not lam_df.empty else pd.Series(False, index=df.index),
-           ["lam"], [ns, lambda r: _f(r.get("sched_K_slow_mean"), 0), sig, rel, au, up],
-           lambda r: _f(r["lam"], 1), metrics=extra + ["sched_K_slow"])
+        # the lambda sweep is at the (q, eps) that has more than one lambda
+        cnt = lam_df.groupby(["dp_q", "dp_target_eps"])["lam"].nunique()
+        if cnt.empty or cnt.max() < 2:
+            W.table(f"dplambda{int(N)}", None); continue
+        q0, e0 = cnt.idxmax()
+        lam_df = lam_df[(lam_df["dp_q"] == q0) & (lam_df["dp_target_eps"] == e0)]
+        family(lam_df, T, W, f"dplambda{int(N)}", pd.Series(True, index=lam_df.index), ["lam"],
+               [ns, lambda r: _f(r.get("sched_K_slow_mean"), 0), sig, rel, au, up],
+               lambda r: _f(r["lam"], 1), metrics=extra + ["sched_K_slow"])
+        W.num(f"dplam{_safe('N' + str(int(N)))}At", f"$q={q0:g}$, $\\varepsilon^\\star={e0:g}$")
+        for l_, gl in lam_df.groupby("lam"):
+            k2 = f"dplam{_safe('N' + str(int(N)))}" + _W.get(float(l_), _safe(str(l_)))
+            W.num(k2 + "K", _f(gl["sched_K_slow"].mean(), 0)); W.num(k2 + "Auroc", _f(gl["fed_auroc_final"].mean()))
+            W.num(k2 + "Rel", _f(gl["dp_rounds_charged"].mean(), 0))
 
     for ds in ("heart", "eicu_demo", "eicu"):
         mk = (df["dataset"] == ds) & (tag == "_real")

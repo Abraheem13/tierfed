@@ -193,11 +193,12 @@ class PrivacyPlannedTierFed(Strategy):
     exactly epsilon-DP for that number of releases (exact subsampled-Gaussian
     RDP accountant), and the surrogate
 
-        J(K) = sum_g w_g K_g^2  +  lam * (1/R) sum_r (d_tx(r)/d) * sigma(K)^2,
+        J(K) = [sum_g w_g K_g^2] / K_max^2  +  lam * E_noise(K) / E_noise(K=1),
+        E_noise(K) = (1/R) sum_r (d_tx(r)/d) * sigma(K)^2,
 
     i.e. the multi-rate drift term of the bound (with a flat, data-free
-    heterogeneity prior) plus the noise energy injected into the shared model
-    per round. Fewer releases need less noise per release (sigma^2 grows roughly
+    heterogeneity prior), normalised by its worst case, plus the noise energy
+    injected into the shared model per round, normalised by the full-rate value. Fewer releases need less noise per release (sigma^2 grows roughly
     linearly with the release count) but drift more; J trades the two. The
     pair minimising J subject to the byte quota is used, and the server is told
     sigma. lam is the single prior (it absorbs the unknown smoothness and
@@ -223,19 +224,28 @@ class PrivacyPlannedTierFed(Strategy):
                   for g in self.shared_tiers}
         best = None
         self.candidates = []
-        for Ks in itertools.product(range(1, self.k_max + 1), repeat=len(self.shared_tiers)):
-            K = dict(zip(self.shared_tiers, Ks))
+        # scale-free objective (v5): drift is normalised by its value at K_max and
+        # the noise energy by its value at full rate (K = 1, every round a release),
+        # so lambda = 1 weights "fraction of worst-case drift" against "fraction of
+        # full-rate noise energy"; v4 compared raw K^2 against sigma^2 in C^2 units,
+        # which made lambda scale-dependent and overweighted drift.
+        def _plan(K):
             due = [[g for g in self.shared_tiers if r <= self.Tw or (r - self.Tw) % K[g] == 0]
                    for r in range(1, self.R + 1)]
             frac = [sum(self.w[g] for g in d) for d in due]
             releases = sum(1 for f in frac if f > 0)
             payload = sum(frac) / self.R
+            sigma = calibrate_sigma(self.eps, releases, self.q, self.delta) if releases else 0.0
+            return releases, payload, sigma, payload * sigma ** 2
+        _, _, _, noise_full = _plan({g: 1 for g in self.shared_tiers})
+        drift_max = float(self.k_max ** 2)
+        for Ks in itertools.product(range(1, self.k_max + 1), repeat=len(self.shared_tiers)):
+            K = dict(zip(self.shared_tiers, Ks))
+            releases, payload, sigma, noise = _plan(K)
             if payload > self.rho + 1e-12 or releases == 0:
                 continue
-            sigma = calibrate_sigma(self.eps, releases, self.q, self.delta)
             drift = sum(self.w[g] * K[g] ** 2 for g in self.shared_tiers)
-            noise = sum(frac) / self.R * sigma ** 2
-            J = drift + self.lam * noise
+            J = drift / drift_max + self.lam * noise / noise_full
             self.candidates.append((J, K, sigma, releases, payload))
             if best is None or J < best[0]:
                 best = (J, K, sigma, releases, payload)
