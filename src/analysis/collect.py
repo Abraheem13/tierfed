@@ -397,6 +397,10 @@ def main(argv=None):
         W.num("NetCellEdgeFedper", _f(mb[mb.strategy == "fedper"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
         W.num("NetCellEdgeTierfed", _f(mb[mb.strategy == "tierfed"]["net_nr_cell_edge_comm_time_s"].mean(), 1) if "net_nr_cell_edge_comm_time_s" in mb else "--")
 
+    img = df[(df["dataset"] == "medmnist") & (tag == "")] if "n_clients_single_class_final" in df else df.iloc[0:0]
+    if not img.empty:
+        W.num("imgSingleClassMin", str(int(img["n_clients_single_class_final"].min())))
+        W.num("imgSingleClassMax", str(int(img["n_clients_single_class_final"].max())))
     v4_families(df, tag, T, W, R)
     W.finish()
     print(f"collected {len(df)} runs -> {T} and {a.paper}")
