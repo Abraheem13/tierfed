@@ -124,7 +124,9 @@ def time_to_target(history: List[Mapping], round_bits: List[Mapping], upload_s: 
                    target: float, metric: str = "fed_auroc") -> Dict[str, float]:
     """Wall-clock (compute of the slowest client + emulated upload) until the
     federated metric first reaches `target`; inf if never."""
-    by_round = {int(h["round"]): h.get(metric) for h in history}
+    # history rows are written once per round in order; the logged 'round' field
+    # of runs made before v6 holds the last synchronisation round, so position is used
+    by_round = {i + 1: h.get(metric) for i, h in enumerate(history)}
     t = 0.0
     for rb, up in zip(round_bits, upload_s):
         t += float(rb.get("compute_s_max", 0.0)) + float(up)

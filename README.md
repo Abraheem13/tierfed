@@ -70,6 +70,37 @@ powershell -ExecutionPolicy Bypass -File scripts\check_v4.ps1        # progress
 * `run_emulation`: ~1.8M-parameter `mlp_wide`; every run's logged per-client upload bytes are replayed
   over paced loopback TCP (`src/netemu.py`) for time-to-target. Application-layer, not netem.
 
+## v6 audit batch (validation-selected metrics, frontiers, heterogeneity, backbones)
+
+Every v6 run splits each site's patients 70/10/20 into train, validation and test. The
+reported AUROC is the test AUROC at the round with the highest validation AUROC; test
+data never choose anything. Tags start with `_au_`, so earlier logs stay reproducible.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run_audit.ps1      # night 1, CPU: hetero, frontier, main, DP (q = 1), bounds, DermaMNIST
+powershell -ExecutionPolicy Bypass -File scripts\run_backbone.ps1   # GPU: ResNet and FT-Transformer, timing test on the ResNet
+powershell -ExecutionPolicy Bypass -File scripts\run_night2.ps1     # CPU: staggering with 8-bit warm-up, all-rounds quota, LAG, dropout, timing
+powershell -ExecutionPolicy Bypass -File scripts\check_audit.ps1    # progress
+make audit                                                         # consistency check + decision gate + tables
+```
+
+`src/analysis/consistency.py` recomputes every transmitting-round count, upload volume
+and DP charge from the schedule rules and asserts them against the logs (all 1813
+earlier logs pass). `src/analysis/audit_report.py` writes the decision gate, the
+iso-byte budgets and every audit table to `results/tables/audit/`;
+`src/analysis/audit_tex.py` and `src/analysis/audit_figures.py` write the manuscript's
+tables and figure. `src/theory/differentiation.py` holds the closed form of the
+interval programme and the differentiation bound Psi (Proposition 2).
+
+## Manuscript figures and tables
+
+```powershell
+.\.venv\Scripts\python.exe -m src.analysis.collect --results results --dataset diabetes --model mlp
+.\.venv\Scripts\python.exe -m src.analysis.paper_figures --results results --out paper\figures
+```
+`collect` writes every table body and number macro under `paper/generated/`; `paper_figures` draws the
+multi-panel figures of the manuscript from the per-seed histories. The flowcharts are TikZ in the LaTeX source.
+
 ## Reporting rules we hold ourselves to
 
 * Non-inferiority is a one-sided test at a stated margin on **both** AUROC and

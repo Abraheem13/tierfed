@@ -50,7 +50,15 @@ class Strategy:
         self.param_names = list(param_names)
         self.sizes = dict(sizes)
         self.compressor = compressor or NoCompression()
+        # optional compressor for warm-up rounds only (M-6): the full-rate warm-up
+        # otherwise sets the peak per-round payload of every sparse schedule
+        self.warmup_compressor: Compressor | None = None
+        self._round = 0
         self.history: List[RoundReport] = []
+
+    def begin_round(self, r: int) -> None:
+        """Called by the server at the start of round r."""
+        self._round = int(r)
 
     # ---------------- schedule ----------------
     def send_keys(self, r: int) -> List[str]:
@@ -120,7 +128,10 @@ class Strategy:
         float32 bit count. An earlier version compressed raw weights, which is
         not what a communication-efficient client sends."""
         out = dict(state)
-        if self.compressor.name == "none" or reference is None:
+        comp = self.compressor
+        if self.warmup_compressor is not None and self._round <= int(getattr(self, "warmup", 0)):
+            comp = self.warmup_compressor
+        if comp.name == "none" or reference is None:
             return out, self.measure_upload([state], keys)
         if not hasattr(self, "_residual"):
             self._residual: Dict[int, Dict[str, torch.Tensor]] = {}
@@ -132,7 +143,7 @@ class Strategy:
             delta = out[k].float() - reference[k].float()
             if k in res:
                 delta = delta + res[k]
-            q, b = self.compressor(delta)
+            q, b = comp(delta)
             res[k] = delta - q.float()
             bits += b
             out[k] = (reference[k].float() + q.float()).to(state[k].dtype)

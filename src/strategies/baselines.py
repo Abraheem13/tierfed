@@ -226,9 +226,15 @@ class LAG(Strategy):
     """
     name = "lag"
 
-    def __init__(self, param_names, sizes, xi: float = 1.0, **kw):
+    def __init__(self, param_names, sizes, xi: float = 1.0, weighted: bool = False, **kw):
         super().__init__(param_names, sizes, **kw)
         self.xi = float(xi)
+        # weighted=False reproduces the v3-v12 runs, which averaged the freshest
+        # update of every client with EQUAL weights (so LAG at xi = 1 was
+        # uniform-weight FedAvg, not sample-weighted FedAvg). weighted=True uses
+        # n_k like every other method.
+        self.weighted = bool(weighted)
+        self.client_n: Dict[int, float] = {}
         self.stale: Dict[int, Dict[str, torch.Tensor]] = {}
         self.prev_global: Dict[str, torch.Tensor] | None = None
         self.n_clients = 1
@@ -252,8 +258,12 @@ class LAG(Strategy):
         keys = self.send_keys(r)
         self.prev_global = {k: v.clone() for k, v in global_state.items()}
         states = [{k: global_state[k].float() + u[k] for k in u} for u in self.stale.values()]
-        w = [1.0] * len(states)
+        w = ([float(self.client_n.get(c, 1.0)) for c in self.stale] if self.weighted
+             else [1.0] * len(states))
         return self._weighted_average(global_state, states, w, keys)
 
+    def set_client_sizes(self, sizes):
+        self.client_n = {k: float(n) for k, n in enumerate(sizes)}
+
     def schedule_table(self, rounds):
-        return {"xi": self.xi}
+        return {"xi": self.xi, "weighted": float(self.weighted)}

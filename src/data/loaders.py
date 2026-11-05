@@ -308,13 +308,15 @@ def load_mimic(n_clients: int = 20, partition: str = "natural", seed: int = 0,
 @register("medmnist")
 def load_medmnist(flag: str = "pneumoniamnist", n_clients: int = 20, partition: str = "dirichlet",
                   alpha: float = 0.5, seed: int = 0, size: int = 28, min_size: int = 50,
-                  **_) -> FederatedDataset:
+                  positive_classes=None, **_) -> FederatedDataset:
     """MedMNIST v2. Binary collections are used as-is; a multi-class collection
-    raises unless `binarise_class` is passed explicitly (v2 silently binarised)."""
+    raises unless `positive_classes` names the classes mapped to label 1
+    (v2 silently binarised DermaMNIST into a 97%-positive task). For DermaMNIST
+    the clinically meaningful split is malignant {0 akiec, 1 bcc, 4 mel} vs benign."""
     import medmnist
     from medmnist import INFO
     info = INFO[flag]
-    if len(info["label"]) != 2:
+    if len(info["label"]) != 2 and not positive_classes:
         raise ValueError(f"{flag} has {len(info['label'])} classes; this benchmark uses binary collections "
                          f"(pneumoniamnist, breastmnist).")
     cls = getattr(medmnist, info["python_class"])
@@ -329,7 +331,12 @@ def load_medmnist(flag: str = "pneumoniamnist", n_clients: int = 20, partition: 
         xtr, xte = xtr.transpose(0, 3, 1, 2), xte.transpose(0, 3, 1, 2)
     ytr = np.concatenate([tr.labels, va.labels]).reshape(-1).astype(int)
     yte = te.labels.reshape(-1).astype(int)
+    if positive_classes:
+        pos = [int(c) for c in positive_classes]
+        ytr, yte = np.isin(ytr, pos).astype(int), np.isin(yte, pos).astype(int)
     parts, rep = build_partition(partition, ytr, n_clients, seed=seed, alpha=alpha, min_size=min_size)
     return FederatedDataset(f"medmnist:{flag}", xtr, ytr, xte, yte, parts,
                             {"modality": "imaging", "flag": flag, "partition_report": rep,
-                             "partition": partition, "seed": seed})
+                             "partition": partition, "seed": seed,
+                             "positive_classes": list(positive_classes or []),
+                             "prevalence": float(ytr.mean())})

@@ -127,6 +127,10 @@ class TexWriter:
         (self.dir / f"{name}.tex").write_text(body if body else RUN_REQUIRED + "\n")
 
     def num(self, name: str, value):
+        # p-value macros (names ending in P) carry their own relation so prose can
+        # write $p\num{...}$ and get "p=0.036" or "p<10^{-4}"
+        if name.endswith("P") and isinstance(value, str) and value[:1].isdigit():
+            value = "=" + value
         self.numbers.append(_macro(name, value))
 
     def flag(self, name: str, value: bool):
@@ -179,8 +183,8 @@ def main_benchmark(df: pd.DataFrame, T: Path, W: TexWriter, dataset: str, model:
         r = S.loc[s]
         ni_a = ni.get(f"{s}|fed_auroc_final", {}); ni_p = ni.get(f"{s}|fed_auprc_final", {})
         lines.append(" & ".join([
-            NAMES[s], str(int(r["n_seeds"])),
-            f"{_f(r.get('fed_auroc_final_mean'))} $\\pm$ {_f(r.get('fed_auroc_final_std'))}",
+            NAMES[s],
+            f"{_f(r.get('fed_auroc_final_mean'))} [{_f(r.get('fed_auroc_final_ci_lo'))}, {_f(r.get('fed_auroc_final_ci_hi'))}]",
             _f(r.get("fed_auprc_final_mean"), 3),
             _f(r.get("fed_auroc_earlystop_value_mean")),
             _f(r.get("pooled_auroc_final_mean")),
@@ -189,7 +193,12 @@ def main_benchmark(df: pd.DataFrame, T: Path, W: TexWriter, dataset: str, model:
             "(ref.)" if s == "fedper" else _p(ni_a.get("p")),
             "(ref.)" if s == "fedper" else _p(ni_p.get("p")),
         ]) + r" \\")
+    best = max(_lead_float(l.split(" & ")[1]) for l in lines)
+    lines = [" & ".join([c if (i != 1 or _lead_float(c) != best) else _bold(c) for i, c in enumerate(l.split(" & "))]) for l in lines]
     W.table(f"main_{key}", "\n".join(lines) + "\n")
+    # single-column variant: method, AUROC [CI], AUPRC, upload, tx rounds, NI_AUROC p
+    short = [" & ".join([c.strip() for i, c in enumerate(l.replace(" \\\\", "").split(" & ")) if i in (0, 1, 2, 5, 6, 7)]) + " \\\\" for l in lines]
+    W.table(f"mainshort_{key}", "\n".join(short) + "\n")
 
     # Holm-corrected paired differences table
     tl = []
@@ -225,6 +234,7 @@ def main_benchmark(df: pd.DataFrame, T: Path, W: TexWriter, dataset: str, model:
     W.num(f"{key}NFeatures", str(int(r0.get("ds_n_features", 0))))
     W.num(f"{key}NPatients", f"{int(r0.get('ds_n_patients_train', 0)):,}")
     W.num(f"{key}Prevalence", _f(100 * r0.get("ds_prevalence_train", np.nan), 1))
+    W.num(f"{key}PrevalenceFrac", _f(r0.get("ds_prevalence_train", np.nan), 2))   # the AUPRC baseline
     W.num(f"{key}MaxClientShare", _f(100 * r0.get("part_size_max_share", np.nan), 0))
     W.num(f"{key}LabelTv", _f(r0.get("part_label_tv_mean", np.nan), 3))
     for t in ("slow", "medium", "fast", "total"):
@@ -244,16 +254,46 @@ def main_benchmark(df: pd.DataFrame, T: Path, W: TexWriter, dataset: str, model:
     W.table(f"network_{key}", "\n".join(nl) + "\n")
 
 
-def family(df, T, W, name, mask, keys, cols, label_fn, metrics=None):
+def _lead_float(cell: str):
+    m = re.search(r"-?\d+\.\d+|-?\d+", cell.replace("\\textbf{", ""))
+    return float(m.group()) if m else float("nan")
+
+
+def _bold(cell: str) -> str:
+    """Bold the leading number of a cell ("0.6269 $\\pm$ 0.0082" -> "\\textbf{0.6269} $\\pm$ 0.0082")."""
+    m = re.search(r"-?\d+\.\d+|-?\d+", cell)
+    return cell if not m else cell[:m.start()] + "\\textbf{" + m.group() + "}" + cell[m.end():]
+
+
+def family(df, T, W, name, mask, keys, cols, label_fn, metrics=None, bold=None, rule_on=None, higher=True):
+    """One generated table body. `bold` is the index (into cols) of the column
+    whose best value is set in bold, within each group given by `rule_on` (a
+    function of the summary row); `rule_on` also inserts a rule between groups."""
     sub = df[mask]
     if sub.empty:
         W.table(name, None); return None
     metrics = metrics or [m for m in METRICS + NET if m in sub]
     out = summarise_runs(sub, keys, metrics)
     out.to_csv(T / f"ablation_{name}.csv", index=False)
-    lines = []
-    for _, r in out.iterrows():
-        lines.append(" & ".join([label_fn(r)] + [c(r) for c in cols]) + r" \\")
+    rows = [(label_fn(r), [c(r) for c in cols], rule_on(r) if rule_on else 0) for _, r in out.iterrows()]
+    if bold is not None:
+        groups = {}
+        for i, (_, cells, g) in enumerate(rows):
+            groups.setdefault(g, []).append((i, _lead_float(cells[bold])))
+        for g, items in groups.items():
+            vals = [v for _, v in items if v == v]
+            if not vals:
+                continue
+            best = max(vals) if higher else min(vals)
+            for i, v in items:
+                if v == best:
+                    rows[i][1][bold] = _bold(rows[i][1][bold])
+    lines, prev = [], None
+    for label, cells, g in rows:
+        if rule_on is not None and prev is not None and g != prev:
+            lines.append(r"\midrule")
+        prev = g
+        lines.append(" & ".join([label] + cells) + r" \\")
     W.table(name, "\n".join(lines) + "\n")
     return out
 
@@ -287,44 +327,75 @@ def main(argv=None):
 
     # budget sweep
     family(df, T, W, "budget", tag.str.startswith("_budget_") & (df.get("solver", "exact") == "exact"),
-           ["rho"], [ns, au, pr, up,
+           ["rho"], [au, pr, up,
                      lambda r: _f(r.get("realised_payload_fraction_mean"), 2),
                      lambda r: _f(r.get("sched_K_slow_mean_mean"), 1),
                      lambda r: _f(r.get("sched_K_medium_mean_mean"), 1),
                      lambda r: _f(100 * r.get("sched_frac_rounds_tier_differentiated_mean", np.nan), 0)],
-           lambda r: _f(r["rho"], 2))
-    family(df, T, W, "solver", tag.str.startswith("_budget_"), ["rho", "solver"], [ns, au, up],
-           lambda r: f"{_f(r['rho'], 2)} / {r['solver']}")
+           lambda r: _f(r["rho"], 2), bold=0,
+           metrics=[m for m in METRICS + NET if m in df] + ["realised_payload_fraction", "sched_K_slow_mean",
+                                                             "sched_K_medium_mean", "sched_frac_rounds_tier_differentiated"])
+    family(df, T, W, "solver", tag.str.startswith("_budget_"), ["rho", "solver"], [au, up],
+           lambda r: f"$\\rho={_f(r['rho'], 2)}$, {r['solver']}", bold=0, rule_on=lambda r: r["rho"])
     family(df, T, W, "baselines", tag.str.startswith("_baselines_"), ["tag"],
-           [ns, au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
-           lambda r: r["tag"].replace("_baselines_", "").replace("_", " "))
-    family(df, T, W, "factorial", tag.str.startswith("_factorial_"), ["tag"], [ns, au, pr, up],
-           lambda r: r["tag"].replace("_factorial_", "").replace("_", " "))
-    family(df, T, W, "periods", tag.str.startswith("_periods_"), ["k_slow", "k_med"], [ns, au, up],
-           lambda r: f"({int(r['k_slow'])}, {int(r['k_med'])})")
+           [au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
+           lambda r: {"adacomm": "AdaComm, $\\tau_0={}$", "lag": "LAG, $\\xi={}$"}.get(r["tag"].split("_")[2], "{}").format(
+               re.sub(r"[a-z]+", "", r["tag"].split("_")[3]) if len(r["tag"].split("_")) > 3 else "")
+           if r["tag"].split("_")[2] in ("adacomm", "lag") else NAMES.get(r["tag"].split("_")[2], r["tag"]) + ", SGD solver",
+           bold=0, rule_on=lambda r: r["tag"].split("_")[2])
+    _fac = {"fedavg": "FedAvg: shared head, every round", "fedper": "FedPer: private head, every round",
+            "sched_only": "Fixed schedule, shared head", "fixed": "Fixed schedule, private head",
+            "tierfed_nohead": "TierFed, shared head", "tierfed": "TierFed, private head"}
+    family(df, T, W, "factorial", tag.str.startswith("_factorial_"), ["tag"], [au, pr, up],
+           lambda r: _fac.get(r["tag"].replace("_factorial_", ""), r["tag"].replace("_factorial_", "").replace("_", " ")), bold=0)
+    family(df, T, W, "periods", tag.str.startswith("_periods_"), ["k_slow", "k_med"], [au, up],
+           lambda r: f"({int(r['k_slow'])}, {int(r['k_med'])})", bold=0, rule_on=lambda r: r["k_slow"])
+    _arch = {"mlp": "MLP", "resnet": "ResNet", "transformer": "FT-Transformer"}
     family(df, T, W, "architecture", tag.str.startswith("_architecture_"), ["model", "strategy"],
-           [ns, au, pr, up, lambda r: f"{int(r.get('tier_total_params_mean', 0)):,}"],
-           lambda r: f"{r['model']} / {NAMES.get(r['strategy'], r['strategy'])}")
-    family(df, T, W, "loss", tag.str.startswith("_loss_"), ["loss", "strategy"], [ns, au, pr, up],
-           lambda r: f"{ {'weighted_ce': 'Inverse-frequency CE', 'focal': 'Focal', 'ldam': 'LDAM', 'cb': 'Class-balanced'}.get(r['loss'], str(r['loss']).replace('_', ' ')) } / {NAMES.get(r['strategy'], r['strategy'])}")
-    family(df, T, W, "warmup", tag.str.startswith("_warmup_"), ["warmup"], [ns, au, pr, up],
-           lambda r: str(int(r["warmup"])))
-    comp = family(df, T, W, "compression", tag.str.startswith("_comp_"), ["strategy", "compressor"],
-                  [ns, au, pr, up], lambda r: f"{NAMES.get(r['strategy'], r['strategy'])} / {r['compressor']}")
+           [au, pr, up, lambda r: f"{int(r.get('tier_total_params_mean', 0)):,}"],
+           lambda r: f"{_arch.get(r['model'], r['model'])} / {NAMES.get(r['strategy'], r['strategy'])}",
+           metrics=[m for m in METRICS + NET if m in df] + ["tier_total_params"], bold=0, rule_on=lambda r: r["model"])
+    family(df, T, W, "loss", tag.str.startswith("_loss_"), ["loss", "strategy"], [au, pr, up],
+           lambda r: f"{ {'weighted_ce': 'Inverse-frequency CE', 'focal': 'Focal', 'ldam': 'LDAM', 'cb': 'Class-balanced'}.get(r['loss'], str(r['loss']).replace('_', ' ')) }, {NAMES.get(r['strategy'], r['strategy'])}",
+           bold=0, rule_on=lambda r: r["loss"])
+    family(df, T, W, "warmup", tag.str.startswith("_warmup_"), ["warmup"], [au, pr, up],
+           lambda r: f"TierFed, $T_w={int(r['warmup'])}$", bold=0)
+    cp = df[tag.str.startswith("_comp_")]
+    if cp.empty:
+        W.table("compression", None)
+    else:
+        g = cp.groupby(["compressor", "strategy"]).agg(a=("fed_auroc_final", "mean"), s=("fed_auroc_final", "std"),
+                                                       u=("total_upload_mb", "mean")).reset_index()
+        cname = {"none": "None (float32)", "quant8": "8-bit quantisation", "quant4": "4-bit quantisation",
+                 "topk": "Top-$k$ (1\\%)", "stc": "Sparse ternary (1\\%)", "sketch": "Count sketch"}
+        lines = []
+        for c in ["none", "quant8", "quant4", "topk", "stc", "sketch"]:
+            gc = g[g.compressor == c].set_index("strategy")
+            if gc.empty:
+                continue
+            cells, best = [], gc["a"].max()
+            for st in ["fedavg", "fedper", "tierfed"]:
+                if st in gc.index:
+                    r = gc.loc[st]; aval = f"{r['a']:.4f}"
+                    cells += [("\\textbf{" + aval + "}") if r["a"] == best else aval, f"{r['u']:.1f}"]
+                else:
+                    cells += ["--", "--"]
+            lines.append(" & ".join([cname.get(c, c)] + cells) + r" \\")
+        W.table("compression", "\n".join(lines) + "\n")
     legacy_dp = tag.str.startswith("_dp") & ~tag.str.startswith("_dpe")
     family(df, T, W, "dp", legacy_dp, ["strategy", "dp_sigma"],
-           [ns, lambda r: _f(r.get("dp_epsilon_mean"), 1), lambda r: _f(r.get("dp_rounds_charged_mean"), 0), au, pr],
+           [lambda r: _f(r.get("dp_epsilon_mean"), 1), lambda r: _f(r.get("dp_rounds_charged_mean"), 0), au, pr],
            lambda r: f"{NAMES.get(r['strategy'], r['strategy'])} / {_f(r['dp_sigma'], 1)}",
            metrics=[m for m in METRICS if m in df] + ["dp_epsilon", "dp_rounds_charged"])
     family(df, T, W, "attack", tag == "_attack", ["strategy"],
-           [ns, lambda r: f"{int(r.get('n_params_exposed_mean_mean', 0)):,}",
+           [lambda r: f"{int(r.get('n_params_exposed_mean_mean', 0)):,}",
             lambda r: _f(r.get("inversion_nmse_mean_mean"), 2),
             lambda r: _f(r.get("inversion_feature_corr_mean_mean"), 3),
             lambda r: _f(r.get("mia_auc_mean_mean"), 3), up],
            lambda r: NAMES.get(r["strategy"], r["strategy"]))
     family(df, T, W, "scaling", tag.str.startswith("_scale"), ["n_clients", "strategy"],
-           [ns, au, up, lambda r: _f(r.get("s_per_round_mean"), 2), lambda r: _f(r.get("peak_mem_mb_mean"), 0)],
-           lambda r: f"{int(r['n_clients'])} / {NAMES.get(r['strategy'], r['strategy'])}")
+           [au, up, lambda r: _f(r.get("s_per_round_mean"), 2), lambda r: _f(r.get("peak_mem_mb_mean"), 0)],
+           lambda r: f"{int(r['n_clients'])} sites, {NAMES.get(r['strategy'], r['strategy'])}", bold=0, rule_on=lambda r: r["n_clients"])
 
     # ---------------- prose macros for the ablation families ----------------
     def _mac(prefix, sub, key_fn):
@@ -402,6 +473,8 @@ def main(argv=None):
         W.num("imgSingleClassMin", str(int(img["n_clients_single_class_final"].min())))
         W.num("imgSingleClassMax", str(int(img["n_clients_single_class_final"].max())))
     v4_families(df, tag, T, W, R)
+    from .theory_numbers import write as theory_numbers
+    theory_numbers(R / "logs", W)
     W.finish()
     print(f"collected {len(df)} runs -> {T} and {a.paper}")
     missing = [p.name for p in Path(a.paper).glob("*.tex") if "RUN REQUIRED" in p.read_text()]
@@ -448,9 +521,18 @@ def v4_families(df, tag, T, W, R):
     for N in sorted(df.loc[m, "n_clients"].dropna().unique()):
         mN = m & (df["n_clients"] == N)
         family(df, T, W, f"dpmatched{int(N)}", mN, ["dp_q", "dp_target_eps", "mkey"],
-               [ns, sig, rel, eps, au, pr, up],
-               lambda r: f"{_f(r['dp_q'], 1)} / {_f(r['dp_target_eps'], 0)} / {nm2(r['mkey'])}",
-               metrics=extra)
+               [sig, rel, au],
+               lambda r: f"{_f(r['dp_q'], 1)}, {_f(r['dp_target_eps'], 0)}, {nm2(r['mkey'])}",
+               metrics=extra, bold=2, rule_on=lambda r: (r["dp_q"], r["dp_target_eps"]))
+        if int(N) == 20:   # main-text body: the q = 0.5 sweep only (q = 1 rows go to the supplement)
+            body = (Path(W.dir) / "dpmatched20.tex").read_text().splitlines()
+            keep, outl = [], []
+            for l in body:
+                if l.startswith("0.5,") or (l.strip() == r"\midrule" and outl and outl[-1].strip() != r"\midrule"):
+                    outl.append(l)
+            while outl and outl[-1].strip() == r"\midrule":
+                outl.pop()
+            W.table("dpmatched20q", "\n".join(outl) + "\n")
         sub = df[mN]
         for (q, e), g in sub.groupby(["dp_q", "dp_target_eps"]):
             key = f"dpm{_safe('N' + str(int(N)))}" + _Q.get(float(q), "Q") + "Eps" + _W.get(float(e), "X")
@@ -480,8 +562,8 @@ def v4_families(df, tag, T, W, R):
         q0, e0 = cnt.idxmax()
         lam_df = lam_df[(lam_df["dp_q"] == q0) & (lam_df["dp_target_eps"] == e0)]
         family(lam_df, T, W, f"dplambda{int(N)}", pd.Series(True, index=lam_df.index), ["lam"],
-               [ns, lambda r: _f(r.get("sched_K_slow_mean"), 0), sig, rel, au, up],
-               lambda r: _f(r["lam"], 1), metrics=extra + ["sched_K_slow"])
+               [lambda r: _f(r.get("sched_K_slow_mean"), 0), sig, rel, au, up],
+               lambda r: _f(r["lam"], 1), metrics=extra + ["sched_K_slow"], bold=3)
         W.num(f"dplam{_safe('N' + str(int(N)))}At", f"$q={q0:g}$, $\\varepsilon^\\star={e0:g}$")
         for l_, gl in lam_df.groupby("lam"):
             k2 = f"dplam{_safe('N' + str(int(N)))}" + _W.get(float(l_), _safe(str(l_)))
@@ -492,8 +574,8 @@ def v4_families(df, tag, T, W, R):
         mk = (df["dataset"] == ds) & (tag == "_real")
         fam = "real" + ds.replace("_", "")
         family(df, T, W, fam, mk, ["strategy"],
-               [ns, au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
-               lambda r: nm(r["strategy"]))
+               [au, pr, up, lambda r: _f(r.get("rounds_transmitting_mean"), 0)],
+               lambda r: nm(r["strategy"]), bold=0)
         g = df[mk]
         if g.empty:
             continue
@@ -510,8 +592,8 @@ def v4_families(df, tag, T, W, R):
 
     wide = df[tag == "_wide"]
     family(df, T, W, "wide", tag == "_wide", ["strategy"],
-           [ns, au, pr, up, lambda r: f"{int(r.get('tier_total_params_mean', 0)):,}"],
-           lambda r: nm(r["strategy"]), metrics=[m for m in METRICS + NET if m in df] + ["tier_total_params"])
+           [au, pr, up],
+           lambda r: nm(r["strategy"]), metrics=[m for m in METRICS + NET if m in df] + ["tier_total_params"], bold=0)
     if not wide.empty:
         W.num("wideParams", f"{int(wide['tier_total_params'].iloc[0]):,}")
         for s_, gs in wide.groupby("strategy"):
@@ -521,6 +603,25 @@ def v4_families(df, tag, T, W, R):
     emu = [json.loads(p.read_text()) for p in sorted((R / "emulation").glob("*.json"))] if (R / "emulation").exists() else []
     if not emu:
         W.table("emulation", None); return
+    # time-to-target is recomputed here from the logs: per-round analytic upload
+    # time (the table shows it matches the emulated total within a few percent)
+    # plus the measured compute of the slowest site, with AUROC taken by round
+    # position (see netemu.time_to_target)
+    from ..netemu import time_to_target
+    from ..network import PROFILES
+    for row in emu:
+        stem = f"diabetes_mlp_wide_{row['strategy']}_R60_C20_s{row['seed']}_wide"
+        sj = R / "logs" / f"{stem}_summary.json"; hc = R / "logs" / f"{stem}_history.csv"
+        if not (sj.exists() and hc.exists()):
+            continue
+        summ = json.loads(sj.read_text()); hist = pd.read_csv(hc).to_dict("records")
+        p = PROFILES[row["profile"]]
+        up = [(rb["max_client_bits"] / (p.uplink_mbps * 1e6) + p.rtt_ms / 1e3) if rb["upload_bits"] > 0 else 0.0
+              for rb in summ["round_bits"]]
+        for c in [k for k in row if k.startswith("tt_")]:
+            tgt = float(c[3:].replace("_s", ""))
+            tt = time_to_target(hist, summ["round_bits"], up, tgt)
+            row[c] = tt["time_to_target_s"]; row[c.replace("tt_", "rt_").replace("_s", "")] = tt["round_to_target"]
     e = pd.DataFrame(emu)
     e["relerr"] = (e["analytic_upload_s"] - e["emu_upload_s"]) / e["emu_upload_s"].where(e["emu_upload_s"] > 0)
     tcols = [c for c in e.columns if c.startswith("tt_")]
@@ -533,7 +634,7 @@ def v4_families(df, tag, T, W, R):
     lines = []
     for _, r in agg.iterrows():
         tt = [("never" if not np.isfinite(r[c]) else _f(r[c], 0)) for c in tcols]
-        lines.append(" & ".join([r["profile"].replace("_", r"\_"), nm(r["strategy"]), str(int(r["n"])),
+        lines.append(" & ".join([r["profile"].replace("_", r"\_"), nm(r["strategy"]),
                                  _f(r["emu"], 1), _f(r["ana"], 1), _f(100 * r["rel"], 1), _f(r["comp"], 0)] + tt) + r" \\")
     W.table("emulation", "\n".join(lines) + "\n")
     W.num("emuMaxAbsRelErrPct", _f(100 * e["relerr"].abs().max(), 1))

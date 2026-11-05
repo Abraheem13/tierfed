@@ -26,6 +26,25 @@ from .utils import clone_state, get_logger
 log = get_logger()
 
 
+def _platt(p_val, y_val, p_test):
+    """Platt scaling fitted on a site's validation split, applied to its test
+    predictions; zero communication."""
+    from sklearn.linear_model import LogisticRegression
+    eps = 1e-6
+    lv = np.log(np.clip(p_val, eps, 1 - eps) / np.clip(1 - p_val, eps, 1))
+    lt = np.log(np.clip(p_test, eps, 1 - eps) / np.clip(1 - p_test, eps, 1))
+    lr = LogisticRegression(C=1e6, max_iter=1000).fit(lv.reshape(-1, 1), y_val)
+    return lr.predict_proba(lt.reshape(-1, 1))[:, 1]
+
+
+def _cal_slope(y, p):
+    """Calibration slope: coefficient of logit(p) in a logistic fit of y (1 = ideal)."""
+    from sklearn.linear_model import LogisticRegression
+    eps = 1e-6
+    z = np.log(np.clip(p, eps, 1 - eps) / np.clip(1 - p, eps, 1)).reshape(-1, 1)
+    return float(LogisticRegression(C=1e6, max_iter=1000).fit(z, y).coef_[0, 0])
+
+
 class FederatedServer:
     def __init__(self, dataset, model_fn: Callable, strategy, device, cfg: Dict,
                  dp: DPConfig | None = None):
@@ -41,10 +60,28 @@ class FederatedServer:
         self.participation = cfg.get("participation", 1.0)
         self.seed = cfg.get("seed", 42)
         # Personalised evaluation needs per-client held-out data (patient-grouped).
-        self.local_tr, self.local_te = dataset.client_test_split(
-            frac=cfg.get("client_test_frac", 0.2), seed=self.seed)
+        # With val_split=True the held-out patients are divided into validation
+        # (round selection, calibration) and test (reporting).
+        self.local_va = None
+        if cfg.get("val_split", False):
+            self.local_tr, self.local_va, self.local_te = dataset.client_val_test_split(
+                frac=cfg.get("client_test_frac", 0.2), val_share=cfg.get("val_share", 0.5), seed=self.seed)
+        else:
+            self.local_tr, self.local_te = dataset.client_test_split(
+                frac=cfg.get("client_test_frac", 0.2), seed=self.seed)
         self.clients = [Client(k, dataset, model_fn, device, cfg, train_idx=self.local_tr[k])
                         for k in range(dataset.n_clients)]
+        if hasattr(strategy, "set_client_sizes"):
+            strategy.set_client_sizes([c.n for c in self.clients])
+        if cfg.get("common_init", False):
+            # round-0 broadcast of the (data-independent) initial shared model, download
+            # only: needed when the first synchronisation comes late (one-shot
+            # federation), since averaging models from different inits is meaningless.
+            # Off by default, so earlier logs reproduce; private tensors stay per site.
+            priv = set(strategy.personal_keys())
+            shared = [k for k in self.global_state if k not in priv]
+            for c in self.clients:
+                c.set_parameters(self.global_state, shared)
         self.history: List[Dict[str, float]] = []
         self.round_bits: List[Dict[str, float]] = []      # for the network model
         self.upload_bits = 0.0
@@ -92,6 +129,8 @@ class FederatedServer:
         priv = self.strategy.personal_keys()
         attack_every = int(self.cfg.get("attack_every", 0))
         for r in range(1, self.rounds + 1):
+            if hasattr(self.strategy, "begin_round"):
+                self.strategy.begin_round(r)
             keys = self.strategy.send_keys(r)
             sel = self._sample(r)
             payload = {k: self.global_state[k] for k in keys}
@@ -184,6 +223,11 @@ class FederatedServer:
         all held-out predictions is also reported."""
         per_client, weights = [], []
         y_all, p_all, n_single = [], [], 0
+        val_metrics, val_w, cal_metrics, cal_w, site_auroc = [], [], [], [], []
+        final = (r == self.rounds)
+        ft = self.cfg.get("eval_finetune_epochs", 0) if final else 0
+        ft_list = sorted({int(j) for j in (ft if isinstance(ft, (list, tuple)) else [ft]) if int(j) > 0})
+        ft_metrics, ft_w = {j: [] for j in ft_list}, {j: [] for j in ft_list}
         for cid, c in enumerate(self.clients):
             idx = self.local_te[cid]
             if len(idx) == 0:
@@ -193,10 +237,25 @@ class FederatedServer:
             y = self.dataset.y_train[idx]
             p = c.predict(x)
             y_all.append(y); p_all.append(p)
+            pv = yv = None
+            if self.local_va is not None and len(self.local_va[cid]):
+                vidx = self.local_va[cid]
+                xv = torch.as_tensor(self.dataset.x_train[vidx], dtype=torch.float32)
+                yv = self.dataset.y_train[vidx]; pv = c.predict(xv)
+                if len(np.unique(yv)) == 2:
+                    val_metrics.append(classification_metrics(yv, pv)); val_w.append(len(vidx))
+            if ft_list and len(np.unique(y)) == 2:
+                for j, mj in self._finetuned_metrics(c, x, y, ft_list).items():
+                    ft_metrics[j].append(mj); ft_w[j].append(len(idx))
             if len(np.unique(y)) < 2:
                 n_single += 1
                 continue
-            per_client.append(classification_metrics(y, p)); weights.append(len(idx))
+            m = classification_metrics(y, p)
+            per_client.append(m); weights.append(len(idx)); site_auroc.append(m["auroc"])
+            if pv is not None and yv is not None and len(np.unique(yv)) == 2:
+                cm = classification_metrics(y, _platt(pv, yv, p))
+                cm["slope"] = _cal_slope(y, p)
+                cal_metrics.append(cm); cal_w.append(len(idx))
         fed = weighted_average(per_client, weights)
         pooled = classification_metrics(np.concatenate(y_all), np.concatenate(p_all)) if y_all else {}
 
@@ -217,12 +276,46 @@ class FederatedServer:
                "n_clients_single_class": float(n_single),
                "n_clients_evaluated": float(len(per_client))}
         row.update({f"fed_{k}": v for k, v in fed.items()})
+        if val_metrics:
+            row["fed_val_auroc"] = weighted_average(val_metrics, val_w).get("auroc", np.nan)
+        if cal_metrics:
+            cal = weighted_average(cal_metrics, cal_w)
+            row["fed_cal_ece"], row["fed_cal_brier"] = cal.get("ece", np.nan), cal.get("brier", np.nan)
+            row["fed_cal_slope"] = cal.get("slope", np.nan)   # slope of the UNcalibrated scores
+        if site_auroc:
+            sa = np.asarray(site_auroc, float); sa = sa[np.isfinite(sa)]
+            if sa.size:
+                row["fed_auroc_site_min"] = float(sa.min()); row["fed_auroc_site_p10"] = float(np.percentile(sa, 10))
+        for j in ft_list:
+            if ft_metrics[j]:
+                row[f"fed_ft{j}_auroc"] = weighted_average(ft_metrics[j], ft_w[j]).get("auroc", np.nan)
         row.update({f"pooled_{k}": v for k, v in pooled.items()})
         row.update({f"global_{k}": v for k, v in glob.items()})
-        row.update(self.divergence.latest())
+        # the tracker's own 'round' is the last synchronisation round, not this round
+        row.update({k: v for k, v in self.divergence.latest().items() if k != "round"})
         if hasattr(self.strategy, "K"):
             row.update({f"K_{g}": float(v) for g, v in self.strategy.K.items()})
         return row
+
+    def _finetuned_metrics(self, c, x, y, epochs_list) -> Dict[int, Dict[str, float]]:
+        """E-3 control: fine-tune the site's final model for j local epochs on its
+        own training split (all parameters, plain local loss), evaluate after each
+        j in `epochs_list`, then restore the model and optimiser state. Training is
+        over when this runs, so the reported trajectory is untouched; the result
+        shows how much accuracy a site obtains by local adaptation alone."""
+        import copy
+        saved = copy.deepcopy(c.model.state_dict()); saved_opt = copy.deepcopy(c.opt_state)
+
+        class _Plain:
+            def local_objective_extra(self, model, gp, loss, cid=None):
+                return loss
+        out, done = {}, 0
+        for j in epochs_list:
+            c.train(_Plain(), None, j - done, self.seed + 104729)
+            done = j
+            out[j] = classification_metrics(y, c.predict(x))
+        c.model.load_state_dict(saved); c.opt_state = saved_opt
+        return out
 
     # ------------------------------------------------------------------ #
     def _membership(self) -> Dict[str, float]:
@@ -251,6 +344,32 @@ class FederatedServer:
             if vals:
                 out.update(TrajectoryStats(m, vals).summary(
                     patience=self.cfg.get("early_stop_patience", 10)))
+        # E-1: report test AUROC at the round chosen on VALIDATION, and the bytes spent
+        # until then; E-2: mean over post-synchronisation rounds in the last 20.
+        if any("fed_val_auroc" in h for h in self.history):
+            vals = [(h.get("fed_val_auroc", np.nan), -i) for i, h in enumerate(self.history)]
+            vals = [v for v in vals if np.isfinite(v[0])]
+            i_best = -max(vals)[1] if vals else len(self.history) - 1   # earliest round on ties
+            hb = self.history[i_best]
+            out["fed_val_auroc_valsel"] = float(hb.get("fed_val_auroc", np.nan))
+            out["fed_auroc_valsel"] = float(hb.get("fed_auroc", np.nan))
+            out["fed_auprc_valsel"] = float(hb.get("fed_auprc", np.nan))
+            out["valsel_round"] = float(i_best + 1)
+            out["upload_mb_valsel"] = float(hb.get("upload_mb", np.nan))
+            for k in ("fed_cal_ece", "fed_cal_brier", "fed_cal_slope", "fed_ece", "fed_brier",
+                      "fed_auroc_site_min", "fed_auroc_site_p10", "n_clients_single_class"):
+                if k in hb:
+                    out[f"{k}_valsel"] = float(hb[k])
+        ups = [h["upload_mb"] for h in self.history]; au = [h.get("fed_auroc", np.nan) for h in self.history]
+        post = [au[i] for i in range(1, len(ups)) if ups[i] > ups[i - 1] + 1e-12 and i >= len(ups) - 20]
+        # a method that never synchronises has no phase: use the plain last-20 mean
+        out["fed_auroc_phase"] = float(np.nanmean(post)) if post else float(np.nanmean(au[-20:]))
+        out["fed_auroc_last20_mean"] = float(np.nanmean(au[-20:]))
+        last = self.history[-1]
+        for k in [k for k in last if k.startswith("fed_ft")] + [
+                "fed_auroc_site_min", "fed_auroc_site_p10", "fed_cal_ece", "fed_cal_brier", "fed_cal_slope"]:
+            if k in last:
+                out[f"{k}_final"] = float(last[k])
         out["total_upload_mb"] = self.upload_bits / 8e6
         out["total_download_mb"] = self.download_bits / 8e6
         out["rounds"] = float(self.rounds)

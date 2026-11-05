@@ -10,8 +10,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .figures import (bandwidth_frontier, divergence_figure, factorial_figure, privacy_tradeoff,
-                      schedule_figure, trajectory_figure)
+from .figures import (bandwidth_frontier, divergence_figure, factorial_figure, matched_privacy_figure,
+                      privacy_tradeoff, schedule_figure, trajectory_figure)
 from .collect import load_summaries, NAMES
 
 
@@ -68,7 +68,24 @@ def main(argv=None):
                                    fed_auroc_final_std=("fed_auroc_final", "std")).reset_index()
         s["cell"] = s["tag"].str.replace("_factorial_", "")
         factorial_figure(s, out=O / "fig_factorial.pdf")
-    dp = df[tag.str.startswith("_dp")]
+    dpm = df[tag.str.startswith("_dpe") & ~tag.str.contains("_lam")]
+    if not dpm.empty:
+        lab = {"fedavg": "FedAvg", "fedper": "FedPer", "tierfed_dp": "Planner ($\\lambda=1$)"}
+        dpm = dpm.assign(mkey=np.where(dpm["strategy"] == "fixed",
+                                       "fixed" + dpm["k_slow"].fillna(0).astype(float).astype(int).astype(str),
+                                       dpm["strategy"].astype(str)))
+        dpm = dpm.assign(label=dpm["mkey"].map(lambda k: lab.get(k, f"Fixed $K={k[5:]}$")),
+                         panel=dpm.apply(lambda r: f"$N={int(r['n_clients'])}$, $q={float(r['dp_q']):g}$", axis=1))
+        g = dpm.groupby(["panel", "label", "dp_target_eps"]).agg(mean=("fed_auroc_final", "mean"),
+                                                                std=("fed_auroc_final", "std")).reset_index()
+        g = g.rename(columns={"dp_target_eps": "eps"})
+        g = g[g.groupby("panel")["eps"].transform("nunique") >= 3]      # curves, not single points
+        order = ["FedAvg", "FedPer", "Fixed $K=4$", "Fixed $K=8$", "Planner ($\\lambda=1$)"]
+        g["o"] = g["label"].map({k: i for i, k in enumerate(order)})
+        g["pn"] = g["panel"].str.extract(r"N=(\d+)").astype(int)[0]
+        g = g.sort_values(["pn", "panel", "o", "eps"])
+        matched_privacy_figure(g, out=O / "fig_dp_matched.pdf")
+    dp = df[tag.str.startswith("_dp") & ~tag.str.startswith("_dpe")]
     if not dp.empty:
         s = dp.groupby(["strategy", "dp_sigma"]).agg(fed_auroc_final_mean=("fed_auroc_final", "mean"),
                                                      fed_auroc_final_std=("fed_auroc_final", "std")).reset_index()

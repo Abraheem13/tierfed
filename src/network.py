@@ -53,13 +53,29 @@ def cost_round(max_client_bits: float, upload_bits: float, n_senders: float,
 def cost_run(round_bits: List[Mapping[str, float]], profile: str | LinkProfile) -> Dict[str, float]:
     p = PROFILES[profile] if isinstance(profile, str) else profile
     tot_t = tot_e = fits = 0.0
+    times = []
     for rb in round_bits:
         c = cost_round(rb["max_client_bits"], rb["upload_bits"], rb["n_senders"], p)
         tot_t += c["time_s"]; tot_e += c["energy_j"]; fits += c["fits_window"]
+        if rb["upload_bits"] > 0:
+            times.append(c["time_s"])
     n = max(len(round_bits), 1)
+    tx = sorted(times)
+    # shared uplink (time division): every site's bits share one link of rate beta
+    shared = sum(rb["upload_bits"] / (p.uplink_mbps * 1e6) + p.rtt_ms / 1e3
+                 for rb in round_bits if rb["upload_bits"] > 0)
+    # radio wake-ups: rounds in which a site transmits anything (per site, averaged);
+    # each costs a promotion delay and a payload-independent tail on cellular radios
+    cb = [rb.get("client_bits") for rb in round_bits if rb.get("client_bits") is not None]
+    wake = (sum(sum(1 for b in c if b > 0) for c in cb) / max(len(cb[0]), 1)) if cb else float("nan")
     return {f"net_{p.name}_comm_time_s": tot_t,
             f"net_{p.name}_energy_j": tot_e,
-            f"net_{p.name}_window_compliance": fits / n}
+            f"net_{p.name}_window_compliance": fits / n,
+            # over transmitting rounds only: the peak load a link must carry
+            f"net_{p.name}_round_time_max_s": tx[-1] if tx else 0.0,
+            f"net_{p.name}_round_time_p95_s": tx[min(len(tx) - 1, int(0.95 * len(tx)))] if tx else 0.0,
+            f"net_{p.name}_shared_comm_time_s": shared,
+            f"net_{p.name}_wakeups_per_site": wake}
 
 
 def cost_all_profiles(round_bits: List[Mapping[str, float]]) -> Dict[str, float]:

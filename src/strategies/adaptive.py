@@ -28,6 +28,7 @@ from typing import Dict, List, Mapping, Sequence
 import torch
 
 from .base import Strategy
+from .schedule_rules import due_tiers, stagger_phases
 
 
 class AdaptiveTierFed(Strategy):
@@ -36,10 +37,32 @@ class AdaptiveTierFed(Strategy):
     def __init__(self, param_names: Sequence[str], sizes: Mapping[str, int],
                  tiers: Mapping[str, str], warmup: int = 5,
                  k_min: int = 1, k_max: int = 8, rho: float = 0.25,
-                 solver: str = "exact", private_head: bool = True, **kw):
+                 solver: str = "exact", private_head: bool = True,
+                 stagger: bool = False, peak_cap: float | None = None, debias: bool = False,
+                 quota: str = "post", rounds: int | None = None, warmup_payload: float = 1.0, **kw):
         super().__init__(param_names, sizes, **kw)
         self.tiers = dict(tiers)
         self.warmup = int(warmup)
+        # quota="post": rho bounds the post-warm-up payload fraction (v3-v12 runs).
+        # quota="all": rho bounds the fraction over ALL R rounds, warm-up included
+        # (P0-5); the solver then meets rho' = (rho R - T_w c_w) / (R - T_w) after
+        # warm-up, with c_w the warm-up payload fraction (1, or about 1/4 at 8 bits).
+        self.quota = quota
+        if quota == "all":
+            if not rounds or int(rounds) <= self.warmup:
+                raise ValueError("quota='all' needs rounds > warmup")
+            R = int(rounds)
+            self.rho_post = (float(rho) * R - self.warmup * float(warmup_payload)) / (R - self.warmup)
+        else:
+            self.rho_post = float(rho)
+        # stagger: tiers follow the modular rule of schedule_rules.py with phase
+        # offsets, so tiers with a common interval never coincide; peak_cap bounds
+        # the post-warm-up payload fraction of any single round (requires stagger).
+        # debias: the dispersion of a tier is divided by the square of the interval
+        # that produced it (Gamma-hat grows as (K s)^2, Section III-B).
+        self.stagger = bool(stagger) or peak_cap is not None
+        self.peak_cap = None if peak_cap is None else float(peak_cap)
+        self.debias = bool(debias)
         self.k_min, self.k_max = int(k_min), int(k_max)
         self.rho = float(rho)
         self.solver = solver
@@ -59,6 +82,8 @@ class AdaptiveTierFed(Strategy):
     def active_tiers(self, r: int) -> List[str]:
         if r <= self.warmup:
             return list(self.shared_tiers)
+        if self.stagger:
+            return due_tiers(r, self.K, self.warmup, stagger_phases(self.K))
         return [g for g in self.shared_tiers if (r - self.last_sync[g]) >= self.K[g]]
 
     def send_keys(self, r: int) -> List[str]:
@@ -87,6 +112,9 @@ class AdaptiveTierFed(Strategy):
         gam = self._measure_gamma(client_states, keys)
         for g in self.shared_tiers:
             if g in gam:
+                if self.debias:
+                    interval = max(1, r - self.last_sync.get(g, 0))
+                    gam[g] = gam[g] / float(interval * interval)
                 self.gamma[g] = gam[g]; self.gamma_age[g] = 0
             elif g in self.gamma:
                 self.gamma_age[g] = self.gamma_age.get(g, 0) + 1
@@ -127,7 +155,15 @@ class AdaptiveTierFed(Strategy):
         best, best_cost = None, None
         for Ks in itertools.product(grid, repeat=len(tiers)):
             payload = sum(w[g] / K for g, K in zip(tiers, Ks))
-            feasible = payload <= self.rho + 1e-12
+            feasible = payload <= self.rho_post + 1e-12
+            if feasible and self.peak_cap is not None:
+                Kd = dict(zip(tiers, Ks)); ph = stagger_phases(Kd)
+                # peak over one hyper-period after warm-up
+                from math import lcm
+                H = lcm(*[int(k) for k in Ks])
+                peak = max(sum(w[g] for g in due_tiers(self.warmup + t, Kd, self.warmup, ph))
+                           for t in range(1, H + 1))
+                feasible = peak <= self.peak_cap + 1e-12
             cost = sum(gam[g] * K * K for g, K in zip(tiers, Ks))
             # lexicographic: feasible first, then bound cost, then smaller K (denser)
             key = (0 if feasible else 1, cost if feasible else payload, sum(Ks))
@@ -140,7 +176,7 @@ class AdaptiveTierFed(Strategy):
         unit bandwidth saved; restricted to powers of two."""
         K = {g: self.k_min for g in self.shared_tiers}
         payload = lambda: sum(w[g] / K[g] for g in self.shared_tiers)  # noqa: E731
-        while payload() > self.rho:
+        while payload() > self.rho_post:
             best, best_ratio = None, None
             for g in self.shared_tiers:
                 if K[g] * 2 > self.k_max:
@@ -159,6 +195,9 @@ class AdaptiveTierFed(Strategy):
     def schedule_table(self, rounds: int) -> Dict[str, float]:
         out = {"warmup": float(self.warmup), "k_min": float(self.k_min),
                "k_max": float(self.k_max), "rho": float(self.rho),
+               "stagger": float(self.stagger), "debias": float(self.debias),
+               "quota_all": float(self.quota == "all"), "rho_post": float(self.rho_post),
+               "peak_cap": float(self.peak_cap) if self.peak_cap is not None else float("nan"),
                **{f"K_{g}": float(v) for g, v in self.K.items()},
                **{f"gamma_{g}": float(v) for g, v in self.gamma.items()},
                **{f"w_{g}": float(v) for g, v in self.tier_weight().items()}}
@@ -230,8 +269,7 @@ class PrivacyPlannedTierFed(Strategy):
         # full-rate noise energy"; v4 compared raw K^2 against sigma^2 in C^2 units,
         # which made lambda scale-dependent and overweighted drift.
         def _plan(K):
-            due = [[g for g in self.shared_tiers if r <= self.Tw or (r - self.Tw) % K[g] == 0]
-                   for r in range(1, self.R + 1)]
+            due = [due_tiers(r, K, self.Tw) for r in range(1, self.R + 1)]
             frac = [sum(self.w[g] for g in d) for d in due]
             releases = sum(1 for f in frac if f > 0)
             payload = sum(frac) / self.R
@@ -254,7 +292,7 @@ class PrivacyPlannedTierFed(Strategy):
         self.J, self.K, self.planned_sigma, self.planned_releases, self.planned_payload = best
 
     def due(self, r: int):
-        return [g for g in self.shared_tiers if r <= self.Tw or (r - self.Tw) % self.K[g] == 0]
+        return due_tiers(r, self.K, self.Tw)
 
     def send_keys(self, r: int):
         act = set(self.due(r)); priv = set(self.private)

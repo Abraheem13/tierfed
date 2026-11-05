@@ -167,3 +167,25 @@ def schedule_figure(runs: List[pd.DataFrame], out="fig_schedule.png"):
     ax.grid(alpha=0.25, linewidth=0.5); ax.legend(frameon=False, fontsize=8)
     fig.savefig(out); plt.close(fig)
     return out
+
+
+def matched_privacy_figure(df: pd.DataFrame, out="fig_dp_matched.png"):
+    """Final AUROC against the target epsilon at matched privacy, one panel per
+    (federation size, sampling rate); df has columns panel, mkey, eps, mean, std, label."""
+    panels = list(dict.fromkeys(df["panel"]))
+    fig, axes = plt.subplots(1, len(panels), figsize=(3.1 * len(panels), 3.2), sharey=True, squeeze=False)
+    for ax, pn in zip(axes[0], panels):
+        sub = df[df["panel"] == pn]
+        for i, (name, g) in enumerate(sub.groupby("label", sort=False)):
+            g = g.sort_values("eps")
+            ls, mk, c = _style(i)
+            ax.errorbar(g["eps"], g["mean"], yerr=g["std"], fmt=mk + ls, color=c,
+                        capsize=2.5, linewidth=1.4, markersize=4.5, label=str(name))
+        ax.axhline(0.5, color="#bbbbbb", linewidth=0.8, linestyle="-")
+        ax.set_xscale("log", base=2); ax.set_xticks([1, 2, 4, 8]); ax.set_xticklabels(["1", "2", "4", "8"])
+        ax.set_title(pn, fontsize=9); ax.set_xlabel("Target $\\varepsilon$ ($\\delta=10^{-5}$)")
+        ax.grid(alpha=0.25, linewidth=0.5)
+    axes[0][0].set_ylabel("Final federated AUROC")
+    axes[0][-1].legend(frameon=False, fontsize=7.5, loc="upper left")
+    fig.tight_layout(); fig.savefig(out); plt.close(fig)
+    return out

@@ -35,6 +35,7 @@ DEFAULTS = dict(
     compressor=None, compressor_kwargs=None, dp=None,
     eval_every=1, early_stop_patience=10, client_test_frac=0.2, out_dir="results",
     attack_every=0, attack_steps=300, attack_batch=8, membership_inference=False, tag="",
+    val_split=False, val_share=0.5, eval_finetune_epochs=0, common_init=False, perturb_site=None,
 )
 
 
@@ -72,6 +73,17 @@ def _run_single(cfg: Dict, skip_existing: bool = False) -> Dict:
 
     ds = load_dataset(cfg["dataset"], n_clients=cfg["n_clients"], seed=cfg["seed"],
                       **(cfg.get("dataset_kwargs") or {}))
+    pert = cfg.get("perturb_site")
+    if pert:
+        # timing side-channel experiment: one target site holds a shifted population
+        # (a fraction of its labels flipped), the property a network observer tries
+        # to infer from the transmission schedule alone
+        import numpy as np
+        ds.y_train = ds.y_train.copy()
+        idx = ds.client_indices[int(pert.get("site", 0))]
+        rng = np.random.default_rng(int(cfg["seed"]) + 4242)
+        flip = idx[rng.random(len(idx)) < float(pert.get("flip", 0.3))]
+        ds.y_train[flip] = 1 - ds.y_train[flip]
     out = Path(cfg["out_dir"]); (out / "logs").mkdir(parents=True, exist_ok=True)
     tag = run_tag(cfg, ds.n_clients)
     if skip_existing and (out / "logs" / f"{tag}_summary.json").exists():

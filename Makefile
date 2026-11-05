@@ -1,4 +1,4 @@
-.PHONY: setup test determinism benchmark ablation compression privacy scaling collect figures paper all clean
+.PHONY: setup test determinism benchmark ablation compression privacy scaling collect figures paper all clean audit consistency
 
 PY ?= python
 DATASET ?= diabetes
@@ -23,9 +23,13 @@ scaling:
 	STAGES="6" bash scripts/reproduce_all.sh
 collect:
 	$(PY) -m src.analysis.collect --results results --dataset $(DATASET) --model mlp
+consistency:
+	$(PY) -m src.analysis.consistency --results results
+audit: consistency
+	$(PY) -m src.analysis.audit_report --results results --dataset $(DATASET)
 figures:
 	$(PY) -m src.analysis.make_figures --results results --dataset $(DATASET) --model mlp
-paper: collect figures
+paper: consistency collect figures
 	$(PY) scripts/claim_check.py paper/generated/flags.json paper/claims.json
 	$(MAKE) -C paper
 

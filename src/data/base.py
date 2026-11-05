@@ -79,6 +79,23 @@ class FederatedDataset:
             te.append(idx[mask]); tr.append(idx[~mask])
         return tr, te
 
+    def client_val_test_split(self, frac: float = 0.2, val_share: float = 0.5, seed: int = 0):
+        """Train / validation / test per client, PATIENT-GROUPED. The held-out
+        patients (a fraction `frac`) are divided into validation and test, so the
+        round used for reporting is chosen on data that is never reported."""
+        rng = np.random.default_rng(seed)
+        tr, va, te = [], [], []
+        for idx in self.client_indices:
+            keys = self.groups[idx] if self.groups is not None else np.arange(len(idx))
+            uniq = np.unique(keys)
+            rng.shuffle(uniq)
+            n_ho = max(2, int(len(uniq) * frac))
+            n_va = max(1, int(round(n_ho * val_share)))
+            va_g = set(uniq[:n_va].tolist()); te_g = set(uniq[n_va:n_ho].tolist())
+            m_va = np.isin(keys, list(va_g)); m_te = np.isin(keys, list(te_g))
+            va.append(idx[m_va]); te.append(idx[m_te]); tr.append(idx[~(m_va | m_te)])
+        return tr, va, te
+
     def describe(self) -> Dict:
         return {
             "dataset": self.name,
