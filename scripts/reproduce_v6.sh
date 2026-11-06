@@ -41,11 +41,18 @@ analysis() {
   $PY -m src.analysis.crossmachine --results results
   $PY -m src.analysis.audit_report --results results --dataset diabetes > results/tables/audit_report_stdout.txt
   $PY -m src.analysis.audit_tex --results results --paper paper/generated --dataset diabetes
+  # TMLCN revision: analyses read only results/logs; outputs feed paper/tmlcn
+  $PY -I scripts/tmlcn/selection_table.py results/logs > scripts/tmlcn/selection_table.out
+  $PY -I scripts/tmlcn/dp_local_paired.py results/logs > scripts/tmlcn/dp_local_paired.out
+  $PY -I scripts/tmlcn/reference_bounds.py results/logs > scripts/tmlcn/reference_bounds.out
+  $PY -I scripts/tmlcn/check_numbers.py paper/tmlcn/main.tex > scripts/tmlcn/check_numbers_main.txt
   $PY -m src.analysis.audit_figures --results results --out paper/figures --dataset diabetes
   $PY -m src.analysis.results_figures --results results --out paper/figures
   $PY -m src.analysis.collect --results results --dataset diabetes --model mlp
   $PY -m src.analysis.make_figures --results results --dataset diabetes --model mlp   # supplement figure
   if command -v pdflatex >/dev/null; then
+    (cd paper/tmlcn && for f in main supp; do pdflatex -interaction=nonstopmode $f.tex >/dev/null; bibtex $f >/dev/null;
+     pdflatex -interaction=nonstopmode $f.tex >/dev/null; pdflatex -interaction=nonstopmode $f.tex >/dev/null; done)
     (cd paper && pdflatex -interaction=nonstopmode main.tex >/dev/null; bibtex main >/dev/null;
      pdflatex -interaction=nonstopmode main.tex >/dev/null; pdflatex -interaction=nonstopmode main.tex >/dev/null
      pdflatex -interaction=nonstopmode supp.tex >/dev/null; bibtex supp >/dev/null

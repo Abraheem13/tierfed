@@ -52,6 +52,11 @@ function Analysis {
   & $py -m src.analysis.crossmachine --results results
   & $py -m src.analysis.audit_report --results results --dataset diabetes | Out-File results\tables\audit_report_stdout.txt
   & $py -m src.analysis.audit_tex --results results --paper paper\generated --dataset diabetes
+  # TMLCN revision: analyses read only results\logs; outputs feed paper\tmlcn
+  & $py -I scripts\tmlcn\selection_table.py results\logs | Out-File -Encoding utf8 scripts\tmlcn\selection_table.out
+  & $py -I scripts\tmlcn\dp_local_paired.py results\logs | Out-File -Encoding utf8 scripts\tmlcn\dp_local_paired.out
+  & $py -I scripts\tmlcn\reference_bounds.py results\logs | Out-File -Encoding utf8 scripts\tmlcn\reference_bounds.out
+  & $py -I scripts\tmlcn\check_numbers.py paper\tmlcn\main.tex | Out-File -Encoding utf8 scripts\tmlcn\check_numbers_main.txt
   & $py -m src.analysis.audit_figures --results results --out paper\figures --dataset diabetes
   & $py -m src.analysis.results_figures --results results --out paper\figures
   & $py -m src.analysis.collect --results results --dataset diabetes --model mlp
