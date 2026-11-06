@@ -1,51 +1,37 @@
 # Reference check — TMLCN manuscript (57 cited entries)
 
-Checked 2026-11-06. Every cited entry was reviewed. "Source" means the bibliographic
-fields were compared with a publisher, proceedings or repository record; "title/venue"
-means a search confirmed the paper exists under that title, authors and venue, without
-re-reading volume or pages. No entry was found to be fabricated.
+Checked 6–7 November 2026. Every cited entry was compared with a source record (the table below says how fully):
+a publisher, proceedings or repository page (PMLR, NeurIPS/NIPS proceedings,
+MLSys proceedings, OpenReview/ICLR, JMLR, AAAI, arXiv, vldb.org, 3GPP change
+history) or an institutional repository record that reproduces the publisher's
+metadata (Pure, DSpace and similar). No entry was found to be fabricated, and no
+wrong field value was found.
 
-## Fields confirmed at a source record
+## Corrections made in this check
 
-| # | Key | Confirmed | Record |
-|---|---|---|---|
-| 7 | li2020fedprox | authors, MLSys 2020, pp. 429–450 | proceedings.mlsys.org metadata |
-| 10 | collins2021 | authors, PMLR 139, pp. 2089–2099 | proceedings.mlr.press/v139/collins21a |
-| 11 | pillutla2022 | authors, PMLR 162, pp. 17716–17758 | proceedings.mlr.press/v162/pillutla22a |
-| 15 | wang2019adacomm | authors, MLSys 2019, pp. 212–229 | proceedings.mlsys.org |
-| 16 | chen2018lag | authors, NeurIPS 2018, pp. 5050–5060 | mlanthology.org |
-| 17 | lee2023fedlama | authors, AAAI 2023, pp. 8491–8499 (DOI 10.1609/aaai.v37i7.26023) | mlanthology.org |
-| 18 | malan2024alf | authors, IEEE IoT-J 11(4), pp. 6072–6083, 2024 (DOI 10.1109/JIOT.2023.3309691) | iris.polito.it |
-| 22 | yang2024fedas | authors, CVPR 2024, pp. 11986–11995 | mlanthology.org |
-| 25 | razmi2022leo | authors, IEEE WCL 11(4), pp. 717–721, 2022 | uni-bremen.de publication record |
-| 29 | kairouz2021ftrl | authors, PMLR 139, pp. 5213–5225 | proceedings.mlr.press/v139/kairouz21b |
-| 37 | yeom2018 | authors, CSF 2018, pp. 268–282 | researchr.org |
-| 41 | tr38913 | TR 38.913 V17.0.0, 2022-03 (RP-95e) | change history, itecspec.com |
-| 52 | dong2022gdp | JRSS-B 84(1), pp. 3–37, 2022 | RePEc record |
-| 54 | rogers2016odometer | authors, NIPS 2016, pp. 1921–1929 | papers.nips.cc metadata |
-| 2 | kairouz2021 | Found. Trends Mach. Learn. 14(1–2), pp. 1–210, 2021 | nowpublishers.com MAL-083 |
-| 21 | wang2021coop | title ("…Local-Update SGD Algorithms"), JMLR 22, 2021 (**article number 213 and pp. 1–50 not re-read**) | researchr.org BibTeX |
-| 55 | lyu2017svt | authors, PVLDB 10(6), first page 637 | vldb.org (**end page 648 not re-read**) |
-
-## Existence, title, authors and venue confirmed by search
-
-| # | Key | Venue confirmed |
+| # | Key | Change |
 |---|---|---|
-| 4 | dayan2021 | Nature Medicine 2021 |
-| 5 | lim2020 | IEEE Commun. Surveys Tuts. |
-| 6 | chen2021joint | IEEE Trans. Wireless Commun. (IEEE Xplore 9210812) |
-| 14 | wang2019jsac | IEEE JSAC 2019 |
-| 20 | sattler2020 | IEEE TNNLS |
-| 30 | choquette2024correlated | ICLR 2024 |
-| 33 | liu2024recordlevel | arXiv 2401.16251, CCS 2024 (**venue from NSF record title only**) |
-| 40 | narayanan2021variegated | ACM SIGCOMM 2021 |
-| 42 | strack2014 | BioMed Res. Int., article 781670 (DOI 10.1155/2014/781670) |
-| 47 | vancalster2019 | BMC Medicine 2019 (PMC6912996) |
+| 1 | mcmahan2017 | last author rendered as "B. A. y Arcas" (BibTeX read "y" as a particle); now "B. Agüera y Arcas" |
+| 3 | rieke2020 | article number 119 could not be confirmed at a source; replaced by issue number 1, which was (DOAJ record, DOI 10.1038/s41746-020-00323-1) |
+| 48 | platt1999 | page range 61–74 could not be confirmed at a source; removed. Book, MIT Press and year 2000 confirmed |
+| several | see below | page ranges and volumes read on the official proceedings pages added where the entry had none |
 
-## Not re-fetched in this pass
+Fields added from official pages: alistarh2017qsgd pp. 1709–1720; andrew2021adaptive vol. 34,
+pp. 17455–17466; liu2022crosssilo vol. 35, pp. 5925–5940; zhu2019dlg pp. 14774–14784;
+vero2023tableak PMLR 202, pp. 35051–35083; carlini2022lira pp. 1897–1914; huang2012lte
+pp. 225–238; duterrail2022flamby vol. 35, pp. 5315–5334; khaled2020 PMLR 108, pp. 4519–4529;
+wang2020fednova vol. 33, pp. 7611–7623; kairouz2021ddg PMLR 139, pp. 5201–5212; balle2018
+PMLR 80, pp. 394–403; choquette2023banded vol. 36, pp. 74856–74889; ke2017lightgbm
+pp. 3146–3154; dayan2021 no. 10.
 
-The remaining 30 entries are standard citations (for example McMahan et al. 2017,
-Kairouz et al. 2021, SCAFFOLD, DLG, LightGBM, MedMNIST v2, eICU-CRD, FLamby) whose
-title, authors, venue and year were checked against the reviewer's knowledge of
-the literature and found consistent; no search or source record was used for them. Their volume and page fields were **not** re-fetched from a
-source record in this pass. Before camera-ready, run every DOI through Crossref.
+## Status of every cited entry
+
+| Status | Keys |
+|---|---|
+| All fields confirmed at a source | mcmahan2017, kairouz2021, rieke2020 (after correction), dayan2021, lim2020, chen2021joint, li2020fedprox, karimireddy2020, arivazhagan2019, collins2021, pillutla2022, stich2019, lin2020postlocal, wang2019jsac, wang2019adacomm, chen2018lag, lee2023fedlama, malan2024alf, alistarh2017qsgd, sattler2020, wang2021coop, yang2024fedas, diao2021heterofl, horvath2021fjord, razmi2022leo, mcmahan2018dp, mironov2017, mironov2019sgm, kairouz2021ftrl, andrew2021adaptive, liu2022crosssilo, liu2024recordlevel, zhu2019dlg, geiping2020, vero2023tableak, yeom2018, carlini2022lira, huang2012lte, tr38913, detrano1989, duterrail2022flamby, yang2023medmnist, pollard2018, platt1999 (after correction), khaled2020, wang2020fednova, kairouz2021ddg, dong2022gdp, balle2018, rogers2016odometer, choquette2023banded, ke2017lightgbm |
+| Title, venue, year and identifier confirmed; full author list not re-read at a source | choquette2024correlated (ICLR 2024), narayanan2021variegated (ACM SIGCOMM 2021), strack2014 (BioMed Res. Int., article 781670, DOI 10.1155/2014/781670), vancalster2019 (BMC Medicine 2019, PMC6912996) |
+| One field from a secondary index | lyu2017svt: vol. 10, no. 6 and first page 637 at vldb.org; end page 648 from a secondary index (DOI 10.14778/3055330.3055331), consistent with the 12-page paper |
+
+Notes: liu2022crosssilo — the proceedings page writes "Ken Liu" and "Steven Z. Wu", the same
+people as the bib entry's name forms. liu2024recordlevel — ACM CCS 2024, DOI
+10.1145/3658644.3670351, five authors in the stated order.
