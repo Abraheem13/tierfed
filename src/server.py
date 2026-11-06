@@ -16,6 +16,8 @@ import numpy as np
 import torch
 
 from .client import Client
+from sklearn.metrics import roc_auc_score
+
 from .metrics import TrajectoryStats, classification_metrics, weighted_average
 from .privacy.dp import DPConfig, calibrate_sigma, private_aggregate
 from .privacy.inversion import attack_update
@@ -83,6 +85,7 @@ class FederatedServer:
             for c in self.clients:
                 c.set_parameters(self.global_state, shared)
         self.history: List[Dict[str, float]] = []
+        self._cal_inputs: Dict[int, list] = {}
         self.round_bits: List[Dict[str, float]] = []      # for the network model
         self.upload_bits = 0.0
         self.download_bits = 0.0
@@ -223,7 +226,7 @@ class FederatedServer:
         all held-out predictions is also reported."""
         per_client, weights = [], []
         y_all, p_all, n_single = [], [], 0
-        val_metrics, val_w, cal_metrics, cal_w, site_auroc = [], [], [], [], []
+        val_metrics, val_w, cal_in, site_auroc = [], [], [], []
         final = (r == self.rounds)
         ft = self.cfg.get("eval_finetune_epochs", 0) if final else 0
         ft_list = sorted({int(j) for j in (ft if isinstance(ft, (list, tuple)) else [ft]) if int(j) > 0})
@@ -243,7 +246,8 @@ class FederatedServer:
                 xv = torch.as_tensor(self.dataset.x_train[vidx], dtype=torch.float32)
                 yv = self.dataset.y_train[vidx]; pv = c.predict(xv)
                 if len(np.unique(yv)) == 2:
-                    val_metrics.append(classification_metrics(yv, pv)); val_w.append(len(vidx))
+                    va = float(roc_auc_score(yv, pv)) if np.all(np.isfinite(pv)) else float("nan")
+                    val_metrics.append({"auroc": va}); val_w.append(len(vidx))
             if ft_list and len(np.unique(y)) == 2:
                 for j, mj in self._finetuned_metrics(c, x, y, ft_list).items():
                     ft_metrics[j].append(mj); ft_w[j].append(len(idx))
@@ -253,9 +257,7 @@ class FederatedServer:
             m = classification_metrics(y, p)
             per_client.append(m); weights.append(len(idx)); site_auroc.append(m["auroc"])
             if pv is not None and yv is not None and len(np.unique(yv)) == 2:
-                cm = classification_metrics(y, _platt(pv, yv, p))
-                cm["slope"] = _cal_slope(y, p)
-                cal_metrics.append(cm); cal_w.append(len(idx))
+                cal_in.append((pv, yv, p, y, len(idx)))
         fed = weighted_average(per_client, weights)
         pooled = classification_metrics(np.concatenate(y_all), np.concatenate(p_all)) if y_all else {}
 
@@ -278,10 +280,10 @@ class FederatedServer:
         row.update({f"fed_{k}": v for k, v in fed.items()})
         if val_metrics:
             row["fed_val_auroc"] = weighted_average(val_metrics, val_w).get("auroc", np.nan)
-        if cal_metrics:
-            cal = weighted_average(cal_metrics, cal_w)
-            row["fed_cal_ece"], row["fed_cal_brier"] = cal.get("ece", np.nan), cal.get("brier", np.nan)
-            row["fed_cal_slope"] = cal.get("slope", np.nan)   # slope of the UNcalibrated scores
+        if cal_in:
+            # Platt fits are costly (two per site); they are run only for the rounds that
+            # are reported (the validation-selected and the final one), in summarise()
+            self._cal_inputs[int(r)] = cal_in
         if site_auroc:
             sa = np.asarray(site_auroc, float); sa = sa[np.isfinite(sa)]
             if sa.size:
@@ -296,6 +298,22 @@ class FederatedServer:
         if hasattr(self.strategy, "K"):
             row.update({f"K_{g}": float(v) for g, v in self.strategy.K.items()})
         return row
+
+    def _calibration(self, r: int) -> Dict[str, float]:
+        """Platt-calibrated ECE and Brier score (fitted on each site's validation
+        split, applied to its test split) and the calibration slope of the raw
+        scores, sample-weighted over sites, for round r."""
+        cal_in = self._cal_inputs.get(int(r))
+        if not cal_in:
+            return {}
+        cal_metrics, cal_w = [], []
+        for pv, yv, p, y, n in cal_in:
+            cm = classification_metrics(y, _platt(pv, yv, p))
+            cm["slope"] = _cal_slope(y, p)
+            cal_metrics.append(cm); cal_w.append(n)
+        cal = weighted_average(cal_metrics, cal_w)
+        return {"fed_cal_ece": cal.get("ece", np.nan), "fed_cal_brier": cal.get("brier", np.nan),
+                "fed_cal_slope": cal.get("slope", np.nan)}   # slope of the UNcalibrated scores
 
     def _finetuned_metrics(self, c, x, y, epochs_list) -> Dict[int, Dict[str, float]]:
         """E-3 control: fine-tune the site's final model for j local epochs on its
@@ -346,11 +364,14 @@ class FederatedServer:
                     patience=self.cfg.get("early_stop_patience", 10)))
         # E-1: report test AUROC at the round chosen on VALIDATION, and the bytes spent
         # until then; E-2: mean over post-synchronisation rounds in the last 20.
+        last_row = self.history[-1]
+        last_row.update(self._calibration(int(last_row["round"])))
         if any("fed_val_auroc" in h for h in self.history):
             vals = [(h.get("fed_val_auroc", np.nan), -i) for i, h in enumerate(self.history)]
             vals = [v for v in vals if np.isfinite(v[0])]
             i_best = -max(vals)[1] if vals else len(self.history) - 1   # earliest round on ties
             hb = self.history[i_best]
+            hb.update(self._calibration(int(hb["round"])))
             out["fed_val_auroc_valsel"] = float(hb.get("fed_val_auroc", np.nan))
             out["fed_auroc_valsel"] = float(hb.get("fed_auroc", np.nan))
             out["fed_auprc_valsel"] = float(hb.get("fed_auprc", np.nan))

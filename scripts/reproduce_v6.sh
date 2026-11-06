@@ -2,8 +2,8 @@
 # One-click reproduction of every v6 run and number used in the paper (Linux/macOS).
 #   bash scripts/reproduce_v6.sh [core|gate|resnet|analysis|all] [workers]
 # Finished runs are skipped, so the script can be stopped and restarted at any time.
-# core   : main table, reference bounds, frontier, DP at q = 1, peak         (290 runs)
-# gate   : heterogeneity sweep and timing side channel                       (204 runs)
+# core   : main table, reference bounds, frontier, DP at q = 1, peak         (235 runs)
+# gate   : heterogeneity sweep and timing side channel                       (136 runs)
 # resnet : ResNet backbone, the regime where Proposition 2 predicts a gain    (30 runs)
 set -u
 PART=${1:-all}; J=${2:-4}; PY=${PY:-python3}
@@ -11,21 +11,21 @@ export PYTHONHASHSEED=0
 cd "$(dirname "$0")/.."
 mkdir -p results/v6_logs
 S10="42 43 44 45 46 47 48 49 50 51"; S6="42 43 44 45 46 47"; S5="42 43 44 45 46"
-MAIN="local fedavg fedprox fedper fedlama adacomm8 lag_uniform lag fixed52 fixed44 fixed44_st fixed88 tierfed tierfed_st tierfed_db"
+MAIN="local fedavg fedprox fedper fedlama adacomm8 lag_uniform lag fixed44 fixed44_st fixed88 tierfed tierfed_st"
 A="-m src.experiments.run_audit --device cpu --out results"
 
 core() {
   for s in $S10; do echo "$A --stage main --only $MAIN --seeds $s"; done
-  for s in $S10; do echo "$A --stage dp --eps 4 --q 1 --only fedper fixed44 fixed88 oneshot tierfed_dp --seeds $s"; done
+  for s in $S6; do echo "$A --stage dp --eps 4 --q 1 --only fedper fixed44 fixed88 oneshot tierfed_dp --seeds $s"; done
   for s in $S10; do echo "-m src.experiments.run_bounds --seeds $s --out results"; done
-  for s in $S5; do echo "$A --stage frontier --only fixed22 fixed33 fixed66 adacomm2 adacomm4 adacomm16 tierfed_rho0.15 tierfed_rho0.4 --seeds $s"; done
-  for s in $S5; do echo "$A --stage frontier2 --seeds $s"; done
+  for s in $S5; do echo "$A --stage frontier --only fixed22 fixed66 adacomm4 adacomm16 tierfed_rho0.15 tierfed_rho0.4 --seeds $s"; done
+  for s in $S5; do echo "$A --stage frontier2 --only lag_xi5000 lag_xi10000 --seeds $s"; done
   for s in $S5; do echo "$A --stage peak --only tierfed_st_w8 fixed44_st_w8 tierfed_all --seeds $s"; done
 }
 gate() {
-  for a in 0.1 0.3 1 10; do for s in $S6; do
-    echo "$A --stage hetero --alpha $a --only fedper local fixed22 fixed44 fixed88 tierfed --seeds $s"; done; done
-  for s in $S10; do echo "$A --stage timing --model mlp --only tierfed lag_xi2000 fixed44 --seeds $s"; done
+  for a in 0.1 0.3 1 10; do for s in $S5; do
+    echo "$A --stage hetero --alpha $a --only fedper local fixed44 fixed88 tierfed --seeds $s"; done; done
+  for s in $S6; do echo "$A --stage timing --model mlp --only tierfed lag_xi2000 fixed44 --seeds $s"; done
 }
 resnet() {
   for s in $S6; do echo "$A --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s"; done

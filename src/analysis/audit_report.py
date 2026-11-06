@@ -28,9 +28,8 @@ MATCH_TOL = 1.05                 # "matched bytes": at most 5 % above TierFed's 
 PRACTICAL = 0.005                # smallest AUROC gain called practically relevant
 BUDGETS = (30.0, 60.0, 120.0)    # MB, total over all sites
 
-MAIN_ORDER = ["local", "fedavg", "fedprox", "scaffold", "fedper", "fedlama", "adacomm8", "lag_uniform", "lag",
-              "fixed52_legacy", "fixed52", "fixed44", "fixed44_st", "fixed88",
-              "tierfed", "tierfed_st", "tierfed_db", "tierfed_pk"]
+MAIN_ORDER = ["local", "fedavg", "fedprox", "fedper", "fedlama", "adacomm8", "lag_uniform", "lag",
+              "fixed44", "fixed44_st", "fixed88", "tierfed", "tierfed_st"]
 UNIFORM_RE = re.compile(r"^fixed(\d+)(\d+)$")
 
 
