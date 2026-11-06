@@ -9,6 +9,7 @@
 set -u
 PART=${1:-all}; J=${2:-4}; PY=${PY:-python3}
 export PYTHONHASHSEED=0
+export SOURCE_DATE_EPOCH=0   # figure PDFs without a creation date: byte-identical on every rebuild
 cd "$(dirname "$0")/.."
 mkdir -p results/v6_logs
 S10="42 43 44 45 46 47 48 49 50 51"; S6="42 43 44 45 46 47"; S5="42 43 44 45 46"
@@ -41,6 +42,7 @@ analysis() {
   $PY -m src.analysis.audit_report --results results --dataset diabetes > results/tables/audit_report_stdout.txt
   $PY -m src.analysis.audit_tex --results results --paper paper/generated --dataset diabetes
   $PY -m src.analysis.audit_figures --results results --out paper/figures --dataset diabetes
+  $PY -m src.analysis.results_figures --results results --out paper/figures
   $PY -m src.analysis.collect --results results --dataset diabetes --model mlp
   $PY -m src.analysis.make_figures --results results --dataset diabetes --model mlp   # supplement figure
   if command -v pdflatex >/dev/null; then

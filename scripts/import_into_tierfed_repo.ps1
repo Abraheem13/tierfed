@@ -27,6 +27,6 @@ Get-ChildItem results\logs -Filter "*_au_*" -ErrorAction SilentlyContinue | Remo
 tar -xf $tar --strip-components=1
 Remove-Item $tar
 git add -A
-git commit -m "v13: final v6 results, cross-machine check, paper and supplement"
+git commit -m "Import the latest paper, code and run logs"
 if (-not $NoPush) { git push }
 Write-Host "done: $(git rev-parse --short HEAD)"

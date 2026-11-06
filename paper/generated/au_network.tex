@@ -1,0 +1,17 @@
+\begin{tabular}{@{}lcccccccccc@{}}
+\toprule
+ & & & & & \multicolumn{3}{c}{5G NR, cell edge} & \multicolumn{2}{c}{LEO satellite} & WAN\\
+\cmidrule(lr){6-8}\cmidrule(lr){9-10}\cmidrule(lr){11-11}
+Method & MB & Peak & Viol. & Wake-ups & $t$ (s) & $t_{\mathrm{sh}}$ (s) & $E$ (J) & $t_{\mathrm{sh}}$ (s) & $E$ (J) & $t_{\mathrm{sh}}$ (s)\\
+\midrule
+FedPer & 217.8 & 1.00 & 1.00 & 60 & 19.2 & 350 & 69.7 & 177 & 348 & 18.0\\
+AdaComm & 29.1 & 1.00 & 0.13 & 8 & 2.6 & 47 & 9.3 & 24 & 47 & 2.4\\
+LAG & 218.4 & 1.00 & 1.00 & 60 & 19.3 & 351 & 69.9 & 177 & 349 & 18.1\\
+Fixed (4,4) & 65.3 & 1.00 & 0.30 & 18 & 5.8 & 105 & 20.9 & 53 & 105 & 5.4\\
+Fixed (4,4), staggered & 67.0 & 0.55 & 0.08 & 32 & 6.3 & 108 & 21.4 & 55 & 107 & 5.7\\
+Fixed (8,8) & 39.9 & 1.00 & 0.18 & 11 & 3.5 & 64 & 12.8 & 32 & 64 & 3.3\\
+\tierfed{} & 65.3 & 1.00 & 0.30 & 18 & 5.8 & 105 & 20.9 & 53 & 105 & 5.4\\
+\tierfed{}, staggered & 67.0 & 0.55 & 0.08 & 32 & 6.3 & 108 & 21.4 & 55 & 107 & 5.7\\
+\tierfed{}, staggered, 8-bit warm-up & 53.4 & 0.55 & 0.00 & 32 & 5.2 & 86 & 17.1 & 44 & 85 & 4.6\\
+\bottomrule
+\end{tabular}

@@ -22,6 +22,6 @@ find results/logs -maxdepth 1 -name '*_au_*' -delete 2>/dev/null || true
 tar -xf "$tmp" --strip-components=1
 rm -f "$tmp"
 git add -A
-git commit -m "v13: final v6 results, cross-machine check, paper and supplement"
+git commit -m "Import the latest paper, code and run logs"
 [ "${1:-}" = "--no-push" ] || git push
 echo "done: $(git rev-parse --short HEAD)"

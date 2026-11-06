@@ -5,6 +5,7 @@
 param([string]$Part = "all", [int]$Jobs = 3)
 $ErrorActionPreference = "Continue"
 $env:PYTHONHASHSEED = "0"
+$env:SOURCE_DATE_EPOCH = "0"   # figure PDFs without a creation date: byte-identical on every rebuild
 Set-Location (Join-Path $PSScriptRoot "..")
 $py = (Resolve-Path ".\.venv\Scripts\python.exe").Path
 New-Item -ItemType Directory -Force -Path results\v6_logs | Out-Null
@@ -52,6 +53,7 @@ function Analysis {
   & $py -m src.analysis.audit_report --results results --dataset diabetes | Out-File results\tables\audit_report_stdout.txt
   & $py -m src.analysis.audit_tex --results results --paper paper\generated --dataset diabetes
   & $py -m src.analysis.audit_figures --results results --out paper\figures --dataset diabetes
+  & $py -m src.analysis.results_figures --results results --out paper\figures
   & $py -m src.analysis.collect --results results --dataset diabetes --model mlp
   & $py -m src.analysis.make_figures --results results --dataset diabetes --model mlp   # supplement figure
   if (Get-Command pdflatex -ErrorAction SilentlyContinue) {   # MiKTeX or TeX Live; otherwise upload paper\ to Overleaf

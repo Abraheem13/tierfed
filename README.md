@@ -100,7 +100,8 @@ planned periods, selected round and AUROC. It also recomputes the gate decision 
 timing verdicts from the second machine's runs alone.
 `src/analysis/audit_report.py` writes the decision gate, the iso-byte budgets and every
 audit table to `results/tables/audit/`; `src/analysis/audit_tex.py` and
-`src/analysis/audit_figures.py` write the manuscript's tables, numbers and figure.
+`src/analysis/audit_figures.py` write the manuscript's tables, numbers and Fig. 5;
+`src/analysis/results_figures.py` draws Figs. 4 and 6 from the per-round histories.
 `src/theory/differentiation.py` holds the closed form of the interval programme and the
 differentiation bound Psi (Proposition 2); `src/privacy/gdp.py` the exact q = 1 accountant.
 

@@ -169,6 +169,135 @@ def tab_peak(pk, df):
     return head + "\n".join(rows) + "\n" r"\bottomrule" "\n" r"\end{tabular}" "\n"
 
 
+def tab_paired(df):
+    """TierFed against every baseline of the main comparison, paired over seeds:
+    mean difference with a bootstrap 95% interval, Holm-corrected Wilcoxon p over
+    the rows, seeds on which TierFed is higher, and the difference in upload."""
+    from .audit_report import holm
+    sp = df[(df.setting == "specialty") & df.eps.isna()]
+    base = [n for n in MAIN_ORDER if n != "tierfed" and n in set(sp.name)]
+    rows = []
+    tf = sp[sp.name == "tierfed"].set_index("seed")
+    for n in base:
+        r = paired(sp, "tierfed", n)
+        b = sp[sp.name == n].set_index("seed")
+        common = tf.index.intersection(b.index)
+        higher = int((tf.loc[common, PRIMARY] > b.loc[common, PRIMARY]).sum())
+        dmb = float(tf.loc[common, "total_upload_mb"].mean() - b.loc[common, "total_upload_mb"].mean())
+        rows.append((n, r, higher, len(common), dmb))
+    adj = holm([r[1]["p"] for r in rows]) if rows else []
+    lines = []
+    for (n, r, higher, k, dmb), ph in zip(rows, adj):
+        lines.append(" & ".join([NAMES.get(n, n), f"{fs(r['diff'])} [{fs(r['lo'])}, {fs(r['hi'])}]",
+                                 fp(ph), f"{higher}/{k}", fs(dmb, 1)]) + r"\\")
+    head = (r"\begin{tabular}{@{}lcccc@{}}" "\n" r"\toprule" "\n"
+            r"\tierfed{} vs. & $\Delta$AUROC [95\% CI] & $p_{\mathrm{Holm}}$ & Higher & $\Delta$MB\\"
+            "\n" r"\midrule" "\n")
+    return head + "\n".join(lines) + "\n" r"\bottomrule" "\n" r"\end{tabular}" "\n"
+
+
+def paired_numbers(df, W):
+    """Numbers quoted from the paired table (same computation as tab_paired)."""
+    from .audit_report import holm
+    sp = df[(df.setting == "specialty") & df.eps.isna()]
+    base = [n for n in MAIN_ORDER if n != "tierfed" and n in set(sp.name)]
+    res = {n: paired(sp, "tierfed", n) for n in base}
+    adj = dict(zip(base, holm([res[n]["p"] for n in base]))) if base else {}
+    tf = sp[sp.name == "tierfed"].set_index("seed")
+    for n, key in (("local", "Local"), ("adacomm8", "Adacomm")):
+        if n not in res:
+            continue
+        r = res[n]; b = sp[sp.name == n].set_index("seed"); common = tf.index.intersection(b.index)
+        W.num(f"auPair{key}D", fs(r["diff"])); W.num(f"auPair{key}Lo", fs(r["lo"])); W.num(f"auPair{key}Hi", fs(r["hi"]))
+        W.num(f"auPair{key}P", fp(adj[n]).replace("$", ""))
+        W.num(f"auPair{key}Higher", f"{int((tf.loc[common, PRIMARY] > b.loc[common, PRIMARY]).sum())}/{len(common)}")
+        W.num(f"auPair{key}Mb", f4(abs(float(tf.loc[common, 'total_upload_mb'].mean() - b.loc[common, 'total_upload_mb'].mean())), 1))
+    others = [n for n in base if n not in ("local", "adacomm8") and not np.allclose(res[n]["diff"], 0)]
+    if others:
+        W.num("auPairFedMaxAbs", f4(max(abs(res[n]["diff"]) for n in others)))
+        W.flag("auPairNoneSig", all(adj[n] >= 0.05 for n in others))
+
+
+def dp_curve_numbers(df, W):
+    """Highest round-wise mean test AUROC of any releasing DP schedule (Fig. resdp (c))."""
+    best = -np.inf
+    for n in ("fedper", "fixed44", "fixed88", "tierfed_dp"):
+        d = df[(df.name == n) & df.eps.notna()]
+        curves = []
+        for f in d["file"]:
+            h = Path(str(f).replace("_summary.json", "_history.csv"))
+            if h.exists():
+                curves.append(pd.read_csv(h)["fed_auroc"].to_numpy(float))
+        if curves:
+            m = min(len(c) for c in curves)
+            best = max(best, float(np.nanmax(np.mean([c[:m] for c in curves], 0))))
+    if np.isfinite(best):
+        W.num("auDpCurveMax", f4(best))
+
+
+def tab_network(df, pk):
+    """Peak load, window violations, radio wake-ups and link cost per method on the
+    specialty sites (means over seeds), on the three link profiles of Section II-B."""
+    sp = df[(df.setting == "specialty") & df.eps.isna()]
+    order = ["fedper", "adacomm8", "lag", "fixed44", "fixed44_st", "fixed88", "tierfed", "tierfed_st",
+             "tierfed_st_w8"]
+    lines = []
+    for n in [x for x in order if x in set(sp.name)]:
+        d = sp[sp.name == n]
+        g = lambda c, nd=0: f4(d[c].mean(), nd) if c in d and d[c].notna().any() else "--"
+        post = pk.loc[n, "peak_post_frac"] if (pk is not None and n in pk.index) else np.nan
+        viol = pk.loc[n, "violation_rate_W0.6"] if (pk is not None and n in pk.index) else np.nan
+        lines.append(" & ".join([NAMES.get(n, n), g("total_upload_mb", 1), f4(post, 2), f4(viol, 2),
+                                 g("net_nr_cell_edge_wakeups_per_site"),
+                                 g("net_nr_cell_edge_comm_time_s", 1), g("net_nr_cell_edge_shared_comm_time_s"),
+                                 g("net_nr_cell_edge_energy_j", 1), g("net_leo_sat_shared_comm_time_s"),
+                                 g("net_leo_sat_energy_j", 0), g("net_hospital_wan_shared_comm_time_s", 1)]) + r"\\")
+    head = (r"\begin{tabular}{@{}lcccccccccc@{}}" "\n" r"\toprule" "\n"
+            r" & & & & & \multicolumn{3}{c}{5G NR, cell edge} & \multicolumn{2}{c}{LEO satellite} & WAN\\"
+            "\n" r"\cmidrule(lr){6-8}\cmidrule(lr){9-10}\cmidrule(lr){11-11}" "\n"
+            r"Method & MB & Peak & Viol. & Wake-ups & $t$ (s) & $t_{\mathrm{sh}}$ (s) & $E$ (J) & $t_{\mathrm{sh}}$ (s) & $E$ (J) & $t_{\mathrm{sh}}$ (s)\\"
+            "\n" r"\midrule" "\n")
+    return head + "\n".join(lines) + "\n" r"\bottomrule" "\n" r"\end{tabular}" "\n"
+
+
+def tab_families(df_all):
+    """The run plan as it is in the logs: experiment family, data, methods, seeds, runs."""
+    d = df_all.copy()
+    def fam(r):
+        if r.setting in ("tm_clean", "tm_shift"):
+            return "Timing side channel"
+        if r.eps is not None and r.eps == r.eps:
+            return "Matched-$\\varepsilon$ DP ($q=1$)"
+        if r.setting == "resnet":
+            return "ResNet backbone"
+        if str(r.setting).startswith("a"):
+            return "Label-skew sweep"
+        if r["name"] in ("central", "hgb"):
+            return "Reference bounds"
+        if r["name"] in MAIN_ORDER:
+            return "Main comparison"
+        if r["name"] in ("tierfed_st_w8", "fixed44_st_w8", "tierfed_all"):
+            return "Peak-aware variants"
+        return "Iso-byte frontier"
+    data = {"Main comparison": "20 specialty sites", "Reference bounds": "pooled / per site",
+            "Iso-byte frontier": "20 specialty sites", "Peak-aware variants": "20 specialty sites",
+            "Label-skew sweep": "Dirichlet $\\alpha\\in\\{0.1,0.3,1,10\\}$", "ResNet backbone": "20 specialty sites",
+            "Matched-$\\varepsilon$ DP ($q=1$)": "20 specialty sites",
+            "Timing side channel": "clean / shifted site 0"}
+    d["family"] = d.apply(fam, axis=1)
+    order = list(data)
+    lines = []
+    for f_ in order:
+        x = d[d.family == f_]
+        if x.empty:
+            continue
+        seeds = sorted(x.seed.unique())
+        lines.append(" & ".join([f_, data[f_], str(x["name"].nunique()), str(len(seeds)), str(len(x))]) + r"\\")
+    head = (r"\begin{tabular}{@{}llccc@{}}" "\n" r"\toprule" "\n"
+            r"Family & Data, sites & Methods & Seeds & Runs\\" "\n" r"\midrule" "\n")
+    return head + "\n".join(lines) + "\n" r"\bottomrule" "\n" r"\end{tabular}" "\n"
+
+
 def numbers(df, mt, gate, dp, tm, W):
     base = df
     for n in [x for x in MAIN_ORDER + ["central", "hgb"] if x in mt.index]:
@@ -446,6 +575,11 @@ def main(argv=None):
     W.table("au_dp", tab_dp(base, dp))
     W.table("au_timing", tab_timing(tm))
     W.table("au_peak", tab_peak(pk, base))
+    W.table("au_paired", tab_paired(base))
+    W.table("au_network", tab_network(base, pk))
+    W.table("au_families", tab_families(df))
+    paired_numbers(base, W)
+    dp_curve_numbers(df, W)
     numbers(base, mt, gate, dp, tm, W)
     from .audit_report import frontier_tables
     _, budget = frontier_tables(base)

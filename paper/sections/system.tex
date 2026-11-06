@@ -1,5 +1,6 @@
 \section{System Model and Study Design}
 \label{sec:system}
+This section fixes the setting in which the scheduler operates: the federation and its parameter tiers, the cost of a round on a constrained uplink, the data and sites, and the metrics by which every method is judged. It closes with the problem that a schedule has to solve.
 
 \subsection{Federation, Tiers and Multi-Rate Aggregation}
 $N$ sites hold private datasets $\mathcal D_k$ of size $n_k$, $n=\sum_k n_k$, $p_k=n_k/n$. The shared objective is $F(\theta)=\sum_k p_kF_k(\theta)$ with $F_k(\theta)=\mathbb E_{\xi\sim\mathcal D_k}[f(\theta;\xi)]$. In round $r$ each participating site initialises the shared part of its model from the broadcast state, performs one local epoch of $s_k=\lceil n_k/B\rceil$ optimiser steps with batch size $B$, and returns the shared slice that is due. Parameters are partitioned into disjoint tiers $\mathcal G=\{\mathrm s,\mathrm m,\mathrm f\}$ (slow, medium, fast) by their position in the forward computation graph (input projection, hidden blocks, head), with the classifier head always in the fast tier. The fast tier is private, so FedPer-style personalisation is the special case $K_{\mathrm s}=K_{\mathrm m}=1$. With $\mathcal A_r\subseteq\mathcal G$ the tiers due in round $r$ and $\mathcal S_r$ the participating sites, the server aggregates the active tiers only,
@@ -21,10 +22,18 @@ The job is costed on a link profile $(\beta,\ell,P)$: uplink rate, round-trip la
 t_r=\max_k\frac{b_k}{\beta}+\ell,\qquad E_r=\sum_k\frac{b_k}{\beta}\,P,
 \label{eq:netcost}
 \end{equation}
-and nothing when no site sends. When the sites share one uplink (time division), $t_r=\sum_kb_k/\beta+\ell$ instead, and bytes saved convert one-to-one into time. Window compliance is the fraction of rounds whose $t_r$ fits a transfer window $W$, the peak load is the largest per-site upload of any round, and the radio wake-ups of a site are the rounds in which it transmits: on cellular radios each wake-up costs a promotion delay and a high-power tail that do not depend on the payload~\cite{huang2012lte,narayanan2021variegated}, so a sparse schedule saves energy beyond its bytes. Three profiles are used: cell-edge 5G NR (5~Mbit/s, 30~ms, 0.2~W)~\cite{tr38913}, an LEO satellite uplink (10~Mbit/s, 40~ms, 2~W) and a wired institutional WAN (100~Mbit/s, 10~ms). They are representative targets, not measurements. The model covers the uplink only and omits scheduling, fading and retransmission; it is a cost translation of measured bits, whose implementation Section~\ref{sec:results-emu} checks over paced TCP.
+and nothing when no site sends. When the sites share one uplink (time division), $t_r=\sum_kb_k/\beta+\ell$ instead, and bytes saved convert one-to-one into time. Three link-level quantities complete the cost,
+\begin{equation}
+\begin{gathered}
+v(W)=\frac1R\sum_{r=1}^R\mathbb 1[t_r>W],\qquad \hat P=\max_{r>T_w}P_r,\\
+u_k=\sum_{r=1}^R\mathbb 1[b_{k,r}>0],
+\end{gathered}
+\label{eq:netmetrics}
+\end{equation}
+the share of rounds that miss a transfer window $W$, the largest payload fraction of a round after the warm-up of $T_w$ rounds (Section~\ref{sec:method}), and the radio wake-ups of site $k$. On cellular radios each wake-up costs a promotion delay and a high-power tail that do not depend on the payload~\cite{huang2012lte,narayanan2021variegated}, so $u_k$ is reported next to the bytes. Three profiles with values chosen for this study are used: a cell-edge 5G NR uplink (5~Mbit/s, 30~ms, 0.2~W; NR deployment scenarios in~\cite{tr38913}), an LEO satellite uplink (10~Mbit/s, 40~ms, 2~W) and a wired institutional WAN (100~Mbit/s, 10~ms). They are representative targets, not measurements, and the model is a cost translation of logged bits on the uplink only, without scheduling, fading or retransmission (its implementation is checked over paced TCP, Section~\ref{sec:results-emu}).
 
 \subsection{Data, Sites and Metrics}
-\textbf{Diabetes 130-US Hospitals}~\cite{strack2014} is the main benchmark: 30-day readmission from encounter-level features. Cleaning follows Strack \emph{et al.} (encounters discharged to death or hospice removed, first encounter per patient kept), which leaves one encounter for each of \num{auNEncounters} patients, with \num{diabetesmlpNFeatures} encoded features and a positive rate of \num{diabetesmlpPrevalence}\%; a patient-grouped fifth (\num{auNHoldout}) is set aside and used in no reported result, and the other \num{auNSitePool} are assigned to the sites. The public release carries no hospital identifier, so sites are formed from the medical-specialty column by longest-processing-time bucketing with a client-share cap of 15\% (a specialty above the cap is split, patient-grouped, before bucketing); the largest site holds \num{diabetesmlpMaxClientShare}\% of the training data and the mean label total-variation distance between sites is \num{diabetesmlpLabelTv}. These clients are called \emph{sites} rather than hospitals. Because this split is nearly IID, the same data are also partitioned by Dirichlet label skew with $\alpha\in\{0.1,0.3,1,10\}$. \textbf{Fed-Heart-Disease}~\cite{detrano1989,duterrail2022flamby}, the four UCI Heart Disease collections as four real institutions with \num{realHeartNtrain} training patients, and PneumoniaMNIST~\cite{yang2023medmnist} under Dirichlet label skew appear in the supplement under the earlier protocol. The eICU-CRD~\cite{pollard2018} needs credentialed access and was not run; its open demo~\cite{eicudemo} has too few stays per hospital for a federation. Table~\ref{tab:setup} summarises the setup; every dataset statistic is read from the run logs.
+\textbf{Diabetes 130-US Hospitals}~\cite{strack2014} is the main benchmark: 30-day readmission from encounter-level features. Cleaning follows Strack \emph{et al.} (encounters discharged to death or hospice removed, first encounter per patient kept), which leaves one encounter for each of \num{auNEncounters} patients, with \num{diabetesmlpNFeatures} encoded features and a positive rate of \num{diabetesmlpPrevalence}\%; a patient-grouped fifth (\num{auNHoldout}) is set aside and used in no reported result, and the other \num{auNSitePool} are assigned to the sites. The release has no hospital identifier, so sites are formed from the medical-specialty column by longest-processing-time bucketing with a share cap of 15\% (larger specialties are split, patient-grouped); the largest site holds \num{diabetesmlpMaxClientShare}\% of the training data and the mean label total-variation distance between sites is \num{diabetesmlpLabelTv}. This split is nearly IID, so the data are also partitioned by Dirichlet label skew, $\alpha\in\{0.1,0.3,1,10\}$. \textbf{Fed-Heart-Disease}~\cite{detrano1989,duterrail2022flamby}, the four UCI Heart Disease collections as four real institutions with \num{realHeartNtrain} training patients, and PneumoniaMNIST~\cite{yang2023medmnist} under Dirichlet label skew appear in the supplement under the earlier protocol. The eICU-CRD~\cite{pollard2018} needs credentialed access and was not run. Every dataset statistic in Table~\ref{tab:setup} is read from the run logs.
 
 \begin{table}[t]
 \caption{Study setup, read from the configuration file and the run logs}
@@ -35,13 +44,11 @@ and nothing when no site sends. When the sites share one uplink (time division),
 Item & Value\\
 \midrule
 Main data & Diabetes 130-US: \num{auNEncounters} patients, \num{auNSitePool} of them at the sites, \num{diabetesmlpNFeatures} features, positive rate \num{diabetesmlpPrevalence}\%, 20 specialty sites (share cap 15\%) or Dirichlet $\alpha\in\{0.1,0.3,1,10\}$\\
-Other data & Fed-Heart-Disease (4 institutions), PneumoniaMNIST (supplement)\\
 Backbones & MLP 128--128--64 (\num{diabetesmlpTierTotalParams} parameters; tier shares \num{diabetesmlpTierSlowPct}/\num{diabetesmlpTierMediumPct}/\num{diabetesmlpTierFastPct}\%); tabular ResNet (width 128, depth 6)\\
 Training & 60 rounds, one local epoch, batch 64, Adam $10^{-3}$ (persistent state), inverse-frequency class weights; per-site patient-grouped split 70/10/20\%\\
 \tierfed{} & $T_w=5$, $K_{\max}=8$, $\rho=0.25$ (post-warm-up) unless stated; exact solver\\
 Baselines & FedProx $\mu=10^{-2}$; FedLAMA-style interval 5, factor 2; AdaComm initial period $\{4,8,16\}$; LAG $\xi\in\{1,5{\cdot}10^3,10^4\}$, sample-weighted; uniform periods $K\in\{1,2,4,6,8\}$ and staggered $(4,4)$ on (\ref{eq:due}), $T_w=5$\\
 DP & $C=1$, $\delta=10^{-5}$, $\varepsilon^\star=4$, $q=1$; $z$ calibrated per method; planner $\lambda=1$\\
-Seeds, tests & 5 to 10 seeds (Section~\ref{sec:setup}); paired Wilcoxon tests, bootstrap intervals\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -66,6 +73,20 @@ Seeds, tests & 5 to 10 seeds (Section~\ref{sec:setup}); paired Wilcoxon tests, b
 \label{fig:pipeline}
 \end{figure}
 
-\textbf{Metrics.} Each site's patients are split into training, validation and test sets (70/10/20\%, patient-grouped), and every method is evaluated on each site's test split with that site's own parameters, sample-weighted; single-class splits are excluded identically for every method. The primary metric is the test AUROC at the round with the highest validation AUROC (the earliest on ties), with the bytes uploaded up to that round; test data never select anything. Secondary metrics are the mean over the last ten rounds, the mean over the post-synchronisation rounds of the last twenty, and the final round. Calibration is reported as ECE and Brier score~\cite{vancalster2019}, before and after Platt scaling~\cite{platt1999} on each site's validation split, and per-site results as the worst-site AUROC. Fig.~\ref{fig:pipeline} summarises the study.
+\textbf{Metrics.} Each site's patients are split into training, validation and test sets (70/10/20\%, patient-grouped); $\mathcal V_k$ and $\mathcal T_k$ denote the last two. With $\mathrm{AUC}_k^{\mathcal T}(r)$ the AUROC of site $k$'s own model after round $r$ on $\mathcal T_k$, the personalised AUROC and the reported round are
+\begin{equation}
+\begin{gathered}
+A^{\mathcal T}(r)=\frac{\sum_{k}|\mathcal T_k|\,\mathrm{AUC}^{\mathcal T}_k(r)}{\sum_{k}|\mathcal T_k|},\\
+\hat r=\min\Big\{\arg\max_{r\le R}A^{\mathcal V}(r)\Big\},
+\end{gathered}
+\label{eq:metric}
+\end{equation}
+where $A^{\mathcal V}$ is the same average over the validation splits and sites whose split holds a single class are left out of each average, identically for every method. The primary metric is $A^{\mathcal T}(\hat r)$ with the bytes uploaded up to $\hat r$; test data never select anything. Secondary metrics are the mean of $A^{\mathcal T}$ over the last ten rounds, over the post-synchronisation rounds of the last twenty and at $r=R$, the ECE and Brier score~\cite{vancalster2019} before and after Platt scaling~\cite{platt1999} fitted on $\mathcal V_k$, and the worst-site AUROC $\min_k\mathrm{AUC}^{\mathcal T}_k(\hat r)$. Fig.~\ref{fig:pipeline} summarises the study.
 
-\textbf{Problem statement.} Given a quota $\rho$ on the payload fraction (\ref{eq:payload}), optionally a cap $\pi$ on the payload of any one round and a budget $(\varepsilon,\delta)$, choose the intervals $\mathbf K$ and phases such that the validation-selected personalised AUROC is non-inferior to full-rate personalisation and is at least that of the best uniform period at the same bytes. Under DP the schedule must be fixed before training, because the accountant charges only data-independent releases. Per-site non-inferiority is reported descriptively, not tested.
+\subsection{Problem Statement}
+Given a quota $\rho$ on the payload fraction (\ref{eq:payload}), optionally a cap $\pi$ on the payload of any one round and a privacy budget $(\varepsilon^\star,\delta)$, the scheduler chooses intervals $\mathbf K$ and phases $\boldsymbol\phi$ for
+\begin{equation}
+\max_{\mathbf K,\boldsymbol\phi}\ A^{\mathcal T}(\hat r)\quad\text{s.t.}\quad\Pi_\infty(\mathbf K)\le\rho,\quad\hat P\le\pi,\quad\varepsilon(\mathbf K)\le\varepsilon^\star .
+\label{eq:problem}
+\end{equation}
+A schedule succeeds if $A^{\mathcal T}(\hat r)$ is non-inferior to full-rate personalisation and at least that of the best uniform period at the same bytes. The objective is unknown before training, so Section~\ref{sec:method} optimises a surrogate. $\varepsilon(\mathbf K)$ is defined only for a schedule fixed before training, because the accountant charges only data-independent releases. Per-site non-inferiority is reported descriptively, not tested.

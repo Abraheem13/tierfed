@@ -166,10 +166,10 @@ def main(argv=None):
     df = load(a.results, a.dataset)
     df = df[(df.setting != "derma") & ~df.setting.str.startswith("tm_")]
     gate = gate_table(df)
-    fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.35))
+    fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.15))
     panel_frontier(axes[0], df); panel_hetero(axes[1], df); panel_psi(axes[2], df, gate); panel_peak(axes[3], df)
     _legend_below(fig, [axes[0], axes[1], axes[3]], ncol=4)   # (c) has its own legend of settings
-    fig.tight_layout(rect=(0, 0.2, 1, 1), w_pad=1.0)
+    fig.tight_layout(rect=(0, 0.22, 1, 1), w_pad=1.0)
     fig.savefig(out / "fig_au.pdf"); plt.close(fig)
     print("written", out / "fig_au.pdf")
 
