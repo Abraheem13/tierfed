@@ -1,326 +1,71 @@
 \section{Results}
 \label{sec:results}
 
-Every table body and every number in this section is generated from the per-seed logs by the released analysis script. Unless stated otherwise, values are means over ten seeds on Diabetes 130-US with the MLP backbone; $p$-values are from paired tests across seeds.
+Every table body and number is generated from the per-seed logs. Unless stated otherwise, values are means over seeds on Diabetes with the MLP and the specialty sites, $p$-values are from paired Wilcoxon tests, and tables S-$n$ are in the supplement.
 
-\subsection{Main benchmark}
-\label{sec:results-fixed}
+\subsection{Protocol Checks}
+\label{sec:results-check}
+The consistency check recomputes, from the stated rules, the transmitting rounds of every data-independent schedule, the bits of every uncompressed round with full participation and the releases charged by the accountant, over all \num{consLogs} logs of this article; it finds \num{consFailed} mismatches in \num{consChecksSchedule} schedule, \num{consChecksBits} byte and \num{consChecksAccountant} accountant checks. The \num{xmachineRuns} heterogeneity and timing runs repeated on a Windows laptop (all v6 runs used one Linux machine) keep \ifflag{xmachineConfigSame}{their configurations}{only some of their configurations}; every data-independent schedule sends \ifflag{xmachineBytesIdentical}{the same bytes in every round}{different bytes}, and \ifflag{xmachineAdaptiveAllSame}{so does every adaptive one}{\num{xmachineAdaptiveSame} of the \num{xmachineAdaptivePairs} adaptive runs do, the rest differing by up to \num{xmachineAdaptiveMbPct}\% because their decisions read client data}. The AUROC at the selected round moves by a median of \num{xmachineAurocMedian} and at most \num{xmachineAurocDiff}\ifflag{xmachineMaxAtSkew}{, at strong label skew}{}: on a flat validation curve a small numerical difference selects another round (\num{xmachineSelDiffer} runs). \ifflag{xmachineGateSame}{\ifflag{xmachineTimingSame}{The gate decision and the leak verdicts are unchanged.}{The gate decision is unchanged, the leak verdicts are not.}}{The gate decision changes.}
 
 \begin{table*}[t]
-\caption{Main benchmark (Diabetes 130-US, 20 sites, 60 rounds, 10 seeds). Final-round federated AUROC (mean $\pm$ SD), AUPRC, early-stopped AUROC, pooled AUROC, cumulative upload per site, number of transmitting rounds, and one-sided non-inferiority $p$-values against FedPer at $\delta_{\mathrm{NI}}=0.01$ on AUROC and AUPRC.}
+\caption{Main comparison on the 20 specialty sites (MLP, 10 seeds). AUROC at the validation-selected round with a bootstrap 95\% interval; MB: total upload over all sites in 60 rounds and up to the selected round; Last 10: mean over the last ten rounds; Phase: mean over the rounds of the last twenty that follow a synchronisation; +FT 3: final model after three local epochs at each site; ECE before and after Platt scaling on each site's validation split; worst-site AUROC; $\Delta$ and $p$ against FedPer}
 \label{tab:main}
-\centering\small
-\begin{tabular}{lrcccccccc}
-\toprule
-Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$_{\mathrm{AUROC}}$ $p$ & NI$_{\mathrm{AUPRC}}$ $p$\\
-\midrule
-\gen{main_diabetes_mlp}
-\bottomrule
-\end{tabular}
+\centering\footnotesize
+\fit{\gen{au_main}}
 \end{table*}
 
-\begin{table}[t]
-\caption{Holm-corrected paired comparisons on final AUROC against FedPer (10 seeds): mean difference, BCa 95\% interval, corrected $p$, paired $d_z$.}
-\label{tab:holm}
-\centering\small
-\begin{tabular}{lcccc c}
-\toprule
-Comparison & $\Delta$ & 95\% CI & $p_{\mathrm{Holm}}$ & $d_z$ & Sig.\\
-\midrule
-\gen{holm_diabetes_mlp}
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Main Comparison}
+\label{sec:results-main}
+At the validation-selected round the federated methods are close (Table~\ref{tab:main}). FedPer reaches \num{auFedperAuroc}. Apart from AdaComm, no method differs from it by more than \num{auFedSpread} AUROC, below the 0.005 that this study calls relevant; the largest difference, for \num{auFedSpreadName}, has $p\num{auFedMinP}$. AdaComm is the one federated method that is lower by a relevant margin, \num{auAdacommEightDFedper} ($p\num{auAdacommEightDFedperP}$), at \num{auAdacommEightMb} against \num{auFedperMb}~MB. Local training without communication differs by \num{auLocalDFedper} ($p\num{auLocalDFedperP}$), so federation helps on this task.
+\ifflag{auTierfedAlwaysFourFour}{On this benchmark \tierfed{} chooses $\mathbf K=(4,4)$ in every seed, and after warm-up its schedule is that of the fixed period $(4,4)$ round for round\ifflag{auTierfedEqualsFixed}{, so the two rows are identical to the last digit}{}. }{}%
+This is what Proposition~\ref{prop:cuberoot} predicts: at the end of warm-up $\Psi=\num{auGateSpecialtyPsi}$\%, so no per-tier schedule can improve the drift surrogate over a uniform period by more than that fraction. \tierfed{} is non-inferior to FedPer at $\Delta_{\mathrm{NI}}=0.01$ ($p\num{auTierfedNiTenP}$) and at 0.005 ($p\num{auTierfedNiFiveP}$), with \num{auTierfedMb} against \num{auFedperMb}~MB over 60 rounds; AdaComm, at \num{auAdacommEightMb}~MB, is non-inferior at 0.01 ($p\num{auAdacommEightNiTenP}$) but not at 0.005 ($p\num{auAdacommEightNiFiveP}$).
 
-Table~\ref{tab:main} reports the main benchmark. Full-rate FedPer reaches \num{diabetesmlpFedperAuroc}~AUROC at \num{diabetesmlpFedperUploadMb}~MB per site. \tierfed{} at $\rho=0.25$ reaches \num{diabetesmlpTierfedAuroc} (paired difference \num{mainTfVsFedperDiff}, $p=\num{mainTfVsFedperP}$) at \num{diabetesmlpTierfedUploadMb}~MB, transmitting in \num{factorialTierfedTxRounds} of 60 rounds; it is \ifflag{diabetesmlpTierfedNonInferiorAuroc}{non-inferior to FedPer on AUROC ($p=\num{diabetesmlpTierfedNiAurocP}$)}{not non-inferior to FedPer on AUROC ($p=\num{diabetesmlpTierfedNiAurocP}$)} and \ifflag{diabetesmlpTierfedNonInferiorAuprc}{on AUPRC ($p=\num{diabetesmlpTierfedNiAuprcP}$)}{not on AUPRC ($p=\num{diabetesmlpTierfedNiAuprcP}$)}. The round-sparse baselines are at least as accurate: AdaComm reaches \num{diabetesmlpAdacommAuroc} at \num{diabetesmlpAdacommUploadMb}~MB (\tierfed{} minus AdaComm: \num{mainTfVsAdacommDiff}, $p=\num{mainTfVsAdacommP}$), and the fixed multi-rate schedule ($K_{\mathrm s}=5$, $K_{\mathrm m}=2$) reaches \num{diabetesmlpFixedAuroc} at \num{diabetesmlpFixedUploadMb}~MB. LAG at its default threshold never skips an upload and is equivalent to full-rate averaging (\num{diabetesmlpLagAuroc}); SCAFFOLD with the Adam local solver used for every method underperforms (\num{diabetesmlpScaffoldAuroc}) and is reported with its native SGD solver in Table~\ref{tab:baselines}. Early-stopped AUROC is within a narrow band for all methods, so no conclusion depends on the final round.
+The lead of the sparse schedules in earlier versions of this work is a property of the round at which they were read. Over the last ten rounds the sparse schedules are ahead (\tierfed{} \num{auTierfedLast}, FedPer \num{auFedperLast}), because full-rate training passes its best validation round early (round \num{auFedperRound} on average, against \num{auTierfedRound} for \tierfed{}) and then overfits; at the validation-selected round the lead disappears. Fine-tuning each site's final model for three local epochs \ifflag{auFtAlwaysLowers}{lowers the AUROC of every method}{does not raise the AUROC of every method}, by \num{auFtLossMin} to \num{auFtLossMax}, so the late-round lead is not local adaptation either: sparse synchronisation overfits later. LAG's lead in the earlier table has a different cause. With the equal weights used there its final-round AUROC is \num{auLagUniformFinal}; with sample weighting it is \num{auLagFinal}, level with FedAvg (\num{auFedavgFinal}), and at its default threshold it never skips an upload, so the lead came from the weighting.
 
-\textbf{Synchronising less does not hurt here.} Table~\ref{tab:periods} sweeps the fixed schedule's periods. A uniform period of four rounds for both shared tiers reaches \num{periodsKsFourKmFourAuroc} at \num{periodsKsFourKmFourUploadMb}~MB, the best accuracy of any configuration in this study; only a long slow-tier period ($K_{\mathrm s}=8$) costs accuracy (\num{periodsKsEightKmOneAuroc} with $K_{\mathrm m}=1$). Table~\ref{tab:factorial} separates the private head from the schedule: FedPer and FedAvg are level (\num{factorialFedperAuroc} and \num{factorialFedavgAuroc}), so the head does not matter on this data, and \tierfed{} with and without the head is also level (\num{factorialTierfedAuroc} and \num{factorialTierfedNoheadAuroc}). The modest gain of every sparse schedule over full-rate averaging is consistent with additional local training acting as personalisation. An earlier version of this work reported that fixed multi-rate schedules lose about 0.05~AUROC to FedPer; that finding was produced by encounters of the same patient appearing in training and test splits, and by a fallback rule that sent the medium tier whenever no tier was due. Both are corrected here and the finding does not reproduce.
+AUPRC follows the same pattern (FedPer \num{auFedperAuprc}, \tierfed{} \num{auTierfedAuprc}, local training \num{auLocalAuprc}, prevalence baseline \num{diabetesmlpPrevalenceFrac}). Inverse-frequency class weighting shifts every method's scores, so raw ECE is \num{auEceRawMin}--\num{auEceRawMax}; Platt scaling on each site's validation split lowers it to \num{auEceCalMin}--\num{auEceCalMax} for every method at no communication cost. The worst site's AUROC is \num{auWorstMin}--\num{auWorstMax}: the sample-weighted mean hides sites at which no method is useful.
 
-\begin{table}[t]
-\caption{Fixed-schedule period sweep $(K_{\mathrm s},K_{\mathrm m})$, 10 seeds; rounds with no tier due are local-only.}
-\label{tab:periods}
-\centering\small
-\begin{tabular}{lrcc}
-\toprule
-$(K_{\mathrm s},K_{\mathrm m})$ & $n$ & AUROC & Upload (MB)\\
-\midrule
-\gen{periods}
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{When Does Per-Tier Scheduling Pay?}
+\label{sec:results-arch}
 
-\begin{table}[t]
-\caption{Attribution (10 seeds): private head $\times$ schedule, and \tierfed{} with and without the private head.}
-\label{tab:factorial}
-\centering\small
-\begin{tabular}{lrccc}
-\toprule
-Cell & $n$ & AUROC & AUPRC & Upload (MB)\\
-\midrule
-\gen{factorial}
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{The budget knob and the controller}
-\label{sec:results-budget}
-
-\begin{table}[t]
-\caption{Quota sweep for \tierfed{} (10 seeds): accuracy, upload, realised payload fraction, mean intervals chosen by the exact solver, and the share of post-warm-up rounds in which the two shared tiers received different intervals.}
-\label{tab:budget}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrcccccc c}
-\toprule
-$\rho$ & $n$ & AUROC & AUPRC & Upload (MB) & Realised & $\bar K_{\mathrm s}$ & $\bar K_{\mathrm m}$ & Differentiated (\%)\\
-\midrule
-\gen{budget}
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{table}[t]
-\caption{Exact solver versus greedy doubling at two quotas (10 seeds).}
-\label{tab:solver}
-\centering\small
-\begin{tabular}{lrcc}
-\toprule
-$\rho$ / solver & $n$ & AUROC & Upload (MB)\\
-\midrule
-\gen{solver}
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:budget} shows that $\rho$ behaves as an operator knob: upload rises monotonically with the quota, from \num{budgetRhoFifteenUploadMb}~MB at $\rho=0.15$ to \num{budgetRhoEightyUploadMb}~MB at $\rho=0.8$. Accuracy is flat above $\rho=0.25$ and drops only at $\rho=0.15$ (\num{budgetRhoFifteenAuroc}); the best quota is $\rho=0.4$ (\num{budgetRhoFortyAuroc} at \num{budgetRhoFortyUploadMb}~MB). The last column is the honest test of the divergence-driven mechanism: at $\rho=0.25$ the solver gave the two shared tiers different intervals in \num{budgetRhoTwentyFiveDiffPct}\% of rounds, at $\rho=0.4$ in \num{budgetRhoFortyDiffPct}\%, and at most in \num{budgetRhoFifteenDiffPct}\% at $\rho=0.15$. On this data the controller mostly reduces to a uniform period chosen to meet the quota, which explains why a well-chosen fixed period performs as well. Where the solvers differ, exactness helps: at $\rho=0.4$ the exact solver reaches \num{budgetRhoFortyAuroc} at \num{budgetRhoFortyUploadMb}~MB against \num{budgetRhoFortyGreedyAuroc} at \num{budgetRhoFortyGreedyUploadMb}~MB for the greedy doubling rule (Table~\ref{tab:solver}).
-
-\begin{table}[t]
-\caption{Baseline sweeps (10 seeds): AdaComm initial period $\tau_0$, LAG threshold $\xi$, and the SGD local solver for FedAvg, FedPer, SCAFFOLD and \tierfed{}.}
-\label{tab:baselines}
-\centering\small
-\begin{tabular}{lrcccc}
-\toprule
-Configuration & $n$ & AUROC & AUPRC & Upload (MB) & Tx rounds\\
-\midrule
-\gen{baselines}
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:baselines} gives the baselines a fair frontier. AdaComm with $\tau_0=8$ is the most byte-efficient configuration without DP (\num{baselinesAdacommTauEightAuroc} at \num{baselinesAdacommTauEightUploadMb}~MB); LAG skips uploads only at $\xi=10^4$, where its accuracy collapses (\num{baselinesLagXiOneZeroZeroZeroZeroAuroc}). With an SGD local solver SCAFFOLD recovers (\num{baselinesScaffoldSgdAuroc}), FedAvg and FedPer improve (\num{baselinesFedavgSgdAuroc}, \num{baselinesFedperSgdAuroc}), and \tierfed{} is lower (\num{baselinesTierfedSgdAuroc}); the ordering of methods therefore depends on the local solver, which we state as a limitation.
-
-\begin{figure}[t]
-\centering\fig{fig_frontier}{0.95\columnwidth}
-\caption{Accuracy--communication frontier on Diabetes (10 seeds): every method, quota and compressor on one pair of axes.}
-\label{fig:frontier}
-\end{figure}
-
-\subsection{Scheduling and compression compose}
-\label{sec:results-comp}
-
-\begin{table}[t]
-\caption{Scheduling $\times$ compression (10 seeds). Compressors act on the update with per-client error feedback. \tierfed{} rows use $\rho=0.25$.}
-\label{tab:comp}
-\centering\small
-\begin{tabular}{lrccc}
-\toprule
-Method / compressor & $n$ & AUROC & AUPRC & Upload (MB)\\
-\midrule
-\gen{compression}
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:comp} confirms (\ref{eq:compose}): reductions from timing and from message size multiply. 8-bit quantisation alone takes FedPer from \num{compFedperNoneUploadMb} to \num{compFedperQuantEightUploadMb}~MB at unchanged accuracy (\num{compFedperQuantEightAuroc}); \tierfed{} with 8-bit quantisation uploads \num{compTierfedQuantEightUploadMb}~MB (\num{compTierfedQuantEightAuroc}); and \tierfed{} with sparse ternary compression uploads \num{compTierfedStcUploadMb}~MB at \num{compTierfedStcAuroc}, against \num{compFedperStcUploadMb}~MB (\num{compFedperStcAuroc}) for FedPer with the same compressor. Count-sketch compression fails for every method (\num{compFedavgSketchAuroc}, \num{compFedperSketchAuroc}, \num{compTierfedSketchAuroc}): at the sketch width used, the unsketched estimate of the update is too noisy for this model, and we report it rather than tune it away.
-
-\subsection{Network-level cost}
-\label{sec:results-net}
-
-\begin{table}[t]
-\caption{Network cost of the main benchmark under the link profiles of Table~\ref{tab:profiles}: total communication time on cell-edge NR, LEO satellite and the 6G edge-slice target, uplink energy on cell-edge NR, and the fraction of rounds fitting a 60-s window on cell-edge NR. Means over 10 seeds, computed from measured bits by (\ref{eq:netcost}).}
-\label{tab:network}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrrrrr}
-\toprule
-Method & Upload (MB) & $t$ NR-edge (s) & $t$ LEO (s) & $t$ 6G (s) & $E$ NR-edge (J) & Window (\%)\\
-\midrule
-\gen{network_diabetes_mlp}
-\bottomrule
-\end{tabular}}
-\end{table}
-
-Table~\ref{tab:network} translates measured bits into what an operator sees. On a cell-edge NR uplink the total communication time of the job falls from \num{NetCellEdgeFedper}~s for FedPer to \num{NetCellEdgeTierfed}~s for \tierfed{}. The model is small, so every method fits the 60-s window on every link profile; the absolute times matter less than the proportional reductions, which carry over to larger models with the same schedule.
-
-\subsection{A wide model on emulated links}
-\label{sec:results-emu}
-\begin{table}[t]
-\caption{Wide MLP (\num{wideParams} parameters) on Diabetes (3 seeds): accuracy and upload.}
-\label{tab:wide}
-\centering\small
-\begin{tabular}{lrccrr}
-\toprule
-Method & $n$ & AUROC & AUPRC & Upload (MB) & Params\\
-\midrule
-\gen{wide}
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{figure*}[t]
+\centering\fig{fig_au}{\textwidth}
+\caption{(a) Test AUROC at the validation-selected round against total upload over 60 rounds, each method with its own knob swept; mean and 95\% interval over seeds; grey lines: local training, centralised MLP and gradient boosting. (b) AUROC against Dirichlet label skew for \tierfed{}, the best uniform period at matched bytes and FedPer, offset horizontally so that identical values stay visible; dotted grey: local training. (c) Gain of \tierfed{} over the best uniform period at matched bytes against $\Psi$ of Proposition~\ref{prop:cuberoot} measured at the end of warm-up, one point per setting. (d) Share of rounds whose per-site upload exceeds a transfer window, against the window relative to the full-payload upload time, on the 5-Mbit/s link; identical schedules give coinciding curves.}
+\label{fig:au}
+\end{figure*}
 
 \begin{table*}[t]
-\caption{Trace-driven socket emulation of the wide-MLP runs: total emulated upload time (real TCP over paced loopback links), the analytic model's prediction from (\ref{eq:netcost}), their relative difference, total compute time of the slowest site, and wall-clock time to reach AUROC 0.60 and 0.62 (``never'' if not reached in 60 rounds). Means over seeds; the cell-edge profile was emulated for one seed.}
-\label{tab:emu}
-\centering\small
-\begin{tabular}{llrrrrrrr}
-\toprule
-Profile & Method & $n$ & Emulated (s) & Analytic (s) & Diff.\ (\%) & Compute (s) & $t_{0.60}$ (s) & $t_{0.62}$ (s)\\
-\midrule
-\gen{emulation}
-\bottomrule
-\end{tabular}
+\caption{Primary contrast: \tierfed{} ($\rho=0.25$) against the best uniform period at matched bytes, chosen on validation among the uniform periods with at most 5\% more upload. $\Psi$: Proposition~\ref{prop:cuberoot} at the end of warm-up; $\mathbf K$: \tierfed{}'s intervals (slow, medium) in the first round after warm-up, most frequent over seeds; MB: total upload over 60 rounds; gain with bootstrap 95\% interval and Wilcoxon $p$}
+\label{tab:gate}
+\centering\footnotesize
+\fit{\gen{au_gate}}
 \end{table*}
+Fig.~\ref{fig:au}(a) places every method on one accuracy--upload plane, each with its own knob swept, on the \num{auFrontierSeeds} seeds that all settings share. Above \num{auPlateauFrom}~MB the \num{auPlateauN} configurations form one plateau between \num{auPlateauMin} and \num{auPlateauMax} AUROC, close to the centralised MLP (\num{auCentralAuroc} over 10 seeds) and gradient boosting (\num{auHgbAuroc}). At a budget of 60~MB the configuration chosen on validation reaches \num{auBudgetAdacommSixZero} for AdaComm, \num{auBudgetUniformPeriodSixZero} for the uniform period and \num{auBudgetTierfedSixZero} for \tierfed{}; at 30~MB only AdaComm (\num{auBudgetAdacommThreeZero}) and LAG at high thresholds (\num{auBudgetLagThreeZero}, near local training at \num{auBudgetLocalThreeZero}) fit. AdaComm with an initial period of 4 is \num{auAdaFourVsTf} above \tierfed{} [\num{auAdaFourVsTfLo}, \num{auAdaFourVsTfHi}] at \num{auAdaFourVsTfMbA} against \num{auAdaFourVsTfMbB}~MB, below the relevance threshold, and \tierfed{} at $\rho=0.15$ is \num{auTfFifteenVsEight} [\num{auTfFifteenVsEightLo}, \num{auTfFifteenVsEightHi}] from the uniform period $K=8$ while sending more. \tierfed{} therefore lies on the frontier of this benchmark but does not extend it.
 
-With \num{wideParams} parameters, a full-rate upload is several megabytes per site and the link dominates the round on every constrained profile (Table~\ref{tab:emu}). The analytic model agrees with real paced TCP to within \num{emuMaxAbsRelErrPct}\% on every run, so the network costs reported in Table~\ref{tab:network} are not an artefact of the formula; the residual is the RTT term, which the analytic model charges in full and the emulator as a one-way delay, plus transport overhead. Over 60 rounds on cell-edge NR, the emulated upload time is \num{emuNrCellEdgeFedperUploadS}~s for FedPer, \num{emuNrCellEdgeTierfedUploadS}~s for \tierfed{}, \num{emuNrCellEdgeFixedUploadS}~s for the fixed period and \num{emuNrCellEdgeAdacommUploadS}~s for AdaComm. Time to a low target (AUROC 0.60) is not reduced by \tierfed{} (\num{emuNrCellEdgeTierfedTtZeropSix}~s against \num{emuNrCellEdgeFedperTtZeropSix}~s), because the target is reached during the full-rate warm-up; the saving is in the remaining rounds. AdaComm never reaches 0.62 within 60 rounds. On accuracy (Table~\ref{tab:wide}) the wide model favours sparse synchronisation more strongly than the small one: the fixed period reaches \num{wideFixedAuroc}, AdaComm \num{wideAdacommAuroc} and \tierfed{} \num{wideTierfedAuroc}, against \num{wideFedperAuroc} for FedPer and \num{wideFedavgAuroc} for FedAvg; with three seeds this is indicative, and the fixed period is again the most accurate.
+Table~\ref{tab:gate} applies the second primary contrast in every setting.\ifflag{auHetSitesAll}{}{ At $\alpha=\num{auHetSkewAlpha}$ only \num{auHetSitesMin} to \num{auHetSitesMax} of the 20 sites receive data, and \num{auHetSingleMin} to \num{auHetSingleMax} of them have a single-class test split, so that setting rests on few sites.} Across the \num{auHetSettings} Dirichlet settings, $\Psi$ at the end of warm-up is at most \num{auHetPsiMax}\%, \tierfed{} differentiates the tiers in at most a fraction \num{auHetDiffMax} of the post-warm-up rounds, and its gain over the best uniform period at matched bytes lies between \num{auHetGainMin} and \num{auHetGainMax} AUROC; \ifflag{auHetAnyWin}{in at least one setting its interval lies above zero.}{no interval lies above zero.}\ifflag{auHetAnyLose}{ In at least one setting it lies below zero, by a relevant margin.}{} \ifflag{auHetPsiSmall}{Label skew therefore does not move the tiers' payload-to-dispersion ratios apart on this model, while the backbone does. On the ResNet}{On the ResNet} $\Psi$ is \num{auGateResnetPsi}\%, and \tierfed{} chooses $\mathbf K=\num{auResnetKEarly}$ right after warm-up \ifflag{auResnetKEarlyAll}{in every seed}{in most seeds}, close to the interval ratio of \num{auResnetRatio} that (\ref{eq:cuberoot}) predicts, and differentiates the tiers in a fraction \num{auResnetDiff} of the post-warm-up rounds. \ifflag{auGateResnetWins}{Its gain over the best uniform period at matched bytes (\num{auGateResnetBest}) is \num{auGateResnetGain} AUROC [\num{auGateResnetLo}, \num{auGateResnetHi}].}{\ifflag{auGateResnetLoses}{It is \num{auGateResnetGain} AUROC [\num{auGateResnetLo}, \num{auGateResnetHi}] from the best uniform period at matched bytes (\num{auGateResnetBest}), below it.}{Its difference from the best uniform period at matched bytes (\num{auGateResnetBest}) is \num{auGateResnetGain} AUROC [\num{auGateResnetLo}, \num{auGateResnetHi}], inside seed noise.}} \ifflag{auResnetFrozenSameAtSel}{A fixed period frozen at $(1,5)$ after warm-up follows the same trajectory until round \num{auResnetFirstDiffMin} at the earliest, after every selected round, so adaptation during training plays no part in this result: the per-tier split itself does not buy accuracy here.}{Freezing the intervals at $(1,5)$ after warm-up changes the AUROC by \num{auResnetVsFrozen} [\num{auResnetVsFrozenLo}, \num{auResnetVsFrozenHi}].} Fig.~\ref{fig:au}(c) shows every setting's gain against its $\Psi$.
 
-\subsection{Attack surface and differential privacy}
+\subsection{Peak Load, Radio Wake-Ups and Link Cost}
+\label{sec:results-net}
+\label{sec:results-emu}
+A mean quota leaves the payload of a single round untouched. Every transmitting round of the aligned $(4,4)$ period sends the full shared payload, so on the 5-Mbit/s link \num{auPeakFixedFourFourViolSix} of all rounds exceed a window of 0.6 times the full-payload upload time (Fig.~\ref{fig:au}(d)). Staggering the two tiers keeps the mean and caps every post-warm-up round at \num{auPeakFixedFourFourStPost} of the payload, so only the warm-up rounds exceed that window (\num{auPeakFixedFourFourStViolSix} of rounds); with the warm-up sent at eight bits the share is \num{auPeakFixedFourFourStWEightViolSix}. The AUROC changes by \num{auStaggerDiff} ($p\num{auStaggerP}$). The price is paid in radio wake-ups (Section~\ref{sec:netmodel}): each site transmits in \num{auPeakFixedFourFourStWake} rounds instead of \num{auPeakFixedFourFourWake}. A uniform period has one tier and cannot shape the peak this way; on this benchmark, this is what tier structure adds.
+
+Over 60 rounds on the cell-edge link, communication takes \num{auNetFedperTime}~s for FedPer and \num{auNetTierfedTime}~s for \tierfed{} with independent links, and \num{auNetFedperShared}~s against \num{auNetTierfedShared}~s when the sites share one uplink, where bytes convert one-to-one into time. Replaying the per-site uploads of the earlier runs over TCP paced at the model's rate matched the model to within \num{emuMaxAbsRelErrPct}\% (supplement), which tests its implementation, not its realism.
+
+\subsection{Privacy: Matched Budgets and the Schedule as a Side Channel}
 \label{sec:results-privacy}
 
 \begin{table}[t]
-\caption{Matched-privacy comparison (10 seeds, $C=1$, $\delta=10^{-5}$). Every method is run at the same target $\varepsilon^\star$ with Poisson client sampling at rate $q$; its noise multiplier $\sigma$ is calibrated to its own number of planned releases with the subsampled-Gaussian accountant (\ref{eq:rdp}). Achieved $\varepsilon$, final-round AUROC and AUPRC, and upload. Only data-independent schedules are eligible (Section~\ref{sec:security-dp}).}
+\caption{Matched privacy at $\varepsilon^\star=4$, $\delta=10^{-5}$, $q=1$, $C=1$ (6 seeds), with $z$ calibrated to each method's own release count: share of updates clipped, AUROC at the validation-selected round, that round, and the final-round AUROC. Local training spends $\varepsilon=0$}
 \label{tab:dp}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrrrccr}
-\toprule
-$q$ / $\varepsilon^\star$ / Method & $n$ & $\sigma$ & Releases & $\varepsilon$ & AUROC & AUPRC & Upload (MB)\\
-\midrule
-\gen{dpmatched}
-\bottomrule
-\end{tabular}}
+\centering\footnotesize
+\fit{\gen{au_dp}}
 \end{table}
 
 \begin{table}[t]
-\caption{Sensitivity of \tierfed{}-DP to its prior $\lambda$ in (\ref{eq:jdp}) at $q=1$, $\varepsilon^\star=4$ (10 seeds): chosen interval, calibrated $\sigma$, releases, AUROC, upload.}
-\label{tab:dplambda}
-\centering\small
-\begin{tabular}{lrrrrcr}
-\toprule
-$\lambda$ & $n$ & $K$ & $\sigma$ & Releases & AUROC & Upload (MB)\\
-\midrule
-\gen{dplambda}
-\bottomrule
-\end{tabular}
+\caption{Timing side channel (5 seeds per world): AUC of an observer who tells a target site with half its labels flipped from a clean one, using the number of rounds with traffic, the target's rounds and bytes, or the bytes of all sites; 0.5 is chance}
+\label{tab:timing}
+\centering\footnotesize
+\fit{\gen{au_timing}}
 \end{table}
+Table~\ref{tab:dp} compares the DP-eligible schedules at the same budget with full participation. Every schedule that releases before its selected round is far below local training, which spends no budget: the best of them reaches \num{auDpBestReleasing}, against \num{auDpLocal} for local training on the same splits. One-shot federation appears to match local training, but \ifflag{auDpOneshotPreRelease}{in every seed}{in some seeds} its selected round (round \num{auDpOneshotRound} on average) comes before its single release; after the release its AUROC is \num{auDpOneshotFinal}. It is local training from a common initialisation, not federation. With 20 sites the noise on the average is $zC/N$ per release, and at $\varepsilon^\star=4$ it swamps the update whatever the schedule, while a share of \num{auDpFedperClip} of FedPer's updates is clipped at $C=1$. The exact accountant of Section~\ref{sec:method-privacy} would lower $z$ by \num{gdpSigmaCutFourPct}\% for every method alike, which does not close a gap of this size. At this federation size the result under client-level DP is therefore not a ranking of schedules but a recommendation: do not federate, or federate hundreds of sites, or protect records instead of sites.
 
-Table~\ref{tab:dp} compares methods at equal privacy rather than equal noise, and the result is negative for every method. At budgets $\varepsilon^\star\le8$ with 20 sites, the noise required for client-level DP reduces every method to near-chance AUROC (between \num{dpmQHalfEpsOneFedavgAuroc} and \num{dpmQHalfEpsEightFixedAuroc} at $q=0.5$); none of these models would be usable. Within that range the ordering is the one the release count predicts: a full-rate method makes 60 releases and needs $\sigma=\num{dpmQHalfEpsFourFedperSigma}$ at $\varepsilon^\star=4$, $q=0.5$; the fixed period makes \num{dpmQHalfEpsFourFixedRel} releases at $\sigma=\num{dpmQHalfEpsFourFixedSigma}$ and is the most accurate method at every budget, significantly better than FedPer at $\varepsilon^\star=8$ (\num{dpmQHalfEpsEightFixedVsFedperDiff}, $p=\num{dpmQHalfEpsEightFixedVsFedperP}$) and at $q=1$, $\varepsilon^\star=4$ (\num{dpmQOneEpsFourFixedVsFedperDiff}, $p=\num{dpmQOneEpsFourFixedVsFedperP}$). \tierfed{}-DP with its default prior $\lambda=1$ is level with FedPer (\num{dpmQHalfEpsFourTfdpVsFedperDiff}, $p=\num{dpmQHalfEpsFourTfdpVsFedperP}$ at $\varepsilon^\star=4$) and below the fixed period at every budget, though not significantly (\num{dpmQHalfEpsFourTfdpVsFixedDiff}, $p=\num{dpmQHalfEpsFourTfdpVsFixedP}$): at $q=0.5$ its surrogate (\ref{eq:jdp}) overweights drift and selects $K=2$ with \num{dpmQHalfEpsFourTierfedDpRel} releases, more than the fixed period. Table~\ref{tab:dplambda} confirms the mechanism: raising the noise weight to $\lambda=10$ selects $K=7$ and 12 releases and gives the highest AUROC of the planner. The planner therefore responds to $\lambda$ as designed, but its default prior is mis-calibrated for this regime, and we do not claim that it improves on choosing the sparsest fixed period. Subsampling amplification works as expected on the accounting side, lowering $\sigma$ at equal $\varepsilon$ (FedPer \num{dpmQHalfEpsFourFedperSigma} at $q=0.5$ against \num{dpmQOneEpsFourFedperSigma} at $q=1$), without changing the conclusion. The adaptive schedulers are absent by construction, since their release patterns depend on client data; the earlier equal-$\sigma$ comparison that included them is in the Supplement (Section~S3) with that caveat.
-
-\begin{table}[t]
-\caption{Attack surface (10 seeds): parameters exposed per transmitting round, update-inversion normalised error and feature correlation on the real transmitted slices, membership-inference AUC on the deployed models ($0.5$ = no leakage), and upload.}
-\label{tab:attack}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrcccr}
-\toprule
-Method & $n$ & Params exposed & NMSE $\uparrow$ & Corr.\ $\downarrow$ & MIA AUC $\downarrow$ & Upload (MB)\\
-\midrule
-\gen{attack}
-\bottomrule
-\end{tabular}}
-\end{table}
-
-Without DP, neither attack separates the methods (Table~\ref{tab:attack}). Update-inversion feature correlation is low for every method (\tierfed{} \num{attackTierfedCorr}, FedPer \num{attackFedperCorr}, AdaComm \num{attackAdacommCorr}), and membership-inference AUC is close to chance (\tierfed{} \num{attackTierfedMia}, FedPer \num{attackFedperMia}). Per transmitted round, \tierfed{} exposes the same slice as FedPer; its reduction in attack surface is only that it transmits in fewer rounds, which this generic attack does not exploit.
-
-\subsection{Robustness, architectures and imaging}
-\label{sec:results-arch}
-
-\begin{table}[t]
-\caption{Local objective sweep, FedPer versus \tierfed{} ($\rho=0.25$), 10 seeds.}
-\label{tab:loss}
-\centering\small
-\begin{tabular}{lrccc}
-\toprule
-Loss / method & $n$ & AUROC & AUPRC & Upload (MB)\\
-\midrule
-\gen{loss}
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\caption{Warm-up sweep for \tierfed{} ($\rho=0.25$), 10 seeds.}
-\label{tab:warmup}
-\centering\small
-\begin{tabular}{lrccc}
-\toprule
-$T_w$ & $n$ & AUROC & AUPRC & Upload (MB)\\
-\midrule
-\gen{warmup}
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\caption{Architectures on Diabetes (5 seeds), every method on the same architecture within a row group; parameter count from the instantiated model.}
-\label{tab:arch}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrcccr}
-\toprule
-Backbone / method & $n$ & AUROC & AUPRC & Upload (MB) & Params\\
-\midrule
-\gen{architecture}
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{table}[t]
-\caption{PneumoniaMNIST (CNN, 20 sites, Dirichlet $\alpha=0.3$, 10 seeds). Columns as in Table~\ref{tab:main}.}
-\label{tab:main-img}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrcccccccc}
-\toprule
-Method & $n$ & AUROC & AUPRC & ES-AUROC & Pooled & Upload (MB) & Tx rounds & NI$_{\mathrm{AUROC}}$ $p$ & NI$_{\mathrm{AUPRC}}$ $p$\\
-\midrule
-\gen{main_medmnist_cnn}
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\tierfed{} matches or exceeds FedPer under every class-imbalance loss (Table~\ref{tab:loss}; e.g.\ LDAM \num{lossLdamTierfedAuroc} versus \num{lossLdamFedperAuroc}). A longer warm-up buys a small gain at a proportional cost in bytes (Table~\ref{tab:warmup}; $T_w=20$: \num{warmupWarmTwoZeroAuroc} at \num{warmupWarmTwoZeroUploadMb}~MB). On the six-block tabular ResNet, \tierfed{} reaches \num{architectureResnetTierfedAuroc} at \num{architectureResnetTierfedUploadMb}~MB against \num{architectureResnetFedperAuroc} at \num{architectureResnetFedperUploadMb}~MB for FedPer, and on the FT-Transformer \num{architectureTransformerTierfedAuroc} at \num{architectureTransformerTierfedUploadMb}~MB against \num{architectureTransformerFedperAuroc} at \num{architectureTransformerFedperUploadMb}~MB (Table~\ref{tab:arch}). As on the MLP, the fixed multi-rate schedule is at least as accurate as \tierfed{} on every backbone (ResNet \num{architectureResnetFixedAuroc} at \num{architectureResnetFixedUploadMb}~MB; FT-Transformer \num{architectureTransformerFixedAuroc} at \num{architectureTransformerFixedUploadMb}~MB), while \tierfed{} uploads less. The FT-Transformer rows other than the fixed schedule were trained on GPU with the fused attention kernel, which is not bit-deterministic; they are reported over five seeds with that caveat.
-
-On PneumoniaMNIST (Table~\ref{tab:main-img}) the picture differs from the tabular benchmark and we report it as it is. The two methods that share the classifier head are the most accurate, FedAvg (\num{medmnistcnnFedavgAuroc}) and the FedLAMA-style schedule (\num{medmnistcnnFedlamaAuroc}); \tierfed{} reaches \num{medmnistcnnTierfedAuroc} at \num{medmnistcnnTierfedUploadMb}~MB against \num{medmnistcnnFedperAuroc} at \num{medmnistcnnFedperUploadMb}~MB for FedPer, and is \ifflag{medmnistcnnTierfedNonInferiorAuroc}{non-inferior}{not non-inferior} to FedPer at the 0.01 margin ($p=\num{medmnistcnnTierfedNiAurocP}$). Under strong label skew the private head is a liability rather than an asset: both head-private methods trail the head-sharing ones and FedPer has a large between-seed spread. A schedule that keeps the head private should therefore not be used for this kind of task without a shared head.
-
-\subsection{Real institutions}
-\label{sec:results-real}
-\begin{table}[t]
-\caption{Fed-Heart-Disease, one client per real institution (4 institutions, 10 seeds, no DP): AUROC, AUPRC, upload and transmitting rounds.}
-\label{tab:real}
-\centering\small
-\begin{tabular}{lrccrr}
-\toprule
-Method & $n$ & AUROC & AUPRC & Upload (MB) & Tx rounds\\
-\midrule
-\gen{realheart}
-\bottomrule
-\end{tabular}
-\end{table}
-
-On the four heart-disease institutions, \tierfed{} reaches \num{realHeartTierfedAuroc} AUROC at \num{realHeartTierfedUploadMb}~MB, significantly above FedPer (\num{realHeartFedperAuroc} at \num{realHeartFedperUploadMb}~MB; difference \num{realHeartTfVsFedperDiff}, $p=\num{realHeartTfVsFedperP}$) and level with FedAvg (\num{realHeartTfVsFedavgDiff}, $p=\num{realHeartTfVsFedavgP}$) and the fixed period (\num{realHeartFixedAuroc} at \num{realHeartFixedUploadMb}~MB; $p=\num{realHeartTfVsFixedP}$); SCAFFOLD is the only method that is clearly worse. The ordering of the specialty-bucket benchmark therefore survives real institutional heterogeneity: sparse schedules match full-rate training at about a third of the upload, and the fixed period is as good as \tierfed{}. The federation is small (\num{realHeartNtrain} training patients), so between-seed variance is large; it is not a clinical result. DP was not run on it: with four clients the client-level Gaussian mechanism needs noise of the order of the whole aggregate.
-
-\subsection{Scalability}
-
-\begin{table}[t]
-\caption{Scalability (Diabetes, Dirichlet partition, 30 rounds, 3 seeds): accuracy, upload per site, seconds per round and peak GPU memory, measured, for 10 to 100 sites.}
-\label{tab:scaling}
-\centering\small
-\begin{tabular}{lrcccc}
-\toprule
-Sites / method & $n$ & AUROC & Upload (MB) & s/round & Peak mem (MB)\\
-\midrule
-\gen{scaling}
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:scaling} reports measured wall-clock and accuracy from 10 to 100 sites with the Dirichlet partition, since the specialty partition cannot produce 100 sites. Upload per site scales linearly with the number of sites for every method and \tierfed{} keeps its proportional saving at every size; seconds per round are dominated by local training and are similar across methods. Accuracy at 100 sites is lower for \tierfed{} than for FedAvg, consistent with each site holding less data. The controller's exact solve enumerates at most 512 points and takes well under a millisecond at every size.
+Table~\ref{tab:timing} measures what the schedule reveals to a passive observer. The fixed period sends the same bytes in both worlds by construction\ifflag{auTimingTierfedSilent}{, and so, on this data, did \tierfed{}, whose intervals did not change: a schedule that does not adapt reveals nothing}{; \tierfed{}'s traffic separates the two worlds with AUC \num{auTimingTierfedAucMax}}. \ifflag{auTimingLagXiTwoZeroZeroZeroTargetSkips}{LAG at $\xi=2000$ skips some of the target site's uploads, and the observer reaches AUC \num{auTimingLagXiTwoZeroZeroZeroAucMax}.}{LAG at $\xi=2000$ never skipped an upload of the target site, yet the other sites skipped \num{auTimingLagXiTwoZeroZeroZeroOtherSkipPct}\% of theirs, and \ifflag{auTimingLagXiTwoZeroZeroZeroLeaks}{how often depends on the target's data through the shared model: the total upload of all sites separates the two worlds with AUC \num{auTimingLagXiTwoZeroZeroZeroAucAll}}{the total upload of all sites separates the two worlds only with AUC \num{auTimingLagXiTwoZeroZeroZeroAucAll}}.} \ifflag{auTimingLagXiFiveZeroZeroZeroTargetLeaks}{At $\xi=5000$ the target's own rounds give it away (AUC \num{auTimingLagXiFiveZeroZeroZeroAucTarget}).}{At $\xi=5000$ the observer reaches AUC \num{auTimingLagXiFiveZeroZeroZeroAucMax}.} Both are read from timing and volume alone, with every payload encrypted and five seeds per world. \ifflag{auTimingLagXiTwoZeroZeroZeroTargetSkips}{}{\ifflag{auTimingLagXiTwoZeroZeroZeroLeaks}{A site therefore cannot protect itself by never skipping. }{}}A scheduler cannot promise before training that it will not adapt, which is why the accountant must refuse every adaptive schedule.

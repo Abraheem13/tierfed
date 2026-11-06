@@ -1,0 +1,13 @@
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Method & Releases & $z$ & Clipped & AUROC & Round & Final\\
+\midrule
+FedPer & 60 & 10.04 & 0.44 & 0.5224 & 26 & 0.5205\\
+Fixed (4,4) & 18 & 5.50 & 0.39 & 0.5320 & 22 & 0.5272\\
+Fixed (8,8) & 11 & 4.30 & 0.38 & 0.5366 & 26 & 0.5303\\
+One-shot & 1 & 1.30 & 0.48 & 0.6199 & 4 & 0.4999\\
+\tierfed{}-DP & 23 & 6.22 & 0.40 & 0.5415 & 32 & 0.5227\\
+\midrule
+Local only ($\varepsilon=0$) & 0 & -- & -- & 0.6145 & -- & --\\
+\bottomrule
+\end{tabular}

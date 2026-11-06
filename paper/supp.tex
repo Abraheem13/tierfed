@@ -1,38 +1,232 @@
 \documentclass[journal]{IEEEtran}
 \usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,etoolbox,url,hyperref}
+\hypersetup{hidelinks, pdftitle={Supplementary Material: Every Round Is a Release}, pdfauthor={Abraheem Rashid}}
 \IfFileExists{generated/numbers.tex}{\input{generated/numbers.tex}}{}
 \newcommand{\runreq}{\textbf{[RUN REQUIRED]}}
 \makeatletter\newcommand{\gen}[1]{\@@input generated/#1.tex }\makeatother % collect.py always writes every table (RUN REQUIRED if no runs)
 \newcommand{\num}[1]{\ifcsdef{#1}{\csname #1\endcsname}{\runreq}}
 \newcommand{\tierfed}{TierFed}
+\newsavebox\tabbox
+\newcommand{\fit}[1]{\sbox\tabbox{#1}\ifdim\wd\tabbox>\linewidth\resizebox{\linewidth}{!}{\usebox\tabbox}\else\usebox\tabbox\fi}
+\renewcommand{\thetable}{S-\Roman{table}}
 \providecommand{\fig}[2]{\IfFileExists{figures/#1.pdf}{\includegraphics[width=#2]{figures/#1.pdf}}{\fbox{\runreq}}}
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
 \begin{document}
-\title{Supplementary Material: Communication as the Binding Constraint}
+\title{Supplementary Material: Every Round Is a Release}
 \author{Abraheem Rashid}
 \maketitle
 
 \section{S1. Relation to the superseded version}
-An earlier manuscript (``Nested Federated Learning'' / ``TierFed'' v2) reported results produced by code with the following defects, found in an internal audit and corrected here: (1) differential privacy was applied inside two strategies only and clipped the aggregate rather than each client's update, so FedAvg/FedPer/FedProx ran without noise and the reported budgets were invalid; the TierFed DP runs crashed on local-only rounds and the table was unsupported; (2) the SCAFFOLD baseline was FedAvg with doubled bit accounting; (3) the scalability table contained no TierFed runs and its values were not those of the logs; (4) the architecture sweep compared different depths across methods; (5) the imaging result used an undisclosed configuration on a binarised 97\%-positive task; (6) the inversion attack targeted the fixed schedule at initialisation and was labelled TierFed; (7) the model described (93 inputs) was not the model trained (162 inputs); (8) repeated runs were not deterministic; (9) no patient-level deduplication was performed and one ``missing specialty'' client held 49\% of the data; (10) the greedy controller reached only powers of two; (11) the fixed multi-rate schedule sent a fallback tier whenever no tier was due, which made its medium-tier period ineffective; (12) compressors were applied to raw weights instead of updates; (13) in v3, the DP comparison ran data-dependent schedulers (adaptive TierFed, AdaComm) under the Gaussian accountant, which does not charge for the information their schedules reveal, so their reported budgets were not valid DP guarantees; v4 refuses such strategies under DP, adds the data-independent TierFed-DP planner, and replaces the equal-$\sigma$ table by a matched-$\varepsilon$ comparison with Poisson sampling (Section~S3). Items (1)--(10) were found in an audit of the earlier manuscript, items (11)--(12) during the v3 runs and item (13) in the v4 revision; all affected runs were deleted and rerun. With these corrections the earlier central finding, that fixed multi-rate schedules lose about 0.05~AUROC to personalised baselines, does not reproduce and is retracted. Every item maps to a code change in the released repository (\texttt{ROADMAP.md}, section 0) and to a test.
+An earlier manuscript (``Nested Federated Learning'' / ``TierFed'' v2) reported results produced by code with the following defects, found in an internal audit and corrected here: (1) differential privacy was applied inside two strategies only and clipped the aggregate rather than each client's update, so FedAvg/FedPer/FedProx ran without noise and the reported budgets were invalid; the TierFed DP runs crashed on local-only rounds and the table was unsupported; (2) the SCAFFOLD baseline was FedAvg with doubled bit accounting; (3) the scalability table contained no TierFed runs and its values were not those of the logs; (4) the architecture sweep compared different depths across methods; (5) the imaging result used an undisclosed configuration on a binarised 97\%-positive task; (6) the inversion attack targeted the fixed schedule at initialisation and was labelled TierFed; (7) the model described (93 inputs) was not the model trained (162 inputs); (8) repeated runs were not deterministic; (9) no patient-level deduplication was performed and one ``missing specialty'' client held 49\% of the data; (10) the greedy controller reached only powers of two; (11) the fixed multi-rate schedule sent a fallback tier whenever no tier was due, which made its medium-tier period ineffective; (12) compressors were applied to raw weights instead of updates; (13) in v3, the DP comparison ran data-dependent schedulers (adaptive TierFed, AdaComm) under the Gaussian accountant, which does not charge for the information their schedules reveal, so their reported budgets were not valid DP guarantees; v4 refuses such strategies under DP, adds the data-independent TierFed-DP planner, and replaces the equal-$\sigma$ table by a matched-$\varepsilon$ comparison with Poisson sampling (Section~S3). (14) the v4 planner objective compared raw $K^2$ against $\sigma^2$ in units of $C^2$, so its prior $\lambda$ was scale-dependent; v5 normalises both terms, and the v4 planner runs were deleted and rerun; (15) the per-round history files recorded, in their \texttt{round} field, the round of the last synchronisation rather than the current round, so the v5 time-to-target values of the emulation table were matched to the wrong rounds for multi-rate methods; v6 fixes the logger, reads histories by position, and recomputes time-to-target from the logged per-round bits and compute times (the emulated totals are unaffected). (16) LAG averaged the freshest update of every site with \emph{equal} weights, so at its default threshold, where it never skips, it was uniform-weight rather than sample-weighted FedAvg; the earlier text called it level with FedPer while its table showed it ahead. Sample weighting is now an option, and both variants are reported. (17) The fixed period of the v3--v12 runs synchronised in round 1 and then whenever $r\bmod K_g=0$, with no warm-up unless one was set, while the text stated the shared due rule (Eq.~(9) of the main text); its transmitting-round counts (37 for $(5,2)$, 19 and 12 in the DP arms) were therefore one or more above that rule. The accountant charged the releases the code made, so the stated $\varepsilon$ were correct. The new runs use one rule for every planned schedule, and a consistency check recomputes every release count, upload volume and DP charge of all logs from the stated rules. (18) \tierfed{}'s quota bounded the post-warm-up payload fraction, while the text defined it over all rounds; the realised all-round fraction at $\rho=0.25$ was 0.30. Both definitions are now stated, and a quota over all rounds is available. (19) The feasible set of the solver has 64 points, not 512. (20) Upload volumes were the total over all sites, and two sentences called them per site. (21) The early-stopped AUROC chose its round on the same split it reported, which overstates it; the new runs select on a separate validation split. Items (1)--(10) were found in an audit of the earlier manuscript, items (11)--(12) during the v3 runs, item (13) in the v4 revision, item (14) in the v5 revision, item (15) in the v6 revision and items (16)--(21) in an external audit of v12; all affected runs were deleted and rerun or, for (16)--(21), superseded by the v13 runs, whose protocol is in the main text. With these corrections the earlier central finding, that fixed multi-rate schedules lose about 0.05~AUROC to personalised baselines, does not reproduce and is retracted. Every item maps to a code change in the released repository (\texttt{ROADMAP.md}, section 0) and to a test.
+
+
+\section{S7. Additional tables}
+Tables S-I to S-XIV hold the sweeps and secondary comparisons of the earlier (v5) protocol: a 80/20 per-site split without a validation set, final-round AUROC, and the fixed period on the legacy rule of item (17) of Section~S1. They are kept because they cover settings the v6 runs do not (compression, real institutions, imaging, scaling, a wide model, the equal-$\sigma$ DP comparison), and they should be read with that protocol in mind; the final-round reading favours sparse schedules, as the main text shows. Every body is generated from the per-seed logs by the same script as the main tables, with the best value in each group in bold.
+
+\begin{table}[t]
+\caption{Fixed-period sweep $(K_{\mathrm s},K_{\mathrm m})$ with local-only rounds (top) and exact versus greedy solver for \tierfed{} at every quota (bottom); 10 seeds}
+\centering\small
+\begin{tabular}{@{}lcr@{}}
+\toprule
+$(K_{\mathrm s},K_{\mathrm m})$ or quota, solver & AUROC & Upload (MB)\\
+\midrule
+\gen{periods}
+\midrule
+\gen{solver}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Baseline sweeps (10 seeds): AdaComm initial period $\tau_0$, LAG threshold $\xi$, and the SGD local solver}
+\label{tab:baselines-legacy}
+\centering\small
+\fit{\begin{tabular}{@{}lccrr@{}}
+\toprule
+Configuration & AUROC & AUPRC & Upload (MB) & Tx rounds\\
+\midrule
+\gen{baselines}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Network cost of the main case under the five link profiles: total communication time on cell-edge NR, LEO and the 6G slice target, uplink energy on cell-edge NR, and share of rounds fitting a 60-s window; 10 seeds, from measured bits}
+\centering\small
+\fit{\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Method & Upload (MB) & $t$ NR-edge (s) & $t$ LEO (s) & $t$ 6G (s) & $E$ NR-edge (J) & Window (\%)\\
+\midrule
+\gen{network_diabetes_mlp}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Sensitivity of the planner to its prior $\lambda$ (10 seeds): chosen interval, calibrated $\sigma$, releases, AUROC, upload. Top: 20 sites at \num{dplamNTwoZeroAt}. Bottom: 100 sites at \num{dplamNOneZeroZeroAt}}
+\centering\small
+\begin{tabular}{@{}lrrrcr@{}}
+\toprule
+$\lambda$ & $K$ & $\sigma$ & Releases & AUROC & Upload (MB)\\
+\midrule
+\gen{dplambda20}
+\midrule
+\gen{dplambda100}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Attack surface without DP (10 seeds): parameters exposed per transmitting round, update-inversion normalised error and feature correlation on the real transmitted slices, membership-inference AUC on the deployed models ($0.5$: no leakage), and upload}
+\centering\small
+\fit{\begin{tabular}{@{}lrrccr@{}}
+\toprule
+Method & Params exposed & NMSE $\uparrow$ & Corr.\ $\downarrow$ & MIA AUC $\downarrow$ & Upload (MB)\\
+\midrule
+\gen{attack}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Ablations (10 seeds). Top: private head $\times$ schedule, and \tierfed{} with and without the head. Middle: warm-up $T_w$. Bottom: class-imbalance loss for FedPer and \tierfed{}}
+\centering\small
+\fit{\begin{tabular}{@{}lccr@{}}
+\toprule
+Configuration & AUROC & AUPRC & Upload (MB)\\
+\midrule
+\gen{factorial}
+\midrule
+\gen{warmup}
+\midrule
+\gen{loss}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Backbones on Diabetes (5 seeds); the transformer arm used a non-deterministic fused attention kernel}
+\centering\small
+\fit{\begin{tabular}{@{}lccrr@{}}
+\toprule
+Backbone, method & AUROC & AUPRC & Upload (MB) & Params\\
+\midrule
+\gen{architecture}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Imaging (PneumoniaMNIST, 20 Dirichlet sites, 10 seeds): final AUROC with BCa 95\% interval, AUPRC, upload, transmitting rounds and non-inferiority $p$ on AUROC against FedPer. Between \num{imgSingleClassMin} and \num{imgSingleClassMax} sites per seed have a single-class held-out split and are excluded identically for every method}
+\centering\small
+\fit{\begin{tabular}{@{}lccrrc@{}}
+\toprule
+Method & AUROC [95\% CI] & AUPRC & Upload (MB) & Tx & NI $p$\\
+\midrule
+\gen{mainshort_medmnist_cnn}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Scaling (Diabetes, Dirichlet $\alpha=1$, 30 rounds, 3 seeds): AUROC, upload per site, wall-clock seconds per round and peak memory on one CPU}
+\centering\small
+\fit{\begin{tabular}{@{}lcrrr@{}}
+\toprule
+Sites, method & AUROC & Upload (MB) & s/round & Peak MB\\
+\midrule
+\gen{scaling}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Socket replay of the wide-MLP runs (\num{wideParams} parameters, 3 seeds; cell-edge profile for one seed): each run's logged per-site uploads sent over loopback TCP paced at the profile's rate. Total replayed upload time, the analytic prediction, their relative difference, total compute time of the slowest site, and wall-clock time to AUROC 0.60 and 0.62 (``never'': not reached in 60 rounds)}
+\centering\small
+\fit{\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+Profile & Method & Emulated (s) & Analytic (s) & Diff.\ (\%) & Compute (s) & $t_{0.60}$ (s) & $t_{0.62}$ (s)\\
+\midrule
+\gen{emulation}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Matched-privacy comparison on the 20 specialty sites, all settings including $q=1$ (10 seeds, $C=1$, $\delta=10^{-5}$); columns as in the main text}
+\centering\small
+\fit{\begin{tabular}{@{}lrrc@{}}
+\toprule
+$q$, $\varepsilon^\star$, method & $\sigma$ & Releases & AUROC\\
+\midrule
+\gen{dpmatched20}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Matched-privacy comparison on the 100-site Dirichlet federation (10 seeds, $C=1$, $\delta=10^{-5}$); columns as in the main text}
+\centering\small
+\fit{\begin{tabular}{@{}lrrc@{}}
+\toprule
+$q$, $\varepsilon^\star$, method & $\sigma$ & Releases & AUROC\\
+\midrule
+\gen{dpmatched100}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Fed-Heart-Disease, one client per real institution (4 institutions, 10 seeds, no DP). Target: any angiographic disease; missingness indicators are added because two features are mostly missing outside Cleveland}
+\centering\small
+\fit{\begin{tabular}{@{}lccrr@{}}
+\toprule
+Method & AUROC & AUPRC & Upload (MB) & Tx rounds\\
+\midrule
+\gen{realheart}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Paired comparison of final AUROC against FedPer on the main case (10 seeds): mean difference, BCa 95\% interval, Holm-corrected $p$ over the eight contrasts, paired $d_z$}
+\centering\small
+\fit{\begin{tabular}{@{}lrccrc@{}}
+\toprule
+Comparison & $\Delta$ & 95\% CI & $p_{\mathrm{Holm}}$ & $d_z$ & Sig.\\
+\midrule
+\gen{holm_diabetes_mlp}
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \section{S2. Derivation of Proposition 1}
+\textbf{Proof sketch.} The perturbed-iterate argument of~\cite{wang2021coop} is applied blockwise. Between two synchronisations of tier $g$ a site takes $K_gs$ local steps on that block, so the squared deviation of its block iterate from the virtual average is bounded by $\eta^2K_g^2s^2(\Gamma_g+\sigma_g^2)$ up to the constants of the cited theorem; the blocks are disjoint and, by the block-separable smoothness assumption, the gradient of one block does not depend on the others, so the deviations add, and the descent lemma with the step-size condition absorbs the cross terms. Without block separability a coupling term $\sum_{g\ne h}L_{gh}^2(\cdot)$ appears, which the analysis does not control. $K_g=1$ for a single block recovers the local-SGD rate.
+
 \label{supp:proof}
-We follow the cooperative-SGD framework of Wang and Joshi [JMLR 2021, Thm.~1], which bounds the averaged gradient norm of local-update SGD in terms of the per-round deviation of client iterates from the virtual average. Write the shared parameter as $\theta=(\theta_g)_{g}$ with disjoint blocks. For site $k$ and block $g$ let $\theta^{(t)}_{k,g}$ be the iterate after $t$ local steps since block $g$ was last synchronised and $\bar\theta^{(t)}_g$ the (virtual) average across sites.
+The derivation follows the cooperative-SGD framework of Wang and Joshi [JMLR 2021, Thm.~1], which bounds the averaged gradient norm of local-update SGD in terms of the per-round deviation of client iterates from the virtual average. Write the shared parameter as $\theta=(\theta_g)_{g}$ with disjoint blocks. For site $k$ and block $g$ let $\theta^{(t)}_{k,g}$ be the iterate after $t$ local steps since block $g$ was last synchronised and $\bar\theta^{(t)}_g$ the (virtual) average across sites.
 
 \begin{lemma}[Blockwise deviation]
-Under A1--A3, for $\eta\le c_0/(LK_{\max}\tau_{\max})$ and any $t\le K_g\tau_{\max}$,
-\[
-\frac1N\sum_k\mathbb E\big\|\theta^{(t)}_{k,g}-\bar\theta^{(t)}_g\big\|^2\ \le\ c\,\eta^2 t^2\,(\Gamma_g+\sigma_g^2)\ \le\ c\,\eta^2K_g^2\tau_{\max}^2(\Gamma_g+\sigma_g^2).
-\]
+Under A1--A3, for $\eta\le c_0/(LK_{\max}s)$ and any $t\le K_gs$,
+\begin{align*}
+\frac1N\sum_k\mathbb E\big\|\theta^{(t)}_{k,g}-\bar\theta^{(t)}_g\big\|^2&\le c\,\eta^2 t^2\,(\Gamma_g+\sigma_g^2)\\
+&\le c\,\eta^2K_g^2s^2(\Gamma_g+\sigma_g^2).
+\end{align*}
 \end{lemma}
 \begin{proof}
 Identical to Lemma 2 of Wang and Joshi restricted to the coordinates of block $g$: the deviation after $t$ steps is a sum of $t$ stochastic-gradient differences, each with second moment bounded by $\Gamma_g+\sigma_g^2$ by (A2)--(A3), and the smoothness term is absorbed by the step-size condition. The restriction to a block is valid because the gradient of block $g$ is bounded blockwise by the same assumptions.
 \end{proof}
 
-The descent-lemma step of the cited theorem bounds $\mathbb E\|\nabla F(\bar\theta_r)\|^2$ by the progress term, the variance term and $L^2$ times the \emph{total} deviation $\frac1N\sum_k\|\theta_k-\bar\theta\|^2$. Because the blocks are disjoint, the total deviation is the sum over $g$ of the blockwise deviations, each bounded by the lemma with its own $K_g$; summing and averaging over rounds gives Proposition~1 of the main text with constants inherited from the cited theorem. We make no claim about the constants beyond their existence. Setting $K_g=1$ for a single block returns the cited bound with $\tau$ local steps.
+The descent-lemma step of the cited theorem bounds $\mathbb E\|\nabla F(\bar\theta_r)\|^2$ by the progress term, the variance term and $L^2$ times the \emph{total} deviation $\frac1N\sum_k\|\theta_k-\bar\theta\|^2$. Because the blocks are disjoint, the total deviation is the sum over $g$ of the blockwise deviations, each bounded by the lemma with its own $K_g$; summing and averaging over rounds gives Proposition~1 of the main text with constants inherited from the cited theorem. No claim is made about the constants beyond their existence. Setting $K_g=1$ for a single block returns the cited bound with $s$ local steps.
 
-\textbf{What the controller sees.} By the same lemma the dispersion of the received slices of tier $g$ after $K_g$ rounds is of order $\eta^2K_g^2\tau^2(\Gamma_g+\sigma_g^2)$; normalising by $\sum_j\|\bar\theta_j\|^2$ gives the scale-free $\hat\Gamma_g$ of Eq.~(7) of the main text (the dispersion estimator). The controller therefore minimises $\sum_g K_g^2\hat\Gamma_g$ where $\hat\Gamma_g$ already carries the factor $K_g^2$ of the interval that produced it; it is a feedback loop on a proxy, and its stability is observed (Fig.~4 of the main text), not proved.
+\textbf{What the controller sees.} By the same lemma the dispersion of the received slices of tier $g$ after $K_g$ rounds is bounded by a term of order $\eta^2K_g^2s^2(\Gamma_g+\sigma_g^2)$; normalising by $\sum_j\|\bar\theta_j\|^2$ gives the scale-free $\hat\Gamma_g$ of the main text. The controller therefore minimises $\sum_g K_g^2\hat\Gamma_g$ where $\hat\Gamma_g$ can already carry the factor $K_g^2$ of the interval that produced it; the debiased proxy $\tilde\Gamma_g$ divides it out. Either way the controller is a feedback loop on a proxy, and its stability is observed, not proved.
+
+\section{S2b. Proof of Proposition 2}
+\label{supp:cuberoot}
+Write $x_g=K_g>0$. The objective $f(x)=\sum_g\Gamma_gx_g^2$ is strictly convex, the constraint $h(x)=\sum_gw_g/x_g-\rho\le0$ is convex on $x>0$, and Slater's condition holds, so the KKT conditions are necessary and sufficient and the minimiser is unique. $f$ increases and $h$ decreases in every coordinate, so the constraint binds: if $h(x)<0$, some $x_g$ can be lowered and $f$ decreases. Stationarity $2\Gamma_gx_g=\lambda w_g/x_g^2$ gives $x_g=(\lambda w_g/2\Gamma_g)^{1/3}$; substituting into $\sum_gw_g/x_g=\rho$ gives $(\lambda/2)^{1/3}=S/\rho$ with $S=\sum_hw_h^{2/3}\Gamma_h^{1/3}$, hence $K_g^\star=(w_g/\Gamma_g)^{1/3}S/\rho$ and $f(K^\star)=\frac{S^2}{\rho^2}\sum_g\Gamma_g(w_g/\Gamma_g)^{2/3}=S^3/\rho^2$. H\"older's inequality with $p=3/2$, $q=3$, $a_g=w_g^{2/3}$, $b_g=\Gamma_g^{1/3}$ gives $S\le(\sum_gw_g)^{2/3}(\sum_g\Gamma_g)^{1/3}=(\sum_g\Gamma_g)^{1/3}$, with equality if and only if $a_g^p\propto b_g^q$, i.e.\ $w_g\propto\Gamma_g$. The uniform point $x_g=1/\rho$ satisfies the constraint with equality and costs $\sum_g\Gamma_g/\rho^2$. Finally, the integer feasible set is contained in the real one, so the integer optimum $J_{\mathrm{int}}\ge J^\star$; when $1/\rho\in\{1,\dots,K_{\max}\}$ the uniform period is integer-feasible, and $1-J_{\mathrm{int}}/J_{\mathrm u}\le1-J^\star/J_{\mathrm u}=\Psi$. $\Psi$ is invariant under $\Gamma\mapsto c\Gamma$ because $S^3$ and $\sum_g\Gamma_g$ are both linear in $c$. \hfill$\square$
+
+\textbf{Staggered phases.} Tier $a$ is due at the rounds $T_w+\phi_a+nK_a$ and tier $b$ at $T_w+\phi_b+mK_b$, $n,m\ge1$. A common round requires $nK_a-mK_b=\phi_b-\phi_a$, a linear Diophantine equation that is solvable if and only if $\gcd(K_a,K_b)$ divides $\phi_b-\phi_a$; when it is solvable, it has infinitely many solutions with $n,m\ge1$. Hence the two due sets are disjoint if and only if $\phi_a-\phi_b\not\equiv0\pmod{\gcd(K_a,K_b)}$.
 
 \section{S3. Differential-privacy accounting}
 Per-client clipping to $C$ makes the $\ell_2$ sensitivity of the sum to the addition or removal of one client exactly $C$, and the fixed denominator $qN$ does not depend on the realised cohort. With Poisson sampling at rate $q$ each release is the subsampled Gaussian mechanism, whose RDP at integer order $\alpha$ is $\frac1{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^k\exp\frac{k^2-k}{2\sigma^2}$ [Mironov, Talwar and Zhang 2019, Sec.~3.3]; for $q=1$ it is $\alpha/(2\sigma^2)$ [Mironov 2017, Prop.~7]. Composition over the $R_{\mathrm{tx}}$ planned releases is additive, and $(\varepsilon,\delta)$-DP follows from [Mironov 2017, Prop.~3], minimised over $\alpha\in\{2,\dots,256\}$ (and a fine fractional grid for $q=1$). The accountant is valid only if the set of release rounds is independent of the private data, which is why only FedAvg, FedProx, FedPer, the fixed period and \tierfed{}-DP are run under DP in the main text. The sum is computed in log space; the implementation matches the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$ at $q=256/60000$, $\sigma=1.1$, 60 epochs) to within 0.05. Model selection on held-out data is not covered by the budget, so DP results are final-round values.
@@ -43,30 +237,33 @@ Per-client clipping to $C$ makes the $\ell_2$ sensitivity of the sum to the addi
 \caption{\textbf{Superseded} equal-$\sigma$ comparison of v3 (per-client clipping $C=1$, 10 seeds, $q=1$). The budgets of the adaptive schedulers (\tierfed{}, AdaComm) do not account for their data-dependent schedules and are therefore not valid DP guarantees: $(\varepsilon,\delta=10^{-5})$ from the exact R\'enyi accountant, number of charged (transmitting) rounds, final AUROC and AUPRC. The same mechanism is applied to every method.}
 \label{tab:dp-legacy}
 \centering\small
-\begin{tabular}{lrrrcc}
+\fit{\begin{tabular}{lrrrcc}
 \toprule
 Method / $\sigma$ & $n$ & $\varepsilon$ & Charged rounds & AUROC & AUPRC\\
 \midrule
 \gen{dp}
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
 \centering\fig{fig_privacy}{0.95\columnwidth}
-\caption{Utility against the DP noise multiplier for every method under the identical mechanism (main text, Eq.~(8)).}
+\caption{Utility against the DP noise multiplier for every method under the identical mechanism (main text, Eq.~(10)).}
 \label{fig:privacy-legacy}
 \end{figure}
 
-Table~\ref{tab:dp-legacy} and Fig.~\ref{fig:privacy-legacy} were presented in v3 as the clearest effect of the study. Under client-level DP, every transmitting round is a release that the accountant charges for and into which noise is injected, so the number of transmitting rounds sets both the budget and the cumulative noise. At $\sigma=1$, full-rate FedAvg collapses to \num{dpFedavgSigmaOneAuroc} and FedPer reaches \num{dpFedperSigmaOneAuroc}, both at $\varepsilon=\num{dpFedperSigmaOneEps}$; \tierfed{} reaches \num{dpTierfedSigmaOneAuroc} at $\varepsilon=\num{dpTierfedSigmaOneEps}$ (\tierfed{} minus FedPer \num{dpTfVsFedperSigmaOneDiff}, $p=\num{dpTfVsFedperSigmaOneP}$). At $\sigma=2$ the margin over FedPer is \num{dpTfVsFedperSigmaTwoDiff} ($p=\num{dpTfVsFedperSigmaTwoP}$) at less than half the budget. Against AdaComm, the strongest round-sparse baseline, the comparison is mixed and we report it as such: level at $\sigma=0.5$ (\num{dpTfVsAdacommSigmaHalfDiff}, $p=\num{dpTfVsAdacommSigmaHalfP}$) and $\sigma=1$ (\num{dpTfVsAdacommSigmaOneDiff}, $p=\num{dpTfVsAdacommSigmaOneP}$), better at $\sigma=2$ (\num{dpTfVsAdacommSigmaTwoDiff}, $p=\num{dpTfVsAdacommSigmaTwoP}$), and worse at $\sigma=4$ (\num{dpTfVsAdacommSigmaFourDiff}, $p=\num{dpTfVsAdacommSigmaFourP}$), where AdaComm's eight releases incur less noise than \tierfed{}'s eighteen. The operational reading is that, under DP, the number of rounds a site transmits is the dominant design variable, and a communication quota is also a privacy quota. None of the budgets reported is claimed to constitute meaningful privacy; they are reported as computed so that the trade-off is measured correctly.
+Table~\ref{tab:dp-legacy} and Fig.~\ref{fig:privacy-legacy} were presented in v3 as the clearest effect of the study. Under client-level DP, every transmitting round is a release that the accountant charges for and into which noise is injected, so the number of transmitting rounds sets both the budget and the cumulative noise. At $\sigma=1$, full-rate FedAvg collapses to \num{dpFedavgSigmaOneAuroc} and FedPer reaches \num{dpFedperSigmaOneAuroc}, both at $\varepsilon=\num{dpFedperSigmaOneEps}$; \tierfed{} reaches \num{dpTierfedSigmaOneAuroc} at $\varepsilon=\num{dpTierfedSigmaOneEps}$ (\tierfed{} minus FedPer \num{dpTfVsFedperSigmaOneDiff}, $p\num{dpTfVsFedperSigmaOneP}$). At $\sigma=2$ the margin over FedPer is \num{dpTfVsFedperSigmaTwoDiff} ($p\num{dpTfVsFedperSigmaTwoP}$) at less than half the budget. Against AdaComm, the strongest round-sparse baseline, the comparison is mixed and is reported as such: level at $\sigma=0.5$ (\num{dpTfVsAdacommSigmaHalfDiff}, $p\num{dpTfVsAdacommSigmaHalfP}$) and $\sigma=1$ (\num{dpTfVsAdacommSigmaOneDiff}, $p\num{dpTfVsAdacommSigmaOneP}$), better at $\sigma=2$ (\num{dpTfVsAdacommSigmaTwoDiff}, $p\num{dpTfVsAdacommSigmaTwoP}$), and worse at $\sigma=4$ (\num{dpTfVsAdacommSigmaFourDiff}, $p\num{dpTfVsAdacommSigmaFourP}$), where AdaComm's eight releases incur less noise than \tierfed{}'s eighteen. The operational reading is that, under DP, the number of rounds a site transmits is the dominant design variable, and a communication quota is also a privacy quota. None of the budgets reported is claimed to constitute meaningful privacy; they are reported as computed so that the trade-off is measured correctly.
 
 \section{S4. Per-seed tables}
 Every run's final metrics are in \texttt{results/tables/collected\_all\_raw.csv} in the released repository. Total runs at build time: \num{TotalRuns}.
 
 \section{S5. SGD arm}
-The SGD arm (learning rate $5\times10^{-2}$) is reported in Table~VI of the main text (baseline sweeps).
+The SGD arm (learning rate $5\times10^{-2}$) is reported, under the earlier protocol, in Table~\ref{tab:baselines-legacy} (baseline sweeps).
 
 \section{S6. Excluded sites on the imaging benchmark}
 Number of sites whose patient-grouped held-out split contained a single class (identical for every method, per seed): between \num{imgSingleClassMin} and \num{imgSingleClassMax} of 20 depending on the seed (read from \texttt{n\_clients\_single\_class\_final} in the logs).
 
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 \end{document}

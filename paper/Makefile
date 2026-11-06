@@ -7,7 +7,9 @@ main.pdf: main.tex sections/*.tex references.bib
 	pdflatex -interaction=nonstopmode main.tex >/dev/null || true
 	pdflatex -interaction=nonstopmode main.tex
 
-supp.pdf: supp.tex
+supp.pdf: supp.tex references.bib
+	pdflatex -interaction=nonstopmode supp.tex >/dev/null || true
+	bibtex supp >/dev/null || true
 	pdflatex -interaction=nonstopmode supp.tex >/dev/null || true
 	pdflatex -interaction=nonstopmode supp.tex
 

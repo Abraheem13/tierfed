@@ -70,27 +70,39 @@ powershell -ExecutionPolicy Bypass -File scripts\check_v4.ps1        # progress
 * `run_emulation`: ~1.8M-parameter `mlp_wide`; every run's logged per-client upload bytes are replayed
   over paced loopback TCP (`src/netemu.py`) for time-to-target. Application-layer, not netem.
 
-## v6 audit batch (validation-selected metrics, frontiers, heterogeneity, backbones)
+## v6: reproduce every number of the paper in one command
 
 Every v6 run splits each site's patients 70/10/20 into train, validation and test. The
 reported AUROC is the test AUROC at the round with the highest validation AUROC; test
 data never choose anything. Tags start with `_au_`, so earlier logs stay reproducible.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\run_audit.ps1      # night 1, CPU: hetero, frontier, main, DP (q = 1), bounds, DermaMNIST
-powershell -ExecutionPolicy Bypass -File scripts\run_backbone.ps1   # GPU: ResNet and FT-Transformer, timing test on the ResNet
-powershell -ExecutionPolicy Bypass -File scripts\run_night2.ps1     # CPU: staggering with 8-bit warm-up, all-rounds quota, LAG, dropout, timing
-powershell -ExecutionPolicy Bypass -File scripts\check_audit.ps1    # progress
-make audit                                                         # consistency check + decision gate + tables
+powershell -ExecutionPolicy Bypass -File scripts\setup_cpu.ps1                 # once (CPU-only machines)
+powershell -ExecutionPolicy Bypass -File scripts\reproduce_v6.ps1 -Part all -Jobs 3
 ```
+```bash
+bash scripts/reproduce_v6.sh all 4
+```
+Parts: `core` (main table, bounds, frontier, DP at q = 1, peak), `gate` (heterogeneity sweep,
+timing side channel), `resnet` (backbone test), `analysis` (consistency and cross-machine checks,
+tables, figures, numbers, and the PDFs when `pdflatex` is installed). Every part except
+`analysis` first runs `scripts/check_determinism` (one configuration twice, bit-identical or stop).
+Finished runs are skipped, so the script can be stopped and restarted.
+`analysis` alone regenerates every table, figure and number from the logs in `results/logs`
+without training anything. The plan is 405 runs; on the 4-core Linux machine used for the paper they took about three hours, and `analysis` takes about 15 minutes.
 
 `src/analysis/consistency.py` recomputes every transmitting-round count, upload volume
-and DP charge from the schedule rules and asserts them against the logs (all 1813
-earlier logs pass). `src/analysis/audit_report.py` writes the decision gate, the
-iso-byte budgets and every audit table to `results/tables/audit/`;
-`src/analysis/audit_tex.py` and `src/analysis/audit_figures.py` write the manuscript's
-tables and figure. `src/theory/differentiation.py` holds the closed form of the
-interval programme and the differentiation bound Psi (Proposition 2).
+and DP charge from the schedule rules and asserts them against the logs.
+`src/analysis/crossmachine.py` compares every run in `results/crossmachine/<machine>/logs`
+(the heterogeneity and timing runs repeated on a Windows laptop, see its `machine.json`)
+with the run of the same name in `results/logs`: configuration, bits per round and site,
+planned periods, selected round and AUROC. It also recomputes the gate decision and the
+timing verdicts from the second machine's runs alone.
+`src/analysis/audit_report.py` writes the decision gate, the iso-byte budgets and every
+audit table to `results/tables/audit/`; `src/analysis/audit_tex.py` and
+`src/analysis/audit_figures.py` write the manuscript's tables, numbers and figure.
+`src/theory/differentiation.py` holds the closed form of the interval programme and the
+differentiation bound Psi (Proposition 2); `src/privacy/gdp.py` the exact q = 1 accountant.
 
 ## Manuscript figures and tables
 

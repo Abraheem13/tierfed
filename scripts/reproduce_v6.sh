@@ -2,8 +2,9 @@
 # One-click reproduction of every v6 run and number used in the paper (Linux/macOS).
 #   bash scripts/reproduce_v6.sh [core|gate|resnet|analysis|all] [workers]
 # Finished runs are skipped, so the script can be stopped and restarted at any time.
+# Every part except analysis first checks that repeated runs are bit-identical on this machine.
 # core   : main table, reference bounds, frontier, DP at q = 1, peak         (235 runs)
-# gate   : heterogeneity sweep and timing side channel                       (136 runs)
+# gate   : heterogeneity sweep and timing side channel                       (140 runs)
 # resnet : ResNet backbone, the regime where Proposition 2 predicts a gain    (30 runs)
 set -u
 PART=${1:-all}; J=${2:-4}; PY=${PY:-python3}
@@ -25,7 +26,7 @@ core() {
 gate() {
   for a in 0.1 0.3 1 10; do for s in $S5; do
     echo "$A --stage hetero --alpha $a --only fedper local fixed44 fixed88 tierfed --seeds $s"; done; done
-  for s in $S6; do echo "$A --stage timing --model mlp --only tierfed lag_xi2000 fixed44 --seeds $s"; done
+  for s in $S5; do echo "$A --stage timing --model mlp --only tierfed lag_xi2000 lag_xi5000 fixed44 --seeds $s"; done
 }
 resnet() {
   for s in $S6; do echo "$A --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s"; done
@@ -36,17 +37,23 @@ run() {   # one python process per line, J at a time; each writes its own log
 }
 analysis() {
   $PY -m src.analysis.consistency --results results
+  $PY -m src.analysis.crossmachine --results results
   $PY -m src.analysis.audit_report --results results --dataset diabetes > results/tables/audit_report_stdout.txt
   $PY -m src.analysis.audit_tex --results results --paper paper/generated --dataset diabetes
   $PY -m src.analysis.audit_figures --results results --out paper/figures --dataset diabetes
   $PY -m src.analysis.collect --results results --dataset diabetes --model mlp
+  $PY -m src.analysis.make_figures --results results --dataset diabetes --model mlp   # supplement figure
   if command -v pdflatex >/dev/null; then
     (cd paper && pdflatex -interaction=nonstopmode main.tex >/dev/null; bibtex main >/dev/null;
      pdflatex -interaction=nonstopmode main.tex >/dev/null; pdflatex -interaction=nonstopmode main.tex >/dev/null
+     pdflatex -interaction=nonstopmode supp.tex >/dev/null; bibtex supp >/dev/null
      pdflatex -interaction=nonstopmode supp.tex >/dev/null; pdflatex -interaction=nonstopmode supp.tex >/dev/null)
   fi
 }
 $PY -c "from src.data import load_dataset; load_dataset('diabetes', n_clients=20, seed=42)" >/dev/null   # cache the data once
+if [ "$PART" != "analysis" ]; then   # repeated runs must be bit-identical before any log is produced
+  PY="$PY" bash scripts/check_determinism.sh diabetes cpu || { echo "determinism check failed: fix the environment first"; exit 1; }
+fi
 case "$PART" in
   core) core | run ;;
   gate) gate | run ;;

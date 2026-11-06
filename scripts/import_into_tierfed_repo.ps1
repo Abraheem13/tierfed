@@ -1,38 +1,32 @@
-# PowerShell equivalent of import_into_tierfed_repo.sh.
-# Run from inside the tierfed folder:   powershell -ExecutionPolicy Bypass -File scripts\import_into_tierfed_repo.ps1
-# Moves this tree into https://github.com/Abraheem13/tierfed (history kept) as a commit by the configured git user.
+# Brings the v13 state of this project into your clone of https://github.com/Abraheem13/tierfed
+# as one commit by your own git identity. Run it from the ROOT of that clone:
+#   powershell -ExecutionPolicy Bypass -File scripts\import_into_tierfed_repo.ps1
+# What it does (nothing else is touched):
+#   1. fetches the tierfed/ folder of the source branch and unpacks it over the clone
+#   2. before that, removes results\logs\*_au_* (the v6 logs): the Linux runs behind the paper
+#      replace them, and the laptop's runs live on in results\crossmachine\laptop_win11\logs
+#   3. earlier-protocol logs, your other files and the git history stay as they are
+#   4. commits and pushes
+param(
+  [string]$Source = "https://github.com/abraheemrashid99-sys/temp.git",
+  [string]$Branch = "claude/brave-fermi-g44qr8",
+  [switch]$NoPush
+)
 $ErrorActionPreference = "Stop"
-$Src    = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$Dst    = if ($env:DST)    { $env:DST }    else { Join-Path (Split-Path $Src -Parent) "tierfed-import" }
-$Remote = if ($env:REMOTE) { $env:REMOTE } else { "https://github.com/Abraheem13/tierfed.git" }
-$Branch = if ($env:BRANCH) { $env:BRANCH } else { "main" }
-
+if (-not (Test-Path ".git") -or -not (Test-Path "src") -or -not (Test-Path "paper")) {
+  throw "Run this from the root of your tierfed clone (the folder with .git, src and paper)."
+}
 if (-not (git config user.name) -or -not (git config user.email)) {
-  Write-Error "Set your identity first: git config --global user.name 'Abraheem Rashid'; git config --global user.email '<your email>'"
+  throw "Set your identity first: git config --global user.name 'Abraheem Rashid'; git config --global user.email '<your email>'"
 }
-
-if (Test-Path $Dst) { Remove-Item -Recurse -Force $Dst }
-git clone $Remote $Dst
-Set-Location $Dst
-git checkout $Branch
-
-# replace the working tree, keep .git
-Get-ChildItem -Force | Where-Object { $_.Name -ne ".git" } | Remove-Item -Recurse -Force
-
-# copy v3 in, skipping local scratch
-$exclude = @(".venv", "__pycache__", ".pytest_cache", ".git")
-Get-ChildItem -Path $Src -Force | Where-Object { $exclude -notcontains $_.Name } | ForEach-Object {
-  Copy-Item -Path $_.FullName -Destination (Join-Path $Dst $_.Name) -Recurse -Force
-}
-foreach ($d in @("results\logs", "results\tables", "results\figures")) {
-  New-Item -ItemType Directory -Force -Path (Join-Path $Dst $d) | Out-Null
-  New-Item -ItemType File -Force -Path (Join-Path $Dst "$d\.gitkeep") | Out-Null
-}
-Get-ChildItem -Path (Join-Path $Dst "results\logs") -Exclude ".gitkeep" | Remove-Item -Recurse -Force
-Get-ChildItem -Path (Join-Path $Dst "results\tables") -Exclude ".gitkeep" | Remove-Item -Recurse -Force
-Get-ChildItem -Path (Join-Path $Dst "paper") -Include "*.pdf","*.aux","*.log","*.bbl","*.blg" -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
-
+git pull
+git fetch $Source $Branch
+$tar = Join-Path $env:TEMP "tierfed_v13.tar"
+git archive -o $tar FETCH_HEAD tierfed
+Get-ChildItem results\logs -Filter "*_au_*" -ErrorAction SilentlyContinue | Remove-Item -Force
+tar -xf $tar --strip-components=1
+Remove-Item $tar
 git add -A
-git commit -m "TierFed v3: audited rewrite" -m "Corrects the defects of v2 (DP not applied to three baselines and invalid accounting; SCAFFOLD stub; unsupported scaling table; mismatched architecture depths; undisclosed imaging configuration; mislabelled inversion attack; nondeterministic runs; no patient dedup) and adds the network cost model, attack-surface evaluation, exact budget solver, AdaComm/LAG baselines, and a manuscript whose every number is generated from per-seed logs. All v2 result logs removed."
-git push origin $Branch
-Write-Host "done: $(git rev-parse --short HEAD) pushed to $Remote $Branch"
+git commit -m "v13: final v6 results, cross-machine check, paper and supplement"
+if (-not $NoPush) { git push }
+Write-Host "done: $(git rev-parse --short HEAD)"

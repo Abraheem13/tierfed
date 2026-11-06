@@ -6,14 +6,14 @@
 set -euo pipefail
 export PYTHONHASHSEED=0
 cd "$(dirname "$0")/.."
-DS="${1:-diabetes}"; DEV="${2:-cpu}"
+DS="${1:-diabetes}"; DEV="${2:-cpu}"; PY="${PY:-python3}"
 OUT=results/determinism
 rm -rf "$OUT"; mkdir -p "$OUT"
 for rep in a b; do
-  python -m src.experiments.run_one --dataset "$DS" --strategy tierfed --seed 42 --rounds 8 --clients 20 \
+  $PY -m src.experiments.run_one --dataset "$DS" --strategy tierfed --seed 42 --rounds 8 --clients 20 \
       --device "$DEV" --out "$OUT/$rep" --strategy-kwargs '{"warmup":2,"rho":0.25}' >/dev/null
 done
-python - <<'EOF'
+$PY - <<'EOF'
 import json, glob, sys
 a = json.load(open(glob.glob("results/determinism/a/logs/*_summary.json")[0]))["summary"]
 b = json.load(open(glob.glob("results/determinism/b/logs/*_summary.json")[0]))["summary"]

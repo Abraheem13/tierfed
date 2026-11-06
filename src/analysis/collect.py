@@ -631,10 +631,14 @@ def v4_families(df, tag, T, W, R):
     order = {"hospital_wan": 0, "nr_typical": 1, "nr_cell_edge": 2}
     agg = agg.sort_values(["profile", "strategy"], key=lambda c: c.map(order).fillna(9) if c.name == "profile" else c)
     agg.to_csv(T / "emulation.csv", index=False)
-    lines = []
+    pretty = {"hospital_wan": "Wired WAN", "nr_typical": "5G NR, typical", "nr_cell_edge": "5G NR, cell edge"}
+    lines, prev = [], None
     for _, r in agg.iterrows():
+        if prev is not None and r["profile"] != prev:
+            lines.append(r"\midrule")              # one block per link profile
+        prev = r["profile"]
         tt = [("never" if not np.isfinite(r[c]) else _f(r[c], 0)) for c in tcols]
-        lines.append(" & ".join([r["profile"].replace("_", r"\_"), nm(r["strategy"]),
+        lines.append(" & ".join([pretty.get(r["profile"], r["profile"].replace("_", " ")), nm(r["strategy"]),
                                  _f(r["emu"], 1), _f(r["ana"], 1), _f(100 * r["rel"], 1), _f(r["comp"], 0)] + tt) + r" \\")
     W.table("emulation", "\n".join(lines) + "\n")
     W.num("emuMaxAbsRelErrPct", _f(100 * e["relerr"].abs().max(), 1))

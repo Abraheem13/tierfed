@@ -27,6 +27,7 @@ from .collect import NAMES, load_summaries
 from ..network import PROFILES
 
 plt.rcParams.update({
+    "pdf.fonttype": 42, "ps.fonttype": 42,   # embedded TrueType, no Type 3 fonts (IEEE PDF checks)
     "font.size": 7.5, "font.family": "sans-serif", "font.sans-serif": ["DejaVu Sans", "Helvetica", "Arial"],
     "mathtext.fontset": "dejavusans", "axes.spines.top": False, "axes.spines.right": False,
     "xtick.direction": "out", "ytick.direction": "out", "xtick.major.size": 2.5, "ytick.major.size": 2.5,

@@ -1,70 +1,170 @@
-\section{\tierfed{}: a Budget-Optimal Controller}
+\section{Quota-Constrained Multi-Rate Scheduling}
 \label{sec:method}
 
-\subsection{Divergence measurement}
-\tierfed{} estimates the heterogeneity of each tier from the dispersion of the slices it actually receives. For tier $g$ with tensors $j\in g$,
+The scheduler separates \emph{what} is sent (tiers), \emph{when} (per-tier intervals chosen under the quota), \emph{how large} (an optional compressor) and \emph{how private} (the DP mechanism and its accountant). Fig.~\ref{fig:arch} shows the architecture. The server-side controller observes the received slices, the sites observe only the broadcast, and the link and the privacy mechanism sit between them.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[x=1mm,y=1mm]
+\node[hdr] at (0,8) {Server-side controller (\tierfed{})};
+\node[hdr] at (62,8) {Link and policy};
+\node[hdr] at (124,8) {Site $k$ of $N$};
+% server column
+\node[srvbox, text width=42mm] (sched) at (0,0)   {\textbf{Schedule.} Tiers due $\mathcal A_r$ by (\ref{eq:due})};
+\node[srvbox, text width=42mm] (solve) at (0,-12) {\textbf{Exact solver} (\ref{eq:ip}). $\mathbf K$ s.t.\ $\sum_g w_g/K_g\le\rho$};
+\node[srvbox, text width=42mm] (disp)  at (0,-24) {\textbf{Dispersion proxy} $\Gh_g$ (\ref{eq:gammahat}) from the received slices};
+\node[srvbox, text width=42mm] (agg)   at (0,-36) {\textbf{Aggregation} (\ref{eq:agg}). Under DP: clip, sum, add noise, fixed denominator (\ref{eq:dp})};
+% link column
+\node[lnkbox, text width=32mm] (op)   at (62,-8)  {\textbf{Operator.} Sets $\rho$; under DP also $\varepsilon$, $\delta$, $q$};
+\node[lnkbox, text width=32mm] (acc)  at (62,-22) {\textbf{Accountant} (\ref{eq:rdp}). Calibrates $z$ to the planned releases};
+\node[lnkbox, text width=32mm] (link) at (62,-36) {\textbf{Uplink} $(\beta,\ell,P)$. Compressor with error feedback};
+% site column
+\node[stebox, text width=42mm] (bcast) at (124,0)   {Receive the active tiers; restore the private head $\theta_{f,k}$};
+\node[stebox, text width=42mm] (train) at (124,-12) {One local epoch (Adam), $s_k=\lceil n_k/B\rceil$ steps};
+\node[stebox, text width=42mm] (ret)   at (124,-24) {Return the active tiers as an update w.r.t.\ the broadcast};
+\node[stebox, text width=42mm] (eval)  at (124,-36) {Select on the site's validation split, report on its test split};
+\begin{scope}[on background layer]
+\node[grp, fit=(sched)(solve)(disp)(agg)] {};
+\node[grp, fit=(op)(acc)(link)] {};
+\node[grp, fit=(bcast)(train)(ret)(eval)] {};
+\end{scope}
+% data path down the round (solid)
+\draw[arr] (sched.east) -- node[lab, above] {broadcast $\{\theta_g\}_{g\in\mathcal A_r}$} (bcast.west);
+\draw[arr] (bcast.south) -- (train.north);
+\draw[arr] (train.south) -- (ret.north);
+\draw[arr] (ret.west) -- ++(-9,0) node[lab, above, pos=0.5] {$b_k$ bits} |- (link.east);
+\draw[arr] (link.west) -- node[lab, above] {$\sum_k$} ([yshift=-2.5mm]agg.east);
+% policy inputs (solid)
+\draw[arr] (op.west) -- ++(-11,0) node[lab, above, pos=0.5] {$\rho$} |- (solve.east);
+\draw[arr] (op.south) -- node[lab, right] {$\varepsilon,\delta,q$} (acc.north);
+\draw[arr] (acc.west) -- ++(-7,0) node[lab, above, pos=0.5] {$z$} |- ([yshift=2.5mm]agg.east);
+% measurements fed back (dashed)
+\draw[meas] (agg.north) -- node[lab, right] {received slices} (disp.south);
+\draw[meas] (disp.north) -- node[lab, right] {$\Gh_g$} (solve.south);
+\draw[arr]  (solve.north) -- node[lab, right] {$\mathbf K$} (sched.south);
+\draw[meas] (train.east) -- ++(4,0) |- (eval.east);
+\end{tikzpicture}
+\caption{Scheduler and environment. Solid arrows carry data and policy inputs; dashed arrows are measurements fed back. Under DP the dashed path from the received slices to the solver is cut and the schedule is planned before training (Section~\ref{sec:method-privacy}).}
+\label{fig:arch}
+\end{figure*}
+
+\subsection{Dispersion Measurement}
+\tierfed{} estimates the heterogeneity of each tier from the dispersion of the slices it receives. For tier $g$ with tensors $j\in g$,
 \begin{equation}
-\Gh_g^{(r)}=\frac{\sum_{j\in g}\frac1{|\mathcal S_r|}\sum_{k\in\mathcal S_r}\big\|\theta_{k,j}^{(r)}-\bar\theta_j^{(r)}\big\|_2^2}{\sum_{j\in g}\big\|\bar\theta_j^{(r)}\big\|_2^2+\epsilon},
+\Gh_g^{(r)}=\frac{\sum_{j\in g}\frac1{|\mathcal S_r|}\sum_{k\in\mathcal S_r}\big\|\theta_{k,j}^{(r)}-\bar\theta_j^{(r)}\big\|_2^2}{\sum_{j\in g}\big\|\bar\theta_j^{(r)}\big\|_2^2+\xi_0},
 \label{eq:gammahat}
 \end{equation}
-a scale-free ratio that makes tiers of different magnitude comparable. Two properties of this estimator are stated now so that no claim rests on them implicitly. First, it is available only for tiers received in round $r$; for the others the last estimate is carried forward and its age is logged. Second, because the received slices are the result of $K_g\tau_k$ local steps, $\Gh_g$ scales with the interval that produced it (Section~\ref{sec:analysis}); it is a proxy for the drift the bound penalises, not an unbiased estimate of $\Gamma_g$.
+a scale-free ratio ($\xi_0=10^{-12}$) that makes tiers of different magnitude comparable. It exists only for tiers received in round $r$; otherwise the last value is carried forward. The received slices result from $m_g=(r-t_g)\,s$ local steps since the tier's last synchronisation $t_g$, and the standard drift lemma of local SGD~\cite{stich2019,khaled2020} bounds the expected numerator by a term of order $\eta^2(m_g\sigma_g^2+m_g^2\Gamma_g)$. $\Gh_g$ can therefore grow quadratically with the interval that produced it, so the controller partly measures its own decisions. The debiased proxy $\tilde\Gamma_g=\Gh_g/(r-t_g)^2$ removes the quadratic growth of the heterogeneity term; it is released as an option but not evaluated here.
 
-\subsection{The integer programme}
-Given a quota $\rho$, the controller solves
+\subsection{The Programme and Its Closed Form}
+\emph{Bound.} The analysis concerns the shared backbone with the private heads frozen; the personalisation gap this introduces is measured empirically. Assume block-separable $L$-smoothness (the gradient of tier $g$ is $L$-Lipschitz in $\theta_g$ and does not depend on the other tiers; this ignores cross-tier coupling and is the main idealisation), unbiased stochastic gradients with per-tier variance $\sigma_g^2$, bounded per-tier heterogeneity $\frac1N\sum_k\|\nabla_gF_k(\theta)-\nabla_gF(\theta)\|^2\le\Gamma_g$, $F\ge F^\star$~\cite{stich2019,wang2021coop}, and the same number $s$ of local steps at every site. With unequal $s_k$, plain averaging converges towards a reweighted objective~\cite{wang2020fednova}; the experiments keep $s_k=\lceil n_k/B\rceil$ and do not normalise.
+\begin{proposition}[Multi-rate local-SGD bound]
+\label{prop:bound}
+With local SGD of step size $\eta$ and tier $g$ averaged every $K_g$ rounds, there are absolute constants $c_0,c_1,c_2$ such that for $\eta\le c_0/(LK_{\max}s)$,
+\begin{align}
+\frac1R\sum_{r=1}^R\mathbb E\big\|\nabla F(\bar\theta_r)\big\|^2
+&\le \frac{c_1(F(\bar\theta_1)-F^\star)}{\eta sR}+c_1\eta L\sum_g\frac{\sigma_g^2}{N}\notag\\
+&\quad+c_2\,\eta^2L^2s^2\sum_g K_g^2\big(\Gamma_g+\sigma_g^2\big).
+\label{eq:bound}
+\end{align}
+\end{proposition}
+The proof applies the perturbed-iterate argument of~\cite{wang2021coop} blockwise (supplement, Section~S2). In the bound, a long interval is cheap only for a tier with small $\Gamma_g+\sigma_g^2$.
+
+\emph{Programme.} Given a quota $\rho$ the controller solves
 \begin{equation}
-\{K_g^\star\}=\arg\min_{K_g\in\{1,\dots,K_{\max}\}}\ \sum_{g\in\mathcal G_{\mathrm{sh}}}K_g^2\,\Gh_g\quad\text{s.t.}\quad\sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g}\le\rho .
+\mathbf K^\star=\arg\min_{K_g\in\{1,\dots,K_{\max}\}}\sum_{g\in\mathcal G_{\mathrm{sh}}}K_g^2\,\Gh_g\ \ \text{s.t.}\ \sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g}\le\rho .
 \label{eq:ip}
 \end{equation}
-With at most three shared tiers and $K_{\max}=8$ the feasible set has at most $8^3=512$ points, so (\ref{eq:ip}) is solved exactly by enumeration in well under a millisecond (Table~\ref{tab:scaling}). We also report the greedy doubling rule of an earlier version of this work, which lengthens the interval of the tier with the smallest marginal bound cost per unit of bandwidth saved,
-\begin{equation}
-g^\star=\arg\min_g\frac{\Gh_g\big[(2K_g)^2-K_g^2\big]}{w_g/K_g-w_g/(2K_g)}=\arg\min_g\frac{6\,\Gh_gK_g^3}{w_g},
-\label{eq:greedy}
-\end{equation}
-and which reaches only powers of two. The closed form exposes the controller's preference: sparsity goes first to tiers with low divergence, a large payload share and a short current interval.
+It keeps the $K_g^2\Gamma_g$ term of (\ref{eq:bound}). The $K_g^2\sigma_g^2$ term is not separately estimable from parameter dispersion, which mixes it with the heterogeneity term, and the common factor $s^2$ does not change the minimiser. With the head private, $\mathcal G_{\mathrm{sh}}=\{\mathrm s,\mathrm m\}$ and $K_{\max}=8$, so the programme has 64 candidates and is solved by enumeration, with ties broken towards the denser schedule.
 
-\subsection{Scheduling rule and warm-up}
-Tier $g$ is due when $r-\tau_g\ge K_g^\star$, where $\tau_g$ is the round of its last synchronisation:
+\begin{proposition}[Closed form and the value of differentiation]
+\label{prop:cuberoot}
+Let $\Gamma_g>0$, $w_g>0$, $\sum_gw_g=1$, and relax $K_g$ to the positive reals. Then (\ref{eq:ip}) has the unique minimiser
 \begin{equation}
-\mathcal A_r=\begin{cases}\mathcal G_{\mathrm{sh}}, & r\le T_w,\\ \{g:\ r-\tau_g\ge K_g^\star\}, & r>T_w.\end{cases}
+K_g^\star=\Big(\frac{w_g}{\Gamma_g}\Big)^{1/3}\frac{S}{\rho},\qquad S=\sum_hw_h^{2/3}\Gamma_h^{1/3},
+\label{eq:cuberoot}
+\end{equation}
+with value $J^\star=S^3/\rho^2$. The uniform interval $K=1/\rho$ costs $J_{\mathrm u}=\sum_g\Gamma_g/\rho^2$, and
+\begin{equation}
+\Psi=1-\frac{J^\star}{J_{\mathrm u}}=1-\frac{S^3}{\sum_g\Gamma_g}\in[0,1),
+\label{eq:psi}
+\end{equation}
+with $\Psi=0$ if and only if $w_g/\Gamma_g$ is equal for all tiers. When $1/\rho$ is an integer, no integer schedule lowers the objective of (\ref{eq:ip}) below that of the uniform period by more than the fraction $\Psi$.
+\end{proposition}
+The objective is strictly convex and increasing in every $K_g$ and the feasible set is convex, so the quota binds and the KKT point is the minimiser; $S^3\le(\sum_gw_g)^2\sum_g\Gamma_g$ is H\"older's inequality with exponents $3/2$ and $3$; the integer statement holds because the relaxation bounds the integer optimum from below and $K=1/\rho$ is integer-feasible (supplement, Section~S2). Two consequences shape the evaluation. The interval ratio $K_a/K_b=(w_a\Gamma_b/w_b\Gamma_a)^{1/3}$ compresses differences: a factor of eight in payload-to-dispersion ratio is needed for a factor of two in interval, so tiers with similar ratios collapse onto one interval after rounding. And $\Psi$ is scale-free in $\Gamma$, so the common bias of $\Gh_g$ cancels when it is measured at the end of warm-up, where every tier has been synchronised every round; it then predicts, before any sparse round, how much a per-tier schedule can gain over a uniform one.
+
+\subsection{Schedule Rule, Phases and the Quota}
+Rounds are indexed $r=1,\dots,R$. The first $T_w$ rounds synchronise every shared tier, and thereafter tier $g$ is due when
+\begin{equation}
+\mathcal A_r=\begin{cases}\mathcal G_{\mathrm{sh}}, & r\le T_w,\\ \{g:\ (r-T_w-\phi_g)\bmod K_g=0\}, & r>T_w,\end{cases}
 \label{eq:due}
 \end{equation}
-Divergence is largest in the earliest rounds, so the first $T_w$ rounds synchronise every shared tier. $T_w=5$ and $K_{\max}=8$ are held fixed across every dataset, architecture, loss and privacy setting in this article; a $T_w$ sweep is in Table~\ref{tab:warmup}.
+with phase $\phi_g=0$ unless staggered. The fixed periods, the DP planner and the accountant all use this one rule, and the consistency check of Section~\ref{sec:results-check} recomputes every release from it. Adaptive \tierfed{} sends tier $g$ when $r-t_g\ge K_g$, which coincides with (\ref{eq:due}) whenever $\mathbf K$ is constant after warm-up. $T_w=5$ and $K_{\max}=8$ are fixed across every dataset, architecture, loss and privacy setting. Fig.~\ref{fig:round} shows one server round.
 
-\begin{algorithm}[t]
-\caption{\tierfed{}: server round $r$}
-\label{alg:tierfed}
-\begin{algorithmic}[1]
-\REQUIRE quota $\rho$, warm-up $T_w$, cap $K_{\max}$, intervals $\{K_g\}$, last-sync $\{\tau_g\}$
-\STATE determine $\mathcal A_r$ by (\ref{eq:due})
-\IF{$\mathcal A_r=\emptyset$} \RETURN \COMMENT{local-only round: zero payload} \ENDIF
-\STATE broadcast $\{\theta_g^{(r)}\}_{g\in\mathcal A_r}$ to $\mathcal S_r$
-\FORALL{$k\in\mathcal S_r$ in parallel}
-\STATE load broadcast tiers; restore private head $\theta_{f,k}$
-\STATE run one local epoch; return (optionally compressed) active tiers
-\ENDFOR
-\STATE (if DP) clip each site's delta to $C$, sum, add $\mathcal N(0,\sigma^2C^2I)$, divide by $|\mathcal S_r|$
-\STATE aggregate active tiers by (\ref{eq:agg})
-\STATE update $\Gh_g$ for $g\in\mathcal A_r$ by (\ref{eq:gammahat}); $\tau_g\leftarrow r$
-\STATE $\{K_g\}\leftarrow$ exact solution of (\ref{eq:ip})
-\end{algorithmic}
-\end{algorithm}
+\emph{Phases and the peak.} A mean quota does not bound the payload $P_r$ of a single round: aligned tiers coincide and send the full shared payload. Two tiers with phases $\phi_a,\phi_b$ are never due in the same round if and only if $\phi_a-\phi_b\not\equiv0\pmod{\gcd(K_a,K_b)}$ (Chinese remainder theorem), so with $\gcd\ge2$ the offset $\lfloor\gcd/2\rfloor$ separates them and bounds the post-warm-up peak by $\max_gw_g$ at an unchanged mean; with co-prime intervals no phase helps. The staggered variant adds $\max_{r>T_w}P_r\le\pi$ to (\ref{eq:ip}) and checks it over one hyper-period $\mathrm{lcm}(\mathbf K)$. A full-rate warm-up still sends the whole payload, so the warm-up rounds can be sent at eight bits.
 
-\subsection{Composition with compression}
-\tierfed{} controls \emph{when} a tier is sent; a compressor controls \emph{how large} the message is. For a compressor with rate $c\in(0,1]$ bits per parameter relative to float32 the expected upload over $R$ rounds is
+\emph{The quota.} Solving (\ref{eq:ip}) with $\rho$ bounds $\Pi_\infty$ of (\ref{eq:payload}), not the realised $\Pi_R$: a warm-up of $T_w$ rounds at payload fraction $c_w$ adds $T_w(c_w-\Pi_\infty)/R$ to the realised fraction. A quota over all rounds is met by solving with $\rho'=(\rho R-c_wT_w)/(R-T_w)$; both forms are reported, and the realised $\Pi_R$ is read from the logs.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=4mm and 6mm, every node/.style={font=\scriptsize}]
+\node[term] (start) {round $r$};
+\node[dec, below=of start] (due) {any tier due by (\ref{eq:due})?};
+\node[proc, text width=36mm, below=of due] (bc) {broadcast the active tiers; sites train one epoch and return their slices};
+\node[dec, below=of bc] (dp) {DP enabled?};
+\node[proc, text width=36mm, below=of dp] (priv) {clip each delta to $C$ and sum;\\ add $\mathcal N(0,z^2C^2I)$;\\ divide by $qN$ (\ref{eq:dp})};
+\node[proc, text width=36mm, below=of priv] (ag) {aggregate the active tiers (\ref{eq:agg}); $t_g\leftarrow r$};
+\node[dec, below=of ag] (dp2) {DP enabled?};
+\node[proc, text width=36mm, below=of dp2] (upd) {update $\Gh_g$ (\ref{eq:gammahat}); re-solve (\ref{eq:ip}) for $\mathbf K$};
+\node[term, below=of upd] (next) {log bits per site; round $r+1$};
+\node[proc, text width=17mm, right=7mm of bc] (local) {local-only round: zero payload, no release};
+\draw[arr] (start) -- (due);
+\draw[arr] (due) -- node[lab, right] {yes} (bc);
+\draw[arr] (due.east) -| node[lab, above, pos=0.3] {no} (local);
+\draw[arr] (local.south) |- (next.east);
+\draw[arr] (bc) -- (dp);
+\draw[arr] (dp) -- node[lab, right] {yes} (priv);
+\draw[arr] (dp.west) -- ++(-9mm,0) node[lab, above, pos=0.5] {no} |- (ag.west);
+\draw[arr] (priv) -- (ag);
+\draw[arr] (ag) -- (dp2);
+\draw[arr] (dp2) -- node[lab, right] {no} (upd);
+\coordinate (k1) at ($(dp2.west)+(-9mm,0)$);
+\coordinate (k2) at (k1 |- next.west);
+\draw[line width=0.6pt] (dp2.west) -- node[lab, above] {yes} (k1);
+\draw[line width=0.6pt] (k1) -- node[lab, sloped, midway] {planned $\mathbf K$} (k2);
+\draw[arr] (k2) -- (next.west);
+\draw[arr] (upd) -- (next);
+\end{tikzpicture}
+\caption{One server round. Under DP the schedule is fixed before training and the dispersion feedback is never computed from the private slices.}
+\label{fig:round}
+\end{figure}
+
+\emph{Compression.} A compressor that emits a fraction $\kappa\in(0,1]$ of the float32 bits multiplies the upload, $B=R\,|\mathcal S|\,\Pi_R(\mathbf K)\,\kappa\,32\,d_{\mathrm{sh}}$ bits for $d_{\mathrm{sh}}$ shared parameters; it acts on each site's update relative to the broadcast, with error feedback, and the bits it emits are counted.
+
+\subsection{Privacy: Threat Model, Mechanism and Eligible Schedules}
+\label{sec:method-privacy}
+\emph{Threat model.} Sites send their updates over TLS to an aggregator that is trusted to apply the mechanism and sees raw updates, as in central DP-FedAvg~\cite{mcmahan2018dp}. Consumers of the released models, the other sites among them, see every broadcast, and central DP protects the released aggregates against them. A passive network observer cannot read the payloads but sees when each site transmits and how many bytes, which is exactly the schedule; a schedule that depends on client data therefore leaks even when every payload is encrypted. Secure aggregation with distributed noise~\cite{kairouz2021ddg} would remove the trust in the aggregator but not this metadata, and poisoning is out of scope.
+
+\emph{Mechanism.} Each round every site joins the cohort $\mathcal S_r$ independently with probability $q$; $q=1$, full participation, is the primary cross-silo setting and $q<1$ a sensitivity analysis. The server clips every participating site's returned delta and adds noise to the sum before dividing by the \emph{fixed} expected cohort size,
 \begin{equation}
-B=R\,|\mathcal S|\,\Pi(\{K_g\})\,c\,32\,d_{\mathrm{sh}}\ \text{bits},
-\label{eq:compose}
+\tilde\Delta=\frac1{qN}\Big(\sum_{k\in\mathcal S_r}\Delta_k\min\big(1,\tfrac{C}{\|\Delta_k\|_2}\big)+\mathcal N(0,z^2C^2I)\Big),
+\label{eq:dp}
 \end{equation}
-with $d_{\mathrm{sh}}$ the shared parameter count; the reduction factors multiply. Section~\ref{sec:results-comp} tests this on five compressors.
+the fixed-denominator DP-FedAvg estimator~\cite{mcmahan2018dp}, so that adding or removing one site changes the sum by at most $C$ in $\ell_2$ and the denominator reveals nothing about the realised cohort; a planned release whose cohort is empty still adds noise. The mechanism is applied by the server to every method identically.
 
-\subsection{What the operator sets}
-The only operator-facing quantity is $\rho$. It is a quota on the fraction of the shared model transmitted per round on average, so it maps directly onto a slice allocation or a transfer-window budget through (\ref{eq:compose}) and (\ref{eq:netcost}). The paper reports the mapping $\rho\mapsto$ (upload, communication time, energy) on every link profile so that an operator can read off what a given quota buys.
+\emph{Accountant.} Over the $R_{\mathrm{tx}}$ planned releases the R\'enyi DP of the Poisson-subsampled Gaussian mechanism is composed at integer orders~\cite{mironov2019sgm},
+\begin{align}
+\varepsilon_\alpha&=\frac{R_{\mathrm{tx}}}{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^ke^{\frac{k^2-k}{2z^2}},\notag\\
+\varepsilon&=\min_\alpha\Big\{\varepsilon_\alpha+\frac{\log(1/\delta)}{\alpha-1}\Big\},
+\label{eq:rdp}
+\end{align}
+with $\delta=10^{-5}$; for $q=1$ this reduces to $R_{\mathrm{tx}}\alpha/(2z^2)$~\cite{mironov2017}. The implementation reproduces the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$) and the $q=1$ closed form as unit tests. At $q=1$ the exact privacy of $R_{\mathrm{tx}}$ Gaussian releases is $\mu$-Gaussian DP with $\mu=\sqrt{R_{\mathrm{tx}}}/z$~\cite{dong2022gdp,balle2018}. Both accountants depend on $R_{\mathrm{tx}}$ only through $R_{\mathrm{tx}}/z^2$, so the exact one lowers every method's noise multiplier by the same factor, \num{gdpSigmaCutEightPct}--\num{gdpSigmaCutOnePct}\% for $\varepsilon^\star$ from 8 to 1. The comparison at matched $\varepsilon$ is therefore unchanged, and every reported $\varepsilon$ is an upper bound; $z$ is calibrated to each method's own release count by bisection on (\ref{eq:rdp}).
 
-\subsection{Planning under a privacy budget (\tierfed{}-DP)}
-\label{sec:method-dp}
-Under client-level DP the set of rounds in which a site transmits is visible to the aggregator and to an eavesdropper. A schedule computed from client updates, as in adaptive \tierfed{}, AdaComm, LAG or FedLAMA, is therefore itself a data-dependent release that the Gaussian accountant does not cover (Section~\ref{sec:security-dp}). \tierfed{}-DP removes this channel by planning the schedule \emph{before} training from public quantities only: the target $(\varepsilon^\star,\delta)$, the sampling rate $q$, the horizon $R$, the warm-up $T_w$, the tier shares $w_g$ and the quota $\rho$. For every candidate $K\in\{1,\dots,K_{\max}\}^{|\mathcal G|}$ it computes the release set $\mathcal R(K)=\{r\le R:\ \exists g,\ r\le T_w\ \text{or}\ (r-T_w)\bmod K_g=0\}$, the smallest noise multiplier $\sigma(K)$ for which $|\mathcal R(K)|$ releases of the subsampled Gaussian mechanism are $(\varepsilon^\star,\delta)$-DP, and the surrogate
+\emph{Which schedules are covered.} The accountant covers a release only if the decision to release does not depend on the private data. This holds for FedAvg, FedProx, FedPer, local training, a fixed period and the planner below, whose release rounds are fixed before training, and not for adaptive \tierfed{}, AdaComm, LAG or FedLAMA, whose schedules are functions of client updates or losses; the released code refuses to run them under DP. Data-dependent release decisions are a known pattern, which privacy filters and odometers~\cite{rogers2016odometer} and the sparse vector technique~\cite{lyu2017svt} charge for; the point here is that FL schedulers take such decisions without charging for them. DP-FTRL~\cite{kairouz2021ftrl} and matrix-factorisation mechanisms~\cite{choquette2023banded} suit full participation but also need data-independent release rounds; they are not evaluated.
+
+\emph{Planning under a privacy budget (\tierfed{}-DP).} A planner that respects the accountant chooses $\mathbf K$ before training from public quantities only, $(\varepsilon^\star,\delta)$, $q$, $R$, $T_w$, $w_g$ and $\rho$. For each candidate it computes the release set of (\ref{eq:due}), the smallest $z(\mathbf K)$ that keeps those releases $(\varepsilon^\star,\delta)$-DP, and minimises
 \begin{equation}
-J(K)=\sum_g w_g K_g^2\;+\;\lambda\,\frac{1}{R}\sum_{r\in\mathcal R(K)}\Big(\sum_{g\ \text{due at}\ r} w_g\Big)\,\sigma(K)^2,
+J(\mathbf K)=\frac{\sum_g w_gK_g^2}{K_{\max}^2}+\lambda\,\frac{\sum_{r}P_r(\mathbf K)\,z(\mathbf K)^2}{\sum_{r}P_r(\mathbf 1)\,z(\mathbf 1)^2},
 \label{eq:jdp}
 \end{equation}
-the drift term of (\ref{eq:bound}) with a flat, data-free heterogeneity prior plus the noise energy injected into the shared model per round. Fewer releases need less noise per release, since $\sigma^2$ grows roughly linearly with the release count at fixed $\varepsilon^\star$, but drift more; (\ref{eq:jdp}) trades the two, subject to the byte quota $\frac1R\sum_r\sum_{g\ \text{due}}w_g\le\rho$. The minimiser is found by enumeration ($K_{\max}^{|\mathcal G|}=64$ candidates) and the server is told $\sigma(K)$. The single prior $\lambda$ absorbs the unknown smoothness and heterogeneity constants of the bound; we report its sensitivity rather than tune it. Because $\gamma$ is flat, \tierfed{}-DP chooses equal intervals for both shared tiers; it is a privacy-aware \emph{period} planner, not a per-tier one, and we say so in the results.
+the drift term of (\ref{eq:bound}) under a flat heterogeneity prior plus the injected noise energy, each normalised by its worst case, with $\lambda=1$. Fewer releases need less noise per release but drift more. Under the flat prior, $\Gamma_g\propto w_g$ and Proposition~\ref{prop:cuberoot} gives $\Psi=0$, so the planner can only choose equal intervals; it is evaluated as an ablation, not claimed as a contribution.

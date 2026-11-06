@@ -169,7 +169,8 @@ def timing_configs():
     schedule? Each method runs with and without a shifted target site; fixed44 is
     the data-independent control (its schedule cannot differ between the worlds)."""
     return [("tierfed", TF, "tierfed"), ("adacomm", {"tau0": 8, "max_interval": 8}, "adacomm8"),
-            ("lag", {"xi": 2000, "weighted": True}, "lag_xi2000"), ("fixed", al(4, 4), "fixed44")]
+            ("lag", {"xi": 2000, "weighted": True}, "lag_xi2000"), ("lag", {"xi": 5000, "weighted": True}, "lag_xi5000"),
+            ("fixed", al(4, 4), "fixed44")]
 
 
 def derma_configs():

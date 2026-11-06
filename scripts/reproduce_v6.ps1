@@ -1,6 +1,6 @@
 # One-click reproduction of every v6 run and number used in the paper (Windows, CPU).
 #   powershell -ExecutionPolicy Bypass -File scripts\reproduce_v6.ps1 -Part gate -Jobs 3
-# Parts: core (235 runs), gate (136 runs), resnet (30 runs), analysis, all.
+# Parts: core (235 runs), gate (140 runs), resnet (30 runs), analysis, all.
 # Finished runs are skipped, so the script can be stopped and restarted at any time.
 param([string]$Part = "all", [int]$Jobs = 3)
 $ErrorActionPreference = "Continue"
@@ -27,7 +27,7 @@ function Gate {
   $c = @()
   foreach ($alpha in @("0.1", "0.3", "1", "10")) { foreach ($s in $S5) {
     $c += "$AUD --stage hetero --alpha $alpha --only fedper local fixed44 fixed88 tierfed --seeds $s" } }
-  foreach ($s in $S6) { $c += "$AUD --stage timing --model mlp --only tierfed lag_xi2000 fixed44 --seeds $s" }
+  foreach ($s in $S5) { $c += "$AUD --stage timing --model mlp --only tierfed lag_xi2000 lag_xi5000 fixed44 --seeds $s" }
   return $c
 }
 function Resnet {
@@ -48,14 +48,28 @@ function Run-Parallel([string[]]$ArgList) {
 }
 function Analysis {
   & $py -m src.analysis.consistency --results results
+  & $py -m src.analysis.crossmachine --results results
   & $py -m src.analysis.audit_report --results results --dataset diabetes | Out-File results\tables\audit_report_stdout.txt
   & $py -m src.analysis.audit_tex --results results --paper paper\generated --dataset diabetes
   & $py -m src.analysis.audit_figures --results results --out paper\figures --dataset diabetes
   & $py -m src.analysis.collect --results results --dataset diabetes --model mlp
+  & $py -m src.analysis.make_figures --results results --dataset diabetes --model mlp   # supplement figure
+  if (Get-Command pdflatex -ErrorAction SilentlyContinue) {   # MiKTeX or TeX Live; otherwise upload paper\ to Overleaf
+    Push-Location paper
+    pdflatex -interaction=nonstopmode main.tex | Out-Null; bibtex main | Out-Null
+    pdflatex -interaction=nonstopmode main.tex | Out-Null; pdflatex -interaction=nonstopmode main.tex | Out-Null
+    pdflatex -interaction=nonstopmode supp.tex | Out-Null; bibtex supp | Out-Null
+    pdflatex -interaction=nonstopmode supp.tex | Out-Null; pdflatex -interaction=nonstopmode supp.tex | Out-Null
+    Pop-Location
+  }
 }
 
 # cache the data once, so that parallel jobs never download it at the same time
 & $py -c "from src.data import load_dataset; load_dataset('diabetes', n_clients=20, seed=42)" | Out-Null
+if ($Part -ne "analysis") {   # repeated runs must be bit-identical before any log is produced
+  powershell -ExecutionPolicy Bypass -File scripts\check_determinism.ps1 diabetes cpu
+  if ($LASTEXITCODE -ne 0) { throw "determinism check failed: fix the environment first" }
+}
 switch ($Part) {
   "core"     { Run-Parallel (Core) }
   "gate"     { Run-Parallel (Gate) }

@@ -184,3 +184,24 @@ def test_exact_gaussian_accounting_is_tighter_than_rdp():
         assert 0 < e_gdp <= e_rdp
     s = sigma_gdp(4.0, 60, 1e-5)
     assert eps_gdp(60, s, 1e-5) == pytest.approx(4.0, rel=1e-6)
+
+
+def test_crossmachine_pair_comparison():
+    import copy
+    from src.analysis.crossmachine import compare_pair
+    a = {"config": {"strategy": "fixed", "seed": 42, "device": "cpu"},
+         "round_bits": [{"round": 1, "upload_bits": 64.0, "client_bits": [32.0, 32.0], "n_senders": 2.0,
+                         "compute_s_max": 0.5}],
+         "schedule": {"K_slow": 4.0, "K_medium": 4.0},
+         "summary": {"valsel_round": 9.0, "fed_auroc_valsel": 0.62, "fed_auroc_final": 0.61, "total_upload_mb": 8e-6}}
+    b = copy.deepcopy(a)
+    b["config"]["device"] = "cuda"                  # the device is not part of the configuration
+    b["round_bits"][0]["compute_s_max"] = 0.2       # wall-clock time is not part of the bits
+    b["summary"]["fed_auroc_valsel"] = 0.625
+    r = compare_pair(a, b)
+    assert r["config_diff"] == [] and r["bits_same"] and r["K_same"] and r["sel_same"]
+    assert r["d_auroc_valsel"] == pytest.approx(0.005)
+    b["round_bits"][0]["client_bits"] = [32.0, 0.0]
+    b["config"]["seed"] = 43
+    r = compare_pair(a, b)
+    assert not r["bits_same"] and r["config_diff"] == ["seed"]

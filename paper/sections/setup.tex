@@ -1,62 +1,12 @@
-\section{Experimental Design}
+\section{Experimental Setup}
 \label{sec:setup}
 
-\subsection{Data}
-\textbf{Diabetes 130-US Hospitals}~\cite{strack2014} is the main tabular benchmark: 30-day readmission from encounter-level features. Cleaning follows Strack \emph{et al.}: encounters discharged to death or hospice are removed and only the first encounter per patient is kept, which leaves \num{diabetesmlpNTrain} training and \num{diabetesmlpNTest} test encounters from \num{diabetesmlpNPatients} patients, \num{diabetesmlpNFeatures} encoded features, and a positive rate of \num{diabetesmlpPrevalence}\%. The public release carries no hospital identifier, so sites are formed from the medical-specialty column by longest-processing-time bucketing with a client-share cap of 15\%: a specialty larger than the cap, including the ``unknown specialty'' group that covers roughly half of the encounters, is split across clients, patient-grouped, before bucketing. The largest client therefore holds \num{diabetesmlpMaxClientShare}\% of the training data and the mean label total-variation distance between clients is \num{diabetesmlpLabelTv}. We call these clients \emph{sites} rather than hospitals. The train/test split and every per-client held-out split are patient-grouped.
+Every v6 run uses the validation-selected protocol of Section~\ref{sec:system}. Seven experiment families are run, each with every listed method on the same seeds. They are the main comparison (13 configurations, 10 seeds), the iso-byte frontier (each method with its own knob swept; 5 seeds for the added settings), the heterogeneity sweep (Dirichlet $\alpha\in\{0.1,0.3,1,10\}$, 5 seeds), the ResNet backbone (6 seeds), matched-$\varepsilon$ DP at $q=1$ (6 seeds), the timing side channel (5 seeds per world) and peak-aware staggering. Table~\ref{tab:setup} lists the hyperparameters. Results of the earlier final-round protocol, on compression, real institutions, imaging, scaling and a wide model, are in the supplement with that protocol stated.
 
-\textbf{Real institutions.} \textbf{Fed-Heart-Disease}~\cite{detrano1989,duterrail2022flamby} pools the four UCI Heart Disease collections (Cleveland Clinic, Hungarian Institute of Cardiology, University Hospitals Z\"urich and Basel, VA Long Beach) with the target ``any angiographic disease''; it has \num{realHeartClients} clients and \num{realHeartNtrain} training patients, and missingness indicators are added because two features are mostly missing outside Cleveland. The open \textbf{eICU-CRD demo}~\cite{pollard2018,eicudemo} was also prepared, one client per \texttt{hospitalid}, but no two of its hospitals have 80 or more stays, so it was not used. The heart federation is small; it tests whether the conclusions survive real site heterogeneity, not clinical performance. The full credentialed eICU-CRD is supported by the same loader and was not run. \textbf{PneumoniaMNIST}~\cite{yang2023medmnist} is the imaging benchmark: a natively binary $28\times28$ collection, partitioned by Dirichlet label skew ($\alpha=0.3$) with a minimum client size of 50 images. Table~\ref{tab:data} summarises; all dataset statistics in this article are read from the run logs.
+\textbf{Baselines and bounds.} \emph{Full rate:} FedAvg~\cite{mcmahan2017}, FedProx~\cite{li2020fedprox} and FedPer~\cite{arivazhagan2019}, the reference for the non-inferiority tests. \emph{Round-sparse:} AdaComm~\cite{wang2019adacomm}, LAG~\cite{chen2018lag} with sample weighting and, for comparison with earlier versions, with the equal weights used there, a FedLAMA-style per-layer interval rule reimplemented from its published description~\cite{lee2023fedlama}, and fixed periods on (\ref{eq:due}) with the same private head and warm-up as \tierfed{}. \emph{Bounds:} local training without communication, a centralised MLP trained on the pooled training splits of all sites for the same number of passes, and gradient boosting~\cite{ke2017lightgbm} as a reference for model quality; all three are scored on the same per-site test splits with the round, epoch or iteration chosen on validation. SCAFFOLD with Adam is a poor match for its control variates, and its SGD arm is in the supplement. Every method uses one architecture table, one evaluation protocol and one bit-accounting rule, and nothing is chosen on test data.
 
-\begin{table}[t]
-\caption{Dataset characteristics, from the run logs.}
-\label{tab:data}
-\centering\small
-\begin{tabular}{lrr}
-\toprule
- & Diabetes 130-US & PneumoniaMNIST\\
-\midrule
-Modality & tabular EHR & imaging\\
-Train / test rows & \num{diabetesmlpNTrain} / \num{diabetesmlpNTest} & \num{medmnistcnnNTrain} / \num{medmnistcnnNTest}\\
-Patients (train) & \num{diabetesmlpNPatients} & --\\
-Features / channels & \num{diabetesmlpNFeatures} & 1 ($28\times28$)\\
-Positive rate (\%) & \num{diabetesmlpPrevalence} & \num{medmnistcnnPrevalence}\\
-Sites & 20 (specialty, capped) & 20 (Dirichlet 0.3)\\
-Largest site share (\%) & \num{diabetesmlpMaxClientShare} & \num{medmnistcnnMaxClientShare}\\
-Label TV (mean) & \num{diabetesmlpLabelTv} & \num{medmnistcnnLabelTv}\\
-\bottomrule
-\end{tabular}
-\end{table}
+\textbf{Differential privacy.} FedPer, fixed periods $K=4$ and $K=8$, one-shot federation (no warm-up, one release in round $R$, after a data-independent broadcast of the initial model) and the planner run at $\varepsilon^\star=4$, $\delta=10^{-5}$, $q=1$, $C=1$, each with $z$ calibrated to its own release count. Local training is the $\varepsilon=0$ reference on the same splits. The $q<1$ sweeps over $\varepsilon^\star\in\{1,2,4,8\}$ on 20 and 100 sites are in the supplement as a sensitivity analysis.
 
-\subsection{Models and tiers}
-Four backbones share one architecture table used by every method: an MLP (hidden 128--128--64), a tabular ResNet (width 128, depth 6), an FT-Transformer (width 64, depth 3, 8 heads)~\cite{gorishniy2021} and a small CNN for imaging. A wide MLP (hidden 1024--1024--512, \num{wideParams} parameters on Diabetes) is used for the link-emulation experiment, so that each upload is several megabytes. Table~\ref{tab:tiers} reports the parameter counts and tier shares of each model as instantiated on the real data.
+\textbf{Timing side channel.} One target site holds half of its labels flipped, or none, and an observer who sees only which rounds carry traffic and how many bytes each site sends tries to tell the two worlds apart; an AUC of 0.5 means that the schedule reveals nothing, and the fixed period is the control.
 
-\begin{table}[t]
-\caption{Automatic tier partition on the real data (from the run logs). The fast tier is the private head.}
-\label{tab:tiers}
-\centering\small
-\begin{tabular}{lrrrr}
-\toprule
-Architecture & Params & Slow (\%) & Medium (\%) & Fast (\%)\\
-\midrule
-MLP (Diabetes) & \num{diabetesmlpTierTotalParams} & \num{diabetesmlpTierSlowPct} & \num{diabetesmlpTierMediumPct} & \num{diabetesmlpTierFastPct}\\
-CNN (PneumoniaMNIST) & \num{medmnistcnnTierTotalParams} & \num{medmnistcnnTierSlowPct} & \num{medmnistcnnTierMediumPct} & \num{medmnistcnnTierFastPct}\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Protocol}
-$R=60$ rounds, 20 sites at full participation, one local epoch, batch 64, Adam at $10^{-3}$ with persistent state, inverse-frequency class weighting, $T_w=5$, $K_{\max}=8$, $\rho=0.25$ unless stated. Baselines use their published defaults (FedProx $\mu=0.01$; FedLAMA-style $\tau=5$, $\phi=2$; AdaComm $\tau_0=8$; LAG $\xi=1$); none were tuned on the test data and neither was \tierfed{}. Because personalised methods hold private heads, every method is evaluated on each site's patient-grouped held-out split with that site's own parameters and the per-site metrics are sample-weighted; sites whose held-out split contains a single class cannot yield an AUROC and are excluded identically for every method, with their count reported. A pooled AUROC over all held-out predictions and the global model's AUROC on the untouched test set are reported alongside. Compressors act on each site's update relative to the broadcast with per-client error feedback, and communication is counted from what the compressor emitted for the sites that actually sent. In the fixed multi-rate schedule, as in \tierfed{}, a round in which no tier is due is local-only.
-
-\textbf{Differential privacy.} The matched-privacy comparison uses $C=1$, $\delta=10^{-5}$, targets $\varepsilon^\star\in\{1,2,4,8\}$ at Poisson rate $q=0.5$ and $\varepsilon^\star=4$ at $q=1$, and the four DP-eligible methods FedAvg, FedPer, a fixed period $(K_s,K_m)=(4,4)$ with $T_w=5$, and \tierfed{}-DP with $\lambda=1$ ($\lambda\in\{0.1,10\}$ as sensitivity). Each method's $\sigma$ is calibrated to its own planned release count; final-round AUROC is reported, since best-round selection on held-out data is not covered by the budget.
-
-\textbf{Link emulation.} The analytic cost model (\ref{eq:netcost}) is checked against real transport. Each run's logged per-site upload sizes are replayed, round by round, as concurrent loopback TCP connections, one per transmitting site, whose senders are paced by a token bucket at the profile's uplink rate after a one-way delay of half the RTT; the round ends when the last byte arrives. This is application-layer, trace-driven emulation: it includes TCP segmentation, socket buffering and operating-system scheduling, but not radio scheduling, fading, loss or the downlink, and kernel-level emulation (netem) was not available on the test machine. Time-to-target adds the measured compute time of the slowest site per round.
-
-\subsection{Determinism}
-Repeated runs of one configuration are bit-identical on the machine that produced the logs (deterministic kernels, single-threaded reductions, seeded loaders); the reproduction script asserts this before any run. An earlier version of this work lacked this guarantee and identical configurations differed by up to 0.006~AUROC, which is larger than the effect it tested.
-
-\subsection{Statistics}
-All comparisons are paired across the ten shared seeds. We report Holm-corrected paired $t$-test $p$-values over the family of all method-versus-FedPer contrasts, BCa bootstrap intervals of the paired difference, and the paired standardised difference $d_z$ with the small-sample correction. Parity is never inferred from a non-significant difference. A one-sided non-inferiority test at margin $\delta_{\mathrm{NI}}=0.01$ is run on \emph{both} final AUROC and final AUPRC,
-\begin{equation}
-t_{\mathrm{NI}}=\frac{\bar d+\delta_{\mathrm{NI}}}{s_d/\sqrt n},\qquad p=1-\mathcal T_{n-1}(t_{\mathrm{NI}}),
-\label{eq:ni}
-\end{equation}
-and the non-inferiority tests are reported uncorrected and interpreted against the Holm-corrected difference tests. The margin is a reporting convention: 0.01~AUROC is below the between-seed standard deviation of every method in Table~\ref{tab:main}; it has no clinical derivation and we do not claim one. Early-stopped and last-ten-round statistics are reported so that no conclusion depends on the final round alone.
+\textbf{Statistics.} All comparisons are paired across seeds. Two primary contrasts were fixed in the code before the runs, with the metric and both thresholds: \tierfed{} against FedPer, and \tierfed{} against the best uniform period at matched bytes, chosen on validation among the uniform periods whose upload is at most 5\% above \tierfed{}'s; every other comparison is exploratory. Tests are two-sided Wilcoxon signed-rank tests and intervals are percentile bootstrap intervals over seeds. The gate first required a Holm-corrected $p<0.05$, which 5 or 6 seeds cannot reach, so the second contrast is read from its interval: a setting counts as a gain only when the 95\% interval excludes zero and the mean gain is at least 0.005 AUROC\ifflag{auRouteA}{}{; no setting passes either rule}. A difference below 0.005 is not called relevant, whatever its $p$. Non-inferiority to FedPer is tested one-sided, $H_0:\mathbb E[d]\le-\Delta_{\mathrm{NI}}$ with $d=\mathrm{AUROC}_{\text{method}}-\mathrm{AUROC}_{\text{FedPer}}$, by the signed-rank test on $d+\Delta_{\mathrm{NI}}$ at $\Delta_{\mathrm{NI}}=0.01$ and, as a sensitivity margin, 0.005. Repeated runs are bit-identical on one machine. On a second machine every data-independent schedule \ifflag{xmachineBytesIdentical}{sends the same bytes}{changes its bytes}, but the AUROC of a single run can move by up to \num{xmachineAurocDiff} (Section~\ref{sec:results-check}), so every comparison is computed within one machine.

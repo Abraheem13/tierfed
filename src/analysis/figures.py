@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 plt.rcParams.update({
+    "pdf.fonttype": 42, "ps.fonttype": 42,   # embedded TrueType, no Type 3 fonts (IEEE PDF checks)
     "font.size": 9.5, "font.family": "DejaVu Sans",
     "axes.spines.top": False, "axes.spines.right": False,
     "figure.dpi": 120, "savefig.dpi": 300, "savefig.bbox": "tight",

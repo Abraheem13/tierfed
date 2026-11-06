@@ -6,11 +6,12 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{etoolbox}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 \usepackage{multirow}
 \usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds}
 \usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Every Round Is a Release: Communication-Budgeted Federated Learning Over Constrained Links}, pdfauthor={Abraheem Rashid}}
 \usepackage{cite}
 
 % ---------------------------------------------------------------------------
@@ -19,42 +20,56 @@
 % A table whose runs do not exist renders [RUN REQUIRED].
 % ---------------------------------------------------------------------------
 \IfFileExists{generated/numbers.tex}{\input{generated/numbers.tex}}{}
+\IfFileExists{generated/numbers_au.tex}{\input{generated/numbers_au.tex}}{}
 \newcommand{\runreq}{\textbf{\textcolor{red}{[RUN REQUIRED]}}}
-\makeatletter\newcommand{\gen}[1]{\@@input generated/#1.tex }\makeatother % collect.py always writes every table (RUN REQUIRED if no runs)
+\makeatletter\newcommand{\gen}[1]{\@@input generated/#1.tex }\makeatother
 \newcommand{\num}[1]{\ifcsdef{#1}{\csname #1\endcsname}{\runreq}}
-% \ifflag{<flag>}{<text if true>}{<text if false>}; unknown flag -> [RUN REQUIRED]
 \newcommand{\ifflag}[3]{\ifcsdef{flag#1}{\ifcsstring{flag#1}{true}{#2}{#3}}{\runreq}}
+\newsavebox\tabbox
+\newcommand{\fit}[1]{\sbox\tabbox{#1}\ifdim\wd\tabbox>\linewidth\resizebox{\linewidth}{!}{\usebox\tabbox}\else\usebox\tabbox\fi}
 \newcommand{\fig}[2]{\IfFileExists{figures/#1.pdf}{\includegraphics[width=#2]{figures/#1.pdf}}{\fbox{\parbox{#2}{\centering\vspace{2em}\runreq\\ figures/#1.pdf\vspace{2em}}}}}
 
 \newtheorem{proposition}{Proposition}
-\newtheorem{assumption}{Assumption}
 \newcommand{\tierfed}{TierFed}
 \newcommand{\Gh}{\hat\Gamma}
 
+% flowchart styles (Figs. 1-3)
+\definecolor{srv}{RGB}{255,255,255}
+\definecolor{lnk}{RGB}{255,255,255}
+\definecolor{ste}{RGB}{255,255,255}
+\definecolor{stg}{RGB}{255,255,255}
+\tikzset{
+  proc/.style={draw=black, rounded corners=1.5pt, align=center, font=\scriptsize, inner sep=3pt, minimum height=6mm, fill=stg, line width=0.5pt},
+  srvbox/.style={proc, fill=srv}, lnkbox/.style={proc, fill=lnk}, stebox/.style={proc, fill=ste},
+  dec/.style={draw=black, diamond, aspect=3.6, align=center, font=\scriptsize, inner sep=1.5pt, fill=white, line width=0.5pt},
+  term/.style={draw=black, rounded corners=3mm, align=center, font=\scriptsize, inner sep=3pt, minimum height=5.5mm, fill=white, line width=0.5pt},
+  grp/.style={draw=black, dashed, rounded corners=3pt, inner sep=5pt},
+  hdr/.style={font=\scriptsize\bfseries, anchor=south},
+  lab/.style={font=\scriptsize, fill=white, inner sep=1.2pt},
+  arr/.style={-{Latex[length=1.8mm,width=1.4mm]}, line width=0.6pt},
+  meas/.style={-{Latex[length=1.8mm,width=1.4mm]}, line width=0.6pt, dashed},
+}
+
 \begin{document}
 
-\title{Fewer Rounds, Fewer Bytes, Smaller Privacy Budgets: Communication-Budgeted Federated Learning for Clinical Prediction over Constrained Links}
+\title{Every Round Is a Release: Communication-Budgeted Federated Learning Over Constrained Links}
 
 \author{Abraheem~Rashid
-\thanks{A.~Rashid is with the Department of Computer Science, Brunel University London, Uxbridge UB8~3PH, U.K. (e-mail: 2546393@brunel.ac.uk).}
-\thanks{Code, per-seed logs and the scripts that generate every table of this article are available at \url{https://github.com/Abraheem13/tierfed}.}}
+\thanks{A.~Rashid is with the Department of Computer Science, Brunel University London, Uxbridge UB8~3PH, U.K. (e-mail: 2546393@brunel.ac.uk).}}
 
-\markboth{IEEE Transactions on Network and Service Management}{Rashid: Communication-Budgeted Federated Learning over Constrained Links}
+\markboth{IEEE Internet of Things Journal}{Rashid: Every Round Is a Release}
 
 \maketitle
 
 \input{sections/abstract}
 
 \begin{IEEEkeywords}
-Federated learning, communication efficiency, network resource allocation, 6G edge intelligence, differential privacy, gradient inversion, clinical prediction, non-IID data.
+Federated learning, communication efficiency, network resource allocation, 6G edge intelligence, differential privacy, link emulation, clinical prediction, non-IID data.
 \end{IEEEkeywords}
 
 \input{sections/introduction}
-\input{sections/related}
 \input{sections/system}
 \input{sections/method}
-\input{sections/analysis}
-\input{sections/security}
 \input{sections/setup}
 \input{sections/results}
 \input{sections/discussion}
@@ -62,5 +77,9 @@ Federated learning, communication efficiency, network resource allocation, 6G ed
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+
+\begin{IEEEbiographynophoto}{Abraheem Rashid}
+is with the Department of Computer Science, Brunel University London, U.K. His research interests include federated learning over constrained networks and privacy in clinical machine learning.
+\end{IEEEbiographynophoto}
 
 \end{document}

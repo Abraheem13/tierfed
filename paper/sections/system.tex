@@ -1,70 +1,71 @@
-\section{System Model and Problem Statement}
+\section{System Model and Study Design}
 \label{sec:system}
 
-\subsection{Federation and objective}
-$N$ sites hold private datasets $\mathcal D_k$ of size $n_k$, $n=\sum_k n_k$, $p_k=n_k/n$. The shared objective is $F(\theta)=\sum_k p_k F_k(\theta)$ with $F_k(\theta)=\mathbb E_{\xi\sim\mathcal D_k}[f(\theta;\xi)]$. In round $r$ each participating site initialises the shared part of its model from the broadcast state and performs one local epoch of $\tau_k=\lceil n_k/B\rceil$ optimiser steps with batch size $B$ (Adam in the main experiments; an SGD arm is in the supplement), then returns the shared slice that is due. Table~\ref{tab:notation} collects the notation.
-
-\begin{table}[t]
-\caption{Notation.}
-\label{tab:notation}
-\centering\small
-\begin{tabular}{ll}
-\toprule
-$N$, $n_k$, $p_k$ & sites; local sample count; aggregation weight\\
-$\theta$, $\theta_g$, $w_g$ & shared parameters; tier $g$; its share of the shared payload\\
-$\theta_f$ & private classifier head (never transmitted)\\
-$K_g$, $K_{\max}$, $\tau_g$ & interval of tier $g$; cap; round of its last synchronisation\\
-$\Gamma_g$, $\Gh_g$ & gradient divergence of tier $g$ (A3); measured dispersion proxy\\
-$\rho$ & communication quota (mean payload fraction after warm-up)\\
-$T_w$, $R$, $\tau_k$ & warm-up rounds; rounds; local steps per round at site $k$\\
-$\eta$, $L$, $\sigma_g^2$ & step size; smoothness; per-tier gradient variance\\
-$C$, $\sigma$, $(\varepsilon,\delta)$ & DP clipping norm; noise multiplier; privacy budget\\
-$\delta_{\mathrm{NI}}$ & non-inferiority margin\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Tier partition}
-Parameters are partitioned into disjoint tiers $\mathcal G=\{\mathrm s,\mathrm m,\mathrm f\}$ (slow, medium, fast). Membership is structural: parameters are ordered by their position in the forward computation graph and cut at depth fractions $\varphi_1<\varphi_2$, with the classifier head always assigned to the fast tier. For the architectures in this article the model declares the cut explicitly (input projection, hidden blocks, head), which the structural rule reproduces. The fast tier is private, which recovers FedPer-style personalisation as the special case $K_{\mathrm s}=K_{\mathrm m}=1$. The parameter counts and tier shares of every model are taken from the model instantiated on the real data and reported in Section~\ref{sec:setup}, Table~\ref{tab:tiers}.
-
-\subsection{Multi-rate aggregation and payload}
-Let $\mathcal A_r\subseteq\mathcal G$ be the tiers due in round $r$ and $\mathcal S_r$ the participating sites. The server aggregates only the active tiers,
+\subsection{Federation, Tiers and Multi-Rate Aggregation}
+$N$ sites hold private datasets $\mathcal D_k$ of size $n_k$, $n=\sum_k n_k$, $p_k=n_k/n$. The shared objective is $F(\theta)=\sum_k p_kF_k(\theta)$ with $F_k(\theta)=\mathbb E_{\xi\sim\mathcal D_k}[f(\theta;\xi)]$. In round $r$ each participating site initialises the shared part of its model from the broadcast state, performs one local epoch of $s_k=\lceil n_k/B\rceil$ optimiser steps with batch size $B$, and returns the shared slice that is due. Parameters are partitioned into disjoint tiers $\mathcal G=\{\mathrm s,\mathrm m,\mathrm f\}$ (slow, medium, fast) by their position in the forward computation graph (input projection, hidden blocks, head), with the classifier head always in the fast tier. The fast tier is private, so FedPer-style personalisation is the special case $K_{\mathrm s}=K_{\mathrm m}=1$. With $\mathcal A_r\subseteq\mathcal G$ the tiers due in round $r$ and $\mathcal S_r$ the participating sites, the server aggregates the active tiers only,
 \begin{equation}
-\theta_g^{(r+1)}=\begin{cases}\sum_{k\in\mathcal S_r} n_k\,\theta_{k,g}^{(r)}\big/\sum_{k\in\mathcal S_r}n_k, & g\in\mathcal A_r,\\ \theta_g^{(r)}, & g\notin\mathcal A_r,\end{cases}
+\theta_g^{(r+1)}=\begin{cases}\sum_{k\in\mathcal S_r}n_k\,\theta_{k,g}^{(r)}\big/\sum_{k\in\mathcal S_r}n_k, & g\in\mathcal A_r,\\ \theta_g^{(r)}, & g\notin\mathcal A_r,\end{cases}
 \label{eq:agg}
 \end{equation}
-and sites keep their own fast tier throughout. With $w_g$ the share of the shared payload carried by tier $g$, the mean payload fraction over $R$ rounds is
+and sites keep their own fast tier throughout. With $w_g$ the share of the shared payload carried by tier $g$, round $r$ sends the fraction $P_r=\sum_{g\in\mathcal A_r}w_g$ of it. The payload fraction over the $R$ rounds and its limit after warm-up are
 \begin{equation}
-\Pi(\{K_g\})=\frac1R\sum_{r=1}^R\sum_{g\in\mathcal A_r}w_g\ \longrightarrow\ \sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g}.
+\Pi_R(\mathbf K)=\frac1R\sum_{r=1}^RP_r,\qquad \Pi_\infty(\mathbf K)=\sum_{g\in\mathcal G_{\mathrm{sh}}}\frac{w_g}{K_g},
 \label{eq:payload}
 \end{equation}
-Rounds with $\mathcal A_r=\emptyset$ transmit nothing; these local-only rounds are the mechanism by which a quota below $\min_g w_g$ is realised. The realised fraction differs from $\rho$ because warm-up rounds are always full and the head is never sent; both the target and the realised fraction are reported.
+where $\mathcal G_{\mathrm{sh}}=\{\mathrm s,\mathrm m\}$ and $\mathbf K=(K_g)_g$. Rounds with $\mathcal A_r=\emptyset$ transmit nothing; these local-only rounds are how a quota below $\min_g w_g$ is realised.
 
-\subsection{Network cost model}
+\subsection{Links and Network Cost}
 \label{sec:netmodel}
-The learning job is costed on a link profile $(\beta,\ell,P)$: uplink rate $\beta$ (bit/s), round-trip latency $\ell$, transmit power $P$. Sites upload in parallel on independent links, so a round in which $b_k$ bits are sent by site $k$ costs
+The job is costed on a link profile $(\beta,\ell,P)$: uplink rate, round-trip latency and transmit power. With independent per-site links, a round in which site $k$ sends $b_k$ bits costs
 \begin{equation}
-t_r=\max_k \frac{b_k}{\beta}+\ell,\qquad E_r=\sum_k\frac{b_k}{\beta}\,P,
+t_r=\max_k\frac{b_k}{\beta}+\ell,\qquad E_r=\sum_k\frac{b_k}{\beta}\,P,
 \label{eq:netcost}
 \end{equation}
-and nothing when no site sends. Communication time and energy are summed over rounds; window compliance is the fraction of rounds whose $t_r$ fits a scheduled window $W$. Table~\ref{tab:profiles} lists the five profiles, chosen to span a cell-edge 5G NR uplink, a mid-cell NR uplink, a 6G sub-THz edge slice target, an LEO satellite uplink and a shared institutional WAN. The model deliberately omits scheduling, fading and retransmission; it is a cost translation of measured bits under stated assumptions, and every method is costed on the same profiles.
+and nothing when no site sends. When the sites share one uplink (time division), $t_r=\sum_kb_k/\beta+\ell$ instead, and bytes saved convert one-to-one into time. Window compliance is the fraction of rounds whose $t_r$ fits a transfer window $W$, the peak load is the largest per-site upload of any round, and the radio wake-ups of a site are the rounds in which it transmits: on cellular radios each wake-up costs a promotion delay and a high-power tail that do not depend on the payload~\cite{huang2012lte,narayanan2021variegated}, so a sparse schedule saves energy beyond its bytes. Three profiles are used: cell-edge 5G NR (5~Mbit/s, 30~ms, 0.2~W)~\cite{tr38913}, an LEO satellite uplink (10~Mbit/s, 40~ms, 2~W) and a wired institutional WAN (100~Mbit/s, 10~ms). They are representative targets, not measurements. The model covers the uplink only and omits scheduling, fading and retransmission; it is a cost translation of measured bits, whose implementation Section~\ref{sec:results-emu} checks over paced TCP.
+
+\subsection{Data, Sites and Metrics}
+\textbf{Diabetes 130-US Hospitals}~\cite{strack2014} is the main benchmark: 30-day readmission from encounter-level features. Cleaning follows Strack \emph{et al.} (encounters discharged to death or hospice removed, first encounter per patient kept), which leaves one encounter for each of \num{auNEncounters} patients, with \num{diabetesmlpNFeatures} encoded features and a positive rate of \num{diabetesmlpPrevalence}\%; a patient-grouped fifth (\num{auNHoldout}) is set aside and used in no reported result, and the other \num{auNSitePool} are assigned to the sites. The public release carries no hospital identifier, so sites are formed from the medical-specialty column by longest-processing-time bucketing with a client-share cap of 15\% (a specialty above the cap is split, patient-grouped, before bucketing); the largest site holds \num{diabetesmlpMaxClientShare}\% of the training data and the mean label total-variation distance between sites is \num{diabetesmlpLabelTv}. These clients are called \emph{sites} rather than hospitals. Because this split is nearly IID, the same data are also partitioned by Dirichlet label skew with $\alpha\in\{0.1,0.3,1,10\}$. \textbf{Fed-Heart-Disease}~\cite{detrano1989,duterrail2022flamby}, the four UCI Heart Disease collections as four real institutions with \num{realHeartNtrain} training patients, and PneumoniaMNIST~\cite{yang2023medmnist} under Dirichlet label skew appear in the supplement under the earlier protocol. The eICU-CRD~\cite{pollard2018} needs credentialed access and was not run; its open demo~\cite{eicudemo} has too few stays per hospital for a federation. Table~\ref{tab:setup} summarises the setup; every dataset statistic is read from the run logs.
 
 \begin{table}[t]
-\caption{Link profiles used by the network cost model (\ref{eq:netcost}). Values are representative targets, not measurements, and are the only assumptions in the network-level results.}
-\label{tab:profiles}
+\caption{Study setup, read from the configuration file and the run logs}
+\label{tab:setup}
 \centering\small
-\begin{tabular}{lrrrr}
+\begin{tabular}{@{}p{17mm}p{65mm}@{}}
 \toprule
-Profile & $\beta$ (Mbit/s) & $\ell$ (ms) & $P$ (W) & $W$ (s)\\
+Item & Value\\
 \midrule
-NR cell edge~\cite{tr38913} & 5 & 30 & 0.2 & 60\\
-NR mid-cell~\cite{tr38913} & 50 & 20 & 0.2 & 60\\
-6G edge slice (target)~\cite{saad2020} & 1000 & 5 & 0.5 & 60\\
-LEO satellite uplink & 10 & 40 & 2.0 & 60\\
-Institutional WAN (wired) & 100 & 10 & 0 & 60\\
+Main data & Diabetes 130-US: \num{auNEncounters} patients, \num{auNSitePool} of them at the sites, \num{diabetesmlpNFeatures} features, positive rate \num{diabetesmlpPrevalence}\%, 20 specialty sites (share cap 15\%) or Dirichlet $\alpha\in\{0.1,0.3,1,10\}$\\
+Other data & Fed-Heart-Disease (4 institutions), PneumoniaMNIST (supplement)\\
+Backbones & MLP 128--128--64 (\num{diabetesmlpTierTotalParams} parameters; tier shares \num{diabetesmlpTierSlowPct}/\num{diabetesmlpTierMediumPct}/\num{diabetesmlpTierFastPct}\%); tabular ResNet (width 128, depth 6)\\
+Training & 60 rounds, one local epoch, batch 64, Adam $10^{-3}$ (persistent state), inverse-frequency class weights; per-site patient-grouped split 70/10/20\%\\
+\tierfed{} & $T_w=5$, $K_{\max}=8$, $\rho=0.25$ (post-warm-up) unless stated; exact solver\\
+Baselines & FedProx $\mu=10^{-2}$; FedLAMA-style interval 5, factor 2; AdaComm initial period $\{4,8,16\}$; LAG $\xi\in\{1,5{\cdot}10^3,10^4\}$, sample-weighted; uniform periods $K\in\{1,2,4,6,8\}$ and staggered $(4,4)$ on (\ref{eq:due}), $T_w=5$\\
+DP & $C=1$, $\delta=10^{-5}$, $\varepsilon^\star=4$, $q=1$; $z$ calibrated per method; planner $\lambda=1$\\
+Seeds, tests & 5 to 10 seeds (Section~\ref{sec:setup}); paired Wilcoxon tests, bootstrap intervals\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Problem statement}
-Given a quota $\rho\in(0,1]$ on the mean shared-payload fraction, choose the synchronisation intervals $\{K_g\}$ each round so that the federated model's accuracy is non-inferior to the full-rate personalised baseline while the payload satisfies (\ref{eq:payload}) and the attack surface, measured as in Section~\ref{sec:security}, does not grow.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=5.5mm, every node/.style={font=\scriptsize}]
+\node[proc, text width=62mm] (d) {\textbf{Public data.} UCI Diabetes 130-US, UCI Heart Disease (four institutions), \mbox{MedMNIST v2}; cached once, patient-deduplicated};
+\node[proc, text width=62mm, below=of d] (s) {\textbf{Deterministic simulation.} Tiers, scheduler, compressor, DP mechanism; bits logged per round and per site};
+\node[proc, text width=62mm, below=of s] (r) {\textbf{\num{auRunsVsix} runs.} Main benchmark, frontiers, heterogeneity sweep, ResNet, matched-$\varepsilon$ DP, timing (the supplement's earlier runs: \texttt{reproduce\_all})};
+\node[proc, text width=62mm, below=of r] (e) {\textbf{Consistency and transport checks.} Release counts and bytes recomputed from the schedule rule; uploads replayed over paced TCP};
+\node[proc, text width=62mm, below=of e] (a) {\textbf{Paired analysis.} Validation-selected rounds, Wilcoxon tests, non-inferiority; every table, figure and number written from the logs};
+\draw[arr] (d) -- node[lab, right=1mm] {seeded loaders} (s);
+\draw[arr] (s) -- node[lab, right=1mm] {per-seed logs} (r);
+\draw[arr] (r) -- node[lab, right=1mm] {logged bits per round and site} (e);
+\draw[arr] (e) -- node[lab, right=1mm] {run summaries} (a);
+\begin{scope}[on background layer]
+\node[grp, fit=(d)(s)(r)(e)(a), inner sep=3mm, label={[font=\scriptsize, fill=white, inner sep=2pt, anchor=west, xshift=2mm]north west:one command: \texttt{reproduce\_v6}}] {};
+\end{scope}
+\end{tikzpicture}
+\caption{Study pipeline from the public data to every reported number. All stages run from one command, and the determinism check runs first.}
+\label{fig:pipeline}
+\end{figure}
+
+\textbf{Metrics.} Each site's patients are split into training, validation and test sets (70/10/20\%, patient-grouped), and every method is evaluated on each site's test split with that site's own parameters, sample-weighted; single-class splits are excluded identically for every method. The primary metric is the test AUROC at the round with the highest validation AUROC (the earliest on ties), with the bytes uploaded up to that round; test data never select anything. Secondary metrics are the mean over the last ten rounds, the mean over the post-synchronisation rounds of the last twenty, and the final round. Calibration is reported as ECE and Brier score~\cite{vancalster2019}, before and after Platt scaling~\cite{platt1999} on each site's validation split, and per-site results as the worst-site AUROC. Fig.~\ref{fig:pipeline} summarises the study.
+
+\textbf{Problem statement.} Given a quota $\rho$ on the payload fraction (\ref{eq:payload}), optionally a cap $\pi$ on the payload of any one round and a budget $(\varepsilon,\delta)$, choose the intervals $\mathbf K$ and phases such that the validation-selected personalised AUROC is non-inferior to full-rate personalisation and is at least that of the best uniform period at the same bytes. Under DP the schedule must be fixed before training, because the accountant charges only data-independent releases. Per-site non-inferiority is reported descriptively, not tested.

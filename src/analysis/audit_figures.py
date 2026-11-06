@@ -43,7 +43,9 @@ def _key_of(name):
 
 
 def panel_frontier(ax, df):
+    from .audit_report import common_seeds
     sp = df[(df.setting == "specialty") & df.eps.isna()].copy()
+    sp = sp[sp.seed.isin(common_seeds(sp[~sp.name.isin(["central", "hgb"])]))]
     sp["family"] = sp.name.map(family)
     for fam, key in FAM_STY.items():
         f = sp[sp.family == fam]
@@ -62,14 +64,19 @@ def panel_frontier(ax, df):
         v = sp[sp.name == n][PRIMARY]
         if len(v):
             ax.axhline(v.mean(), color="#999999", linestyle=ls, linewidth=0.8, label=lab, zorder=1)
-    ax.set_xscale("log"); ax.set_xlabel("Upload, total over sites (MB)"); ax.set_ylabel("AUROC")
+    ax.set_xscale("log")
+    lo = sp.loc[sp.total_upload_mb > 0, "total_upload_mb"].min()
+    ticks = [t for t in (3, 10, 30, 100, 300) if t >= 0.7 * lo]
+    ax.set_xticks(ticks); ax.set_xticklabels([str(t) for t in ticks]); ax.minorticks_off()
+    ax.set_xlim(0.7 * min(ticks[0], lo), 300)
+    ax.set_xlabel("Upload over 60 rounds (MB)"); ax.set_ylabel("AUROC")
     ax.set_title("(a) Accuracy against upload")
 
 
 def panel_hetero(ax, df):
     alphas = sorted([s for s in df.setting.unique() if s.startswith("a")], key=lambda s: float(s[1:]))
     if not alphas:
-        ax.set_title("(b) Accuracy against label skew"); return
+        ax.set_title("(b) Label skew"); return
     xs = np.arange(len(alphas))
     series = {"tierfed": [], "fixed": [], "fedper": [], "fedavg": []}
     for st_ in alphas:
@@ -78,44 +85,60 @@ def panel_hetero(ax, df):
         bu = best_uniform(d, MATCH_TOL * tf_mb) if np.isfinite(tf_mb) else None
         for key, name in (("tierfed", "tierfed"), ("fixed", bu), ("fedper", "fedper"), ("fedavg", "fedavg")):
             series[key].append(_mci(d[d.name == name][PRIMARY]) if name else (np.nan, np.nan))
+    dodge = {"tierfed": -0.15, "fixed": -0.05, "fedper": 0.05, "fedavg": 0.15}   # identical series stay visible
     for key, vals in series.items():
         m = np.array([v[0] for v in vals]); e = np.array([v[1] for v in vals])
+        if not np.isfinite(m).any():
+            continue                  # a method that was not run in this sweep gets no legend entry
         st = STY[key]
-        ax.errorbar(xs, m, yerr=e, fmt=st["marker"] + st["ls"], color=st["color"], linewidth=st["lw"],
+        ax.errorbar(xs + dodge[key], m, yerr=e, fmt=st["marker"] + st["ls"], color=st["color"], linewidth=st["lw"],
                     elinewidth=0.6, capsize=2, capthick=0.6, markersize=3.0,
                     label="Best uniform, matched bytes" if key == "fixed" else st["label"],
                     zorder=3 if key == "tierfed" else 2)
     loc = [_mci(df[(df.setting == s) & (df.name == "local")][PRIMARY])[0] for s in alphas]
     ax.plot(xs, loc, ":", color="#999999", linewidth=0.8)
     ax.set_xticks(xs); ax.set_xticklabels([s[1:] for s in alphas]); ax.set_xlim(-0.4, len(xs) - 0.6)
-    ax.set_xlabel("Dirichlet $\\alpha$ (smaller: more skew)"); ax.set_ylabel("AUROC")
-    ax.set_title("(b) Accuracy against label skew")
+    ax.set_xlabel("Dirichlet $\\alpha$"); ax.set_ylabel("AUROC")
+    ax.set_title("(b) Label skew")
 
 
 def panel_psi(ax, df, gate):
+    """One marker shape per setting and a legend, so that settings with nearly equal
+    Psi and gain never put text on top of each other."""
     st = STY["tierfed"]
+    shapes = {"specialty": "o", "a0.1": "v", "a0.3": "D", "a1": "s", "a10": "^", "resnet": "*", "transformer": "P"}
+    xs = []
     for _, r in gate.iterrows():
         d = df[(df.setting == r.setting) & (df.name == "tierfed")]
         psi = d["psi"].mean() if "psi" in d else np.nan
         if not np.isfinite(psi) or not np.isfinite(r.gain_vs_uniform):
             continue
-        x = max(100 * psi, 0.01)
+        x = max(100 * psi, 0.01); xs.append(x)
         ax.errorbar([x], [r.gain_vs_uniform], yerr=[[r.gain_vs_uniform - r.gain_lo], [r.gain_hi - r.gain_vs_uniform]],
-                    fmt="o", color=st["color"], markersize=3.4, elinewidth=0.7, capsize=2, capthick=0.6, zorder=3)
-        ax.annotate(SET_LAB.get(r.setting, r.setting), (x, r.gain_vs_uniform), textcoords="offset points",
-                    xytext=(4, 3), fontsize=6.2, color="#333333")
-    ax.axhline(0, color="#999999", linewidth=0.7)
-    ax.set_xscale("log"); ax.set_xlabel("$\\Psi$ at the end of warm-up (%)")
-    ax.set_ylabel("Gain over best uniform (AUROC)")
+                    fmt=shapes.get(r.setting, "o"), color=st["color"], markersize=4.2 if r.setting == "resnet" else 3.4,
+                    markerfacecolor="white" if r.setting.startswith("a") else st["color"], markeredgewidth=0.8,
+                    elinewidth=0.7, capsize=2, capthick=0.6, zorder=3, label=SET_LAB.get(r.setting, r.setting))
+    ax.axhline(0, color="#999999", linewidth=0.7, zorder=1)
+    ax.set_xscale("log"); ax.minorticks_off(); ax.set_xlabel("$\\Psi$ at the end of warm-up (%)")
+    if xs:
+        lo, hi = min(xs) / 3, max(xs) * 3
+        ax.set_xlim(lo, hi)
+        ticks = [t for t in (0.1, 1, 10, 100, 1000) if lo <= t <= hi]
+        ax.set_xticks(ticks); ax.set_xticklabels([f"{t:g}" for t in ticks])
+    # the legend goes where no setting lies: right of the small-Psi cluster, below the axis line
+    ax.legend(loc="lower left", bbox_to_anchor=(0.36, 0.0), fontsize=5.6, ncol=2, frameon=False,
+              handletextpad=0.2, columnspacing=0.6, borderaxespad=0.2, labelspacing=0.25)
+    ax.set_ylabel("Gain over uniform")
     ax.set_title("(c) Gain against $\\Psi$")
 
 
 def panel_peak(ax, df, uplink_mbps=5.0, rtt_s=0.03):
     sp = df[(df.setting == "specialty") & df.eps.isna()]
     fr = np.linspace(0.3, 1.1, 33)
-    for name, key, lab in (("fixed44", "fixed4", "Fixed (4,4), aligned"),
-                           ("fixed44_st_w8", "fixed8", "Fixed (4,4), staggered, 8-bit warm-up"),
-                           ("tierfed", "tierfed", "TierFed"), ("tierfed_st_w8", "tierfed_dp", "TierFed, staggered, 8-bit warm-up")):
+    for name, key, lab in (("fixed44", "fixed4", "Fixed (4,4)"),
+                           ("fixed44_st_w8", "fixed8", "Fixed (4,4), staggered"),
+                           ("tierfed", "tierfed", STY["tierfed"]["label"]),
+                           ("tierfed_st_w8", "tierfed_dp", "TierFed, staggered")):
         runs = sp[sp.name == name]
         if runs.empty:
             continue
@@ -130,7 +153,7 @@ def panel_peak(ax, df, uplink_mbps=5.0, rtt_s=0.03):
         if curves:
             st = STY[key]
             ax.plot(fr, np.mean(curves, 0), st["ls"], color=st["color"], linewidth=st["lw"], label=lab)
-    ax.set_xlabel("Window $W$ / full-payload upload time $t_1$"); ax.set_ylabel("Rounds over the window")
+    ax.set_xlabel("Window / full-payload upload time"); ax.set_ylabel("Rounds over the window")
     ax.set_title("(d) Window violations, 5 Mbit/s")
 
 
@@ -145,7 +168,7 @@ def main(argv=None):
     gate = gate_table(df)
     fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.35))
     panel_frontier(axes[0], df); panel_hetero(axes[1], df); panel_psi(axes[2], df, gate); panel_peak(axes[3], df)
-    _legend_below(fig, axes, ncol=4)
+    _legend_below(fig, [axes[0], axes[1], axes[3]], ncol=4)   # (c) has its own legend of settings
     fig.tight_layout(rect=(0, 0.2, 1, 1), w_pad=1.0)
     fig.savefig(out / "fig_au.pdf"); plt.close(fig)
     print("written", out / "fig_au.pdf")
