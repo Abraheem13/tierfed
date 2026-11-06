@@ -86,19 +86,19 @@ def fig_dynamics(L: Path, out: Path):
     axes[1].set_title("(b) Upload over all sites")
     # (c) site 0 of seed 42: upload per round as a share of its full shared payload
     ax = axes[2]
-    for name, key, off, lab in (("fixed44", "fixed44", -0.2, "Aligned (4,4)"),
-                                ("fixed44_st", "fixed", 0.2, "Staggered (4,4)")):
+    for name, key, off, lab in (("fixed44", "fixed44", -0.21, "Aligned (4,4)"),
+                                ("fixed44_st", "fixed", 0.21, "Staggered (4,4)")):
         f = sorted(glob.glob(str(L / f"diabetes_mlp_fixed_R60_C20_s42_au_{name}_summary.json")))
         if not f:
             continue
         rb = json.loads(Path(f[0]).read_text())["round_bits"]
         full = rb[0]["client_bits"][0]                    # round 1 sends the whole shared payload
-        frac = [b["client_bits"][0] / full for b in rb][:30]
+        frac = [b["client_bits"][0] / full for b in rb][:21]
         st = _sty(key)
-        ax.bar(np.arange(1, len(frac) + 1) + off, frac, width=0.4, color=st["color"], alpha=0.85,
+        ax.bar(np.arange(1, len(frac) + 1) + off, frac, width=0.36, color=st["color"], alpha=0.9,
                linewidth=0, label=lab)
     ax.set_xlabel("Round"); ax.set_ylabel("Share of shared payload")
-    ax.set_ylim(0, 1.08); ax.set_xlim(0.3, 30.7)
+    ax.set_ylim(0, 1.08); ax.set_xlim(0.4, 21.6); ax.set_xticks([1, 5, 9, 13, 17, 21])
     ax.set_title("(c) Upload of one site per round")
     h, l = [], []
     for a in axes:
