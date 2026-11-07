@@ -1,10 +1,10 @@
 # Cover letter — IEEE Transactions on Machine Learning in Communications and Networking
 
-> Before sending, fill the two items marked **[CONFIRM]**. They concern facts only the author can state.
+> Before sending, fill the two items marked **[CONFIRM]**. They concern facts only the authors can state.
 
 Dear Editor-in-Chief,
 
-Please consider the enclosed manuscript, "When Does Per-Tier Synchronisation Pay? Quota-Constrained Federated Learning Over Constrained Links", for publication in the IEEE Transactions on Machine Learning in Communications and Networking.
+Please consider the enclosed manuscript, "When Does Per-Tier Synchronisation Pay? A Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning", by Abraheem Rashid (Brunel University London) and Mehwish Mahmood (Queen's University Belfast), for publication in the IEEE Transactions on Machine Learning in Communications and Networking.
 
 The article treats a cross-silo federated learning job as a tenant on a constrained uplink with a byte quota and asks when synchronising different parts of a model at different rates pays. It contributes:
 
@@ -18,10 +18,10 @@ We believe the work fits the journal's scope on distributed and federated machin
 
 **Prior versions. [CONFIRM]** An earlier version of this work, titled "Nested Federated Learning" and later "TierFed", was submitted to ______ (journal) and is ______ (withdrawn / rejected / under review). Section S1 of the supplement lists every defect found in that version and how it was corrected; the present manuscript is a full rewrite with corrected code, and no version of it is under review elsewhere.
 
-**Authorship. [CONFIRM]** The listed author is the sole author. Earlier drafts of this work listed co-authors; each has agreed in writing to the present author list. (Replace this paragraph with the correct author list and approvals if that is not the case.)
+**Authorship. [CONFIRM]** Both listed authors have approved the manuscript and its submission. Earlier drafts of this work listed other co-authors; each has agreed in writing to the present author list. (Correct this paragraph if that is not the case.)
 
-The author declares no competing interests and no funding. All data are public and de-identified; no ethics approval was required. Generative AI tools assisted with code refactoring, figure layout and editing; the author verified all content, code, numbers and figures.
+The authors declare no competing interests and no funding. All data are public and de-identified; no ethics approval was required. Generative AI tools assisted with code refactoring, figure layout and editing; the authors verified all content, code, numbers and figures.
 
 Sincerely,
-Abraheem Rashid
+Abraheem Rashid (corresponding author), on behalf of both authors
 Department of Computer Science, Brunel University London

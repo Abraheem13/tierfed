@@ -1,7 +1,7 @@
 # TMLCN submission package
 
 Manuscript for the IEEE Transactions on Machine Learning in Communications and Networking:
-"When Does Per-Tier Synchronisation Pay? Quota-Constrained Federated Learning Over Constrained Links".
+"When Does Per-Tier Synchronisation Pay? A Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning".
 
 | File | What it is |
 |---|---|

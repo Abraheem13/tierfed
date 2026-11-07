@@ -13,7 +13,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={When Does Per-Tier Synchronisation Pay? Quota-Constrained Federated Learning Over Constrained Links}, pdfauthor={Abraheem Rashid}}
+\hypersetup{pdftitle={When Does Per-Tier Synchronisation Pay? A Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning}, pdfauthor={Abraheem Rashid, Mehwish Mahmood}}
 \usepackage{cite}
 
 % ---------------------------------------------------------------------------
@@ -47,12 +47,14 @@
 \begin{document}
 \bstctlcite{IEEEexample:BSTcontrol}
 
-\title{When Does Per-Tier Synchronisation Pay? Quota-Constrained Federated Learning Over Constrained Links}
+\title{When Does Per-Tier Synchronisation Pay? A Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning}
 
-\author{Abraheem~Rashid
-\thanks{A.~Rashid is with the Department of Computer Science, Brunel University London, Uxbridge UB8~3PH, U.K. (e-mail: 2546393@brunel.ac.uk).}}
+\author{Abraheem~Rashid and Mehwish~Mahmood
+\thanks{A.~Rashid is with the Department of Computer Science, Brunel University London, Uxbridge UB8~3PH, U.K. (e-mail: 2546393@brunel.ac.uk).}
+\thanks{M.~Mahmood is with Queen's University Belfast, Belfast, U.K.}
+\thanks{Corresponding author: Abraheem Rashid.}}
 
-\markboth{IEEE Transactions on Machine Learning in Communications and Networking}{Rashid: When Does Per-Tier Synchronisation Pay?}
+\markboth{IEEE Transactions on Machine Learning in Communications and Networking}{Rashid and Mahmood: When Does Per-Tier Synchronisation Pay?}
 
 \maketitle
 
@@ -623,7 +625,7 @@ Some conclusions of this study are firmer than others. This section states what 
 This article asked when per-tier synchronisation pays in cross-silo federated learning over constrained links, and tested the answer with \tierfed{}, a quota-constrained multi-rate scheduler. The closed form of its programme bounds the gain of any per-tier schedule over a uniform period by $\Psi$, measurable before any sparse round: $\Psi$ is 0.1\% on the main benchmark, where \tierfed{} reduces to the uniform period, and 71.4\% on a ResNet, where the tiers are split as predicted but the split does not beat the best uniform period at matched bytes. Two lessons follow. First, on constrained links tier structure pays in the load of a single round, not in accuracy, and staggered phases cut the rounds that miss a transfer window from 0.30 to 0.08 at the same long-run payload fraction, at the price of more wake-ups. Second, under client-level DP the schedule is part of the mechanism, because an adaptive scheduler's traffic reveals a shifted site even when that site never skips, and at 20 sites every releasing schedule ends below local training on average, so the quota and the budget must be planned before training and checked against not federating at all.
 
 \section*{Data, Code and Declarations}
-Code, configuration, per-seed logs and the one-command reproduction of every table, figure and number are at \url{https://github.com/Abraheem13/tierfed}. All datasets are public and de-identified; no ethics approval was required. Generative AI tools assisted with code refactoring, figure layout and editing; the author verified all content, code, numbers and figures. An earlier version, ``Nested Federated Learning'', is superseded by this article (supplement, Section~S1). The author declares no competing interests and no funding.
+Code, configuration, per-seed logs and the one-command reproduction of every table, figure and number are at \url{https://github.com/Abraheem13/tierfed}. All datasets are public and de-identified; no ethics approval was required. Generative AI tools assisted with code refactoring, figure layout and editing; the authors verified all content, code, numbers and figures. An earlier version, ``Nested Federated Learning'', is superseded by this article (supplement, Section~S1). The authors declare no competing interests and no funding.
 
 
 \bibliographystyle{IEEEtran}
