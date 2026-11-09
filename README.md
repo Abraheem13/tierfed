@@ -102,6 +102,10 @@ timing verdicts from the second machine's runs alone.
 audit table to `results/tables/audit/`; `src/analysis/audit_tex.py` and
 `src/analysis/audit_figures.py` write the manuscript's tables, numbers and Fig. 5;
 `src/analysis/results_figures.py` draws Figs. 4 and 6 from the per-round histories.
+`scripts/make_submission.py` writes `paper/submission/TierFed_IoTJ_submission.zip`: one
+self-contained .tex each for the article and the supplement (every generated table, number and
+flag resolved to plain text), their figures, .bbl files and PDFs, checked to compile to the same
+text as the multi-file build.
 `src/theory/differentiation.py` holds the closed form of the interval programme and the
 differentiation bound Psi (Proposition 2); `src/privacy/gdp.py` the exact q = 1 accountant.
 
