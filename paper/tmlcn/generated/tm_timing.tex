@@ -1,0 +1,13 @@
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Schedule & Model & Rounds with traffic & Target's rounds & Target's bytes & All bytes & Runs per world & $p$\\
+\midrule
+Fixed (4,4) & MLP & 0.50 & 0.50 & 0.50 & 0.50 & 5 & 1.000\\
+\tierfed{} & MLP & 0.50 & 0.50 & 0.50 & 0.50 & 7 & 1.000\\
+AdaComm & MLP & 0.50 & 0.50 & 0.50 & 0.50 & 8 & 1.000\\
+LAG, $\xi=2000$ & MLP & 0.50 & 0.50 & 0.50 & 0.83 & 7 & 0.031\\
+LAG, $\xi=5000$ & MLP & 0.96 & 0.96 & 0.96 & 0.93 & 7 & 0.001\\
+\midrule
+\tierfed{} & ResNet & 0.25 & 0.25 & 0.25 & 0.25 & 2 & 1.000\\
+\bottomrule
+\end{tabular}

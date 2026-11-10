@@ -1,0 +1,19 @@
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Family & Data and clients & Configurations & Seeds & Runs\\
+\midrule
+Main comparison & 20 specialty groups & 13 & 10 & 130\\
+Reference bounds & pooled data, per-group test splits & 2 & 10 & 20\\
+Accuracy--upload frontier & 20 specialty groups & 8 & 5 & 40\\
+Peak-aware variants & 20 specialty groups & 3 & 5 & 15\\
+Label-skew sweep & Dirichlet $\alpha\in\{0.1,0.3,1,10\}$ & 20 & 5 & 100\\
+ResNet backbone & 20 specialty groups & 5 & 6--7 & 34\\
+Clinical centres & Fed-Heart-Disease, 4 centres & 13 & 20 & 260\\
+Carry-over synchronisation step & specialty groups, centres, ResNet & 10 & 20 & 150\\
+Matched-$\varepsilon$ DP ($q=1$) & 20 specialty groups & 5 & 6 & 30\\
+Timing side channel, MLP & clean or shifted target group & 5 & 5--9 per world & 72\\
+Timing side channel, ResNet & clean or shifted target group & 1 & 2 per world & 4\\
+\midrule
+Total &  &  &  & 855\\
+\bottomrule
+\end{tabular}

@@ -1,26 +1,55 @@
 # Cover letter — IEEE Transactions on Machine Learning in Communications and Networking
 
-> Before sending, fill the two items marked **[CONFIRM]**. They concern facts only the authors can state.
+> Before sending, complete the two items marked **[CONFIRM]**. They concern facts that only the authors can state.
 
 Dear Editor-in-Chief,
 
-Please consider the enclosed manuscript, "When Does Per-Tier Synchronisation Pay? A Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning", by Abraheem Rashid (Brunel University London) and Mehwish Mahmood (Queen's University Belfast), for publication in the IEEE Transactions on Machine Learning in Communications and Networking.
+Please consider the enclosed manuscript, "Per-Tier Synchronisation in Communication-Budgeted
+Federated Learning: A Closed-Form Bound and an Empirical Study", by Abraheem Rashid (Brunel
+University London) and Mehwish Mahmood (Queen's University Belfast), for publication in the IEEE
+Transactions on Machine Learning in Communications and Networking.
 
-The article treats a cross-silo federated learning job as a tenant on a constrained uplink with a byte quota and asks when synchronising different parts of a model at different rates pays. It contributes:
+The article treats a cross-silo federated learning job as a tenant on a constrained uplink with a
+byte quota, and examines whether synchronising different parts of a model at different rates
+improves on a single period for the whole model. Its contributions are:
 
-1. **A closed-form test of the value of per-tier synchronisation.** The relaxed quota-constrained programme of a blockwise local-SGD surrogate has a closed form, and a Hölder bound Ψ, measurable at the end of warm-up, limits how much any per-tier schedule can reduce that surrogate below a uniform period. Phases chosen by a gcd condition cap the payload of a single round.
-2. **The schedule as a privacy release.** Under client-level differential privacy every synchronisation is a release, so a schedule computed from client updates is not charged by the accountant and is visible in the traffic. A timing experiment shows that an adaptive scheduler's traffic reveals a site with shifted labels even when that site never skips an upload.
-3. **An audited evaluation.** Rounds are selected on validation and the conclusions are re-read under two other selection rules; every baseline has its own knob swept; local, centralised and gradient-boosted references bound the task; a consistency check recomputes every planned release, uncompressed upload and privacy charge from the stated rules; and part of the runs is repeated on a second machine.
+1. **A quota-constrained multi-rate scheduler and a bound on its benefit.** The relaxed programme
+   of the scheduler has a closed form, and a Hölder bound Ψ, measurable at the end of warm-up,
+   limits how far any per-tier schedule can lower the drift surrogate below a uniform period.
+   Phases chosen by a gcd condition bound the payload of a single round.
+2. **An analysis of the schedule as a privacy release.** Under client-level differential privacy
+   every synchronisation is a release, so a schedule computed from client updates is not covered
+   by the accountant and is visible in the traffic; a timing experiment measures what a passive
+   observer learns from it.
+3. **An evaluation designed to detect the absence of a gain.** Rounds are selected on validation
+   data, every baseline is tuned over its own communication parameter, the comparison is repeated
+   under label skew, on a deeper backbone, at four real clinical centres and with a second
+   synchronisation step, and a consistency check recomputes every planned release, upload and
+   privacy charge from the stated rules.
 
-The results are reported as they came out, including where they cut against the proposed scheduler. On the main readmission benchmark Ψ is 0.1% and the scheduler reduces to a uniform period. On a ResNet Ψ is 71.4% and the tiers split as predicted, but no reading of the runs shows a relevant gain over the best uniform period at matched bytes. Staggered phases reduce transfer-window violations from 0.30 to 0.08 of rounds at the cost of more radio wake-ups. Under client-level privacy with 20 sites every releasing schedule ends below local training.
+The results are reported as they came out, including where they do not favour the proposed
+scheduler. In none of the seven settings was the per-tier schedule more accurate than the best
+uniform period at matched bytes. Where Ψ is at most 2.2% the scheduler reduces to a uniform
+period; on a ResNet Ψ is 71.4% and the tiers are split as predicted without a gain in AUROC.
+Staggered tiers lower the share of rounds that miss a transfer window from 0.30 to 0.08 at the
+cost of more radio wake-ups. Under client-level privacy with 20 clients every releasing schedule
+ends below local training.
 
-We believe the work fits the journal's scope on distributed and federated machine learning for efficient network performance and on the scalability of machine learning in networks, and its emphasis on reproducible sharing of code and artefacts: code, per-seed logs and a one-command reproduction are public at https://github.com/Abraheem13/tierfed.
+We believe that the work fits the scope of the journal on distributed and federated learning for
+networks, and its emphasis on reproducible research: the code, the per-seed logs and a
+one-command reproduction of every number are public at https://github.com/Abraheem13/tierfed.
 
-**Prior versions. [CONFIRM]** An earlier version of this work, titled "Nested Federated Learning" and later "TierFed", was submitted to ______ (journal) and is ______ (withdrawn / rejected / under review). Section S1 of the supplement lists every defect found in that version and how it was corrected; the present manuscript is a full rewrite with corrected code, and no version of it is under review elsewhere.
+**Prior versions. [CONFIRM]** State here whether any version of this work has been submitted to
+or posted at another venue (journal, conference or preprint server), under which title, and its
+status. No version of the manuscript is under review elsewhere.
 
-**Authorship. [CONFIRM]** Both listed authors have approved the manuscript and its submission. Earlier drafts of this work listed other co-authors; each has agreed in writing to the present author list. (Correct this paragraph if that is not the case.)
+**Authorship. [CONFIRM]** Both listed authors have approved the manuscript and its submission.
+(If any other person contributed in a way that merits authorship, or commented on the manuscript
+and should be acknowledged, add them before submission.)
 
-The authors declare no competing interests and no funding. All data are public and de-identified; no ethics approval was required. Generative AI tools assisted with code refactoring, figure layout and editing; the authors verified all content, code, numbers and figures.
+The authors declare no competing interests and no funding. All data are public and de-identified,
+and no ethics approval was required. Generative AI tools were used for code refactoring, figure
+layout and language editing; the authors verified all content, code, numbers and figures.
 
 Sincerely,
 Abraheem Rashid (corresponding author), on behalf of both authors

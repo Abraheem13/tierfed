@@ -23,10 +23,12 @@ import pandas as pd
 from .audit_report import MATCH_TOL, PRIMARY, _uniform_k, best_uniform, family, gate_table, load, paired
 from .paper_figures import STY, _legend_below  # noqa: F401  (imports the shared rcParams)
 
+STY["tierfed"] = {**STY["tierfed"], "label": "TierFed"}
+
 FAM_STY = {"TierFed": "tierfed", "Uniform period": "fixed", "AdaComm": "adacomm", "LAG": "lag",
            "FedLAMA": "fedlama"}
 SET_LAB = {"specialty": "spec.", "a0.1": "$\\alpha$=0.1", "a0.3": "$\\alpha$=0.3", "a1": "$\\alpha$=1",
-           "a10": "$\\alpha$=10", "resnet": "ResNet", "transformer": "Transformer"}
+           "a10": "$\\alpha$=10", "resnet": "ResNet", "transformer": "Transformer", "hospitals": "centres"}
 
 
 def _mci(v):
@@ -106,7 +108,8 @@ def panel_psi(ax, df, gate):
     """One marker shape per setting and a legend, so that settings with nearly equal
     Psi and gain never put text on top of each other."""
     st = STY["tierfed"]
-    shapes = {"specialty": "o", "a0.1": "v", "a0.3": "D", "a1": "s", "a10": "^", "resnet": "*", "transformer": "P"}
+    shapes = {"specialty": "o", "a0.1": "v", "a0.3": "D", "a1": "s", "a10": "^", "resnet": "*", "transformer": "P",
+              "hospitals": "X"}
     xs = []
     for _, r in gate.iterrows():
         d = df[(df.setting == r.setting) & (df.name == "tierfed")]
@@ -153,8 +156,8 @@ def panel_peak(ax, df, uplink_mbps=5.0, rtt_s=0.03):
         if curves:
             st = STY[key]
             ax.plot(fr, np.mean(curves, 0), st["ls"], color=st["color"], linewidth=st["lw"], label=lab)
-    ax.set_xlabel("Window / full-payload upload time"); ax.set_ylabel("Rounds over the window")
-    ax.set_title("(d) Window violations, 5 Mbit/s")
+    ax.set_xlabel("Window / full-payload upload time"); ax.set_ylabel("Share of rounds missing it")
+    ax.set_title("(d) Missed windows, 5 Mbit/s")
 
 
 def main(argv=None):
@@ -164,7 +167,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     df = load(a.results, a.dataset)
-    df = df[(df.setting != "derma") & ~df.setting.str.startswith("tm_")]
+    df = df[(df.setting != "derma") & ~df.setting.str.startswith("tm_") & ~df.setting.str.endswith("_co")]
     gate = gate_table(df)
     fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.15))
     panel_frontier(axes[0], df); panel_hetero(axes[1], df); panel_psi(axes[2], df, gate); panel_peak(axes[3], df)
