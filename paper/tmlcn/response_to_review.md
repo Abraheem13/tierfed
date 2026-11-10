@@ -25,20 +25,20 @@ to the selected checkpoint, the saving is 27.7% (45.7 vs 63.2 MB). Say which com
 headline uses and keep it consistent with the main metric."*
 
 Both readings are now defined and named, and no saving is stated without its reading.
-Section II-D defines the cumulative upload B(r) (Eq. (8)) and its two readings: B(r-hat), the
+Section \mbox  {II-D} defines the cumulative upload B(r) (Eq. (8)) and its two readings: B(r-hat), the
 upload up to the validation-selected round, which is the cost that belongs to the primary metric,
 and B(R), the upload of the whole budget of 60 rounds. The abstract now reads "28% less upload up
 to that round and 70% less over all 60 rounds" (45.7 against 63.2 MB, and 65.3 against 217.8 MB;
-percentages are rounded to integers so that they agree with the rounded megabytes). Section V-B
+percentages are rounded to integers so that they agree with the rounded megabytes). Section \mbox  {V-B}
 states both with their megabytes and adds that the scheduler selects round 36 on average and
 FedPer round 17, so the saving up to the selected round is obtained with about twice as many rounds.
-Tables IV and V and the paired table of the supplement carry both readings in separate columns.
+Tables III and IV and the paired table of the supplement (Table S-II) carry both readings in separate columns.
 
 **Comment 3 (Section II-A, one local epoch).** *"Are inactive tiers kept locally or reset from the
 server? Figure 2 suggests only active tiers are replaced. Clarify this, including what happens to
 the optimizer state."*
 
-Section II-A now states the complete round as three equations (Eqs. (1)-(3)) and says explicitly:
+Section \mbox  {II-A} now states the complete round as three equations (Eqs. (1)-(3)) and says explicitly:
 
 - a tier that is not due is kept at the client, is neither reset nor frozen, and continues to be
   trained; the server copy does not change;
@@ -47,7 +47,7 @@ Section II-A now states the complete round as three equations (Eqs. (1)-(3)) and
 - the optimiser state belongs to the client: Adam's moment estimates and step count are kept from
   round to round for all parameters and are not reset when the values of a tier are replaced.
 
-The caption of Fig. 2 and that of Fig. 3 now say the same. Answering this comment exactly also
+The captions of Fig. 2 and Fig. 3 now say the same. Answering this comment exactly also
 showed that the previous text described the synchronisation inaccurately in one respect, which
 has been corrected throughout. Because a due tier is restarted from the server copy, what a
 client uploads is always one local epoch away from the broadcast, whatever the interval. The
@@ -59,13 +59,13 @@ implementation. The revision therefore
   tier is uploaded after all local epochs since its last synchronisation);
 - restates Proposition 1 for the restart step, with the drift of the clients' copies and the
   bound for the server copy as separate parts, and gives the bound of the carry-over step next
-  to it (Section III-B, proofs in Section S1);
+  to it (Section \mbox  {III-B}, proofs in Section S1);
 - reports the measured dispersion for both: under the restart step it is flat in the period
   (slow tier 4.59-5.93, medium tier 6.93-7.71, times 1e-3, for K = 1 to 8), under the
   carry-over step it is larger by factors of 7.5 and 5.3 at K = 4 and of 26.9 and 11.9 at K = 8
-  (Table S-V, Fig. 7(d));
+  (Table S-IV, Fig. 7(d));
 - adds an experiment with the carry-over step on the specialty groups, the clinical centres and
-  the ResNet (Section V-E, Table VII, Fig. 7(c)).
+  the ResNet (Section \mbox  {V-E}, Table VI, Fig. 7(c)).
 
 The main finding is the same under both steps: the scheduler reduces to the uniform period. The
 step does change how a sparse period compares with FedPer, and this is reported (see comment 4).
@@ -76,7 +76,7 @@ under the same protocol would strengthen the clinical relevance."*
 
 Both parts were addressed.
 
-(a) Wording. Section II-C now says that the public release carries no hospital identifier, that
+(a) Wording. Section \mbox  {II-C} now says that the public release carries no hospital identifier, that
 the clients of the main benchmark "are not hospitals" but 20 groups of patients formed from the
 medical-specialty column, and names them specialty groups. The word "site" is no longer used: the
 generic participant is a "client", the clients of the readmission benchmark are "specialty
@@ -85,7 +85,7 @@ abstract, all tables, figures and captions, and the limitation is repeated in th
 
 (b) Real institutions. Fed-Heart-Disease (the four collections of the UCI Heart Disease data:
 Cleveland, Budapest, Zurich/Basel and Long Beach; 920 patients) was run under the protocol of the
-main benchmark, with the methods of the main comparison and 20 seeds (Section V-C, Table V,
+main benchmark, with the methods of the main comparison and 20 seeds (Section \mbox  {V-C}, Table IV,
 Fig. 7(a,b), supplement Section S7). The result is reported as it came out:
 
 - the scheduler again selects the uniform period (4,4) in every seed (Psi = 0.7%), and its runs are
@@ -105,7 +105,7 @@ sigma_g^2, so their average with equal weights has variance at most sigma_g^2 / 
 speed-up of local SGD). The proposition now states the equal-weight assumption explicitly, and
 the text adds what replaces 1/N under the sample weights used in the experiments: the sum of the
 squared weights, i.e. 1/N_eff, with N_eff = 11.8 for the 20 specialty groups and 3.6 for the four
-centres. The derivation is in Section S1.2.
+centres. The derivation is in Section S1 of the supplement.
 
 **Comment 6 (privacy planner, "can only choose equal intervals").** *"Usually, we will avoid using
 words such as 'only', since it is too absolute. It is better to double check if this statement is
@@ -117,7 +117,7 @@ Psi = 0), but the integer planner is not restricted to equal intervals. It was e
 of 35 combinations of prior weight and quota (identical for four privacy budgets): it returns
 equal intervals in 31 of them, including all those without a binding quota, and the unequal pair
 (5,6) in the remaining 4, all at a quota of 0.25, where counting the warm-up makes (4,4) infeasible
-(Section III-D, Table S-IV). The corresponding sentence of the Discussion was removed.
+(Section \mbox  {III-D}, Table S-III). The corresponding sentence of the Discussion was removed.
 
 **Comment 7 ("The final-round lead of the sparse schedules, reported in an earlier version of this
 work").** *"???"*
@@ -126,9 +126,9 @@ All references to earlier versions of the work were removed from the article, th
 the declarations. The observation itself is kept and is now stated on the data of the article:
 over the last ten rounds the sparse schedules are ahead of FedPer (0.6346 against 0.6261), so a
 comparison at the final round would favour them, whereas at the validation-selected round the
-difference is -0.0007 (Section V-B). The section of the supplement that listed changes
+difference is -0.0007 (Section \mbox  {V-B}). The section of the supplement that listed changes
 with respect to earlier versions was removed; supplementary experiments that use a different
-configuration are described by that configuration (Section S8).
+configuration are described by that configuration (Section S9).
 
 **Comment 8 (Discussion, "Some conclusions of this study are firmer than others.").** *"??? AI
 generated?"*
@@ -151,13 +151,13 @@ sentences.
 
 ## Further changes made during the revision
 
-- **More runs.** The ResNet comparison now has 6 seeds and the matched-budget DP comparison
-  6; the timing experiment has up to 7 runs per world, includes AdaComm, and was repeated on the
-  ResNet, where the scheduler adapts. The article reports 855 runs of the main protocol.
+- **More runs.** The ResNet comparison now has 10 seeds and the matched-budget DP comparison
+  10; the timing experiment has up to 10 runs per world, includes AdaComm, and was repeated on the
+  ResNet, where the scheduler adapts. The article reports 946 runs of the main protocol.
 - **Timing experiment.** The leak criterion now requires a permutation test (largest deviation of
   the AUC from 0.5 over the four observables, 10,000 permutations) in addition to the AUC threshold.
-- **Consistency check.** It was rerun on all 2,218 logs: 0 mismatches in 977 schedule, 872 byte and
-  230 accountant checks.
+- **Consistency check.** It was rerun on all 2,760 logs: 0 mismatches in 1,249 schedule, 1,144 byte and
+  250 accountant checks.
 - **References.** All 57 cited entries were re-checked against external records; four were
   corrected and four completed (see `REFERENCE_CHECK.md`).
 - **Preprocessing.** The article now states that features are standardised, and missing values

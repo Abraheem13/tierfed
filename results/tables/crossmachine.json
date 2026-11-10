@@ -1,0 +1,94 @@
+{
+ "laptop_win11": {
+  "machine": {
+   "label": "laptop_win11",
+   "system": "Windows 11",
+   "hardware": "ASUS ZenBook UX431DA laptop, AMD Ryzen mobile processor (family 23, model 24), 14 GB RAM",
+   "device": "cpu",
+   "launcher": "scripts/reproduce_v6.ps1 gate (the version before lag_xi5000 was added to the timing test and its seeds were cut to 42-46)",
+   "source": "pushed by the author to Abraheem13/tierfed, commit 4dbd3c3 (results/logs/*_au_*); copied here unchanged",
+   "note": "library versions were not recorded in these logs; the reference machine is the 4-core Linux machine whose runs are in results/logs"
+  },
+  "pairs": 136,
+  "unmatched": 0,
+  "config_differs": 0,
+  "bits_same": 123,
+  "bits_same_data_independent": 92,
+  "pairs_data_independent": 92,
+  "pairs_adaptive": 44,
+  "bits_same_adaptive": 31,
+  "adaptive_mb_rel_diff_max": 0.02943189596167012,
+  "K_same": 136,
+  "sel_same": 97,
+  "d_auroc_valsel": {
+   "median": 0.0003370935249893403,
+   "max": 0.0892858388116975
+  },
+  "d_auroc_final": {
+   "median": 0.0014367858687838186,
+   "max": 0.027703518264797222
+  },
+  "max_gap_run": "diabetes_mlp_fedper_R60_C20_s42_au_het_a0.3_fedper_summary.json",
+  "failures": {},
+  "gate": {
+   "settings": [
+    "a0.1",
+    "a0.3",
+    "a1",
+    "a10"
+   ],
+   "won_ref": [],
+   "won_second": [],
+   "same": true,
+   "gain_ref": [
+    -0.0113,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gain_second": [
+    -0.0083,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gain_absdiff_max": 0.003056517347212462
+  },
+  "timing": {
+   "methods": [
+    "fixed44",
+    "lag_xi2000",
+    "tierfed"
+   ],
+   "ref": {
+    "fixed44": {
+     "auc_max": 0.5,
+     "leaks": false
+    },
+    "lag_xi2000": {
+     "auc_max": 0.8194444444444444,
+     "leaks": true
+    },
+    "tierfed": {
+     "auc_max": 0.5,
+     "leaks": false
+    }
+   },
+   "second": {
+    "fixed44": {
+     "auc_max": 0.5,
+     "leaks": false
+    },
+    "lag_xi2000": {
+     "auc_max": 0.8055555555555556,
+     "leaks": true
+    },
+    "tierfed": {
+     "auc_max": 0.5,
+     "leaks": false
+    }
+   },
+   "same": true
+  }
+ }
+}

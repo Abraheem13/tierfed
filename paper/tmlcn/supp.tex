@@ -114,9 +114,9 @@ Dirichlet $\alpha=10$, 5 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main 
  & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0125 [\ensuremath{-}0.0168, \ensuremath{-}0.0090] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
  & Mean of the last ten rounds & \ensuremath{+}0.0017 [\ensuremath{-}0.0005, \ensuremath{+}0.0043] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
 \midrule
-ResNet backbone, 7 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0020 [\ensuremath{-}0.0058, \ensuremath{+}0.0011] & \ensuremath{-}0.0011 [\ensuremath{-}0.0059, \ensuremath{+}0.0028]\\
- & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0057 [\ensuremath{-}0.0103, \ensuremath{-}0.0014] & \ensuremath{+}0.0031 [\ensuremath{-}0.0021, \ensuremath{+}0.0074]\\
- & Mean of the last ten rounds & \ensuremath{+}0.0073 [\ensuremath{+}0.0053, \ensuremath{+}0.0091] & \ensuremath{-}0.0058 [\ensuremath{-}0.0078, \ensuremath{-}0.0039]\\
+ResNet backbone, 10 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0029 [\ensuremath{-}0.0057, \ensuremath{-}0.0002] & \ensuremath{-}0.0023 [\ensuremath{-}0.0061, \ensuremath{+}0.0011]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0055 [\ensuremath{-}0.0088, \ensuremath{-}0.0025] & \ensuremath{+}0.0038 [\ensuremath{-}0.0004, \ensuremath{+}0.0074]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0078 [\ensuremath{+}0.0047, \ensuremath{+}0.0113] & \ensuremath{-}0.0062 [\ensuremath{-}0.0077, \ensuremath{-}0.0047]\\
 \midrule
 Clinical centres, 20 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0085 [\ensuremath{-}0.0161, \ensuremath{-}0.0010] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
  & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0059 [\ensuremath{-}0.0125, \ensuremath{+}0.0000] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
@@ -205,7 +205,7 @@ Because the centres are small, the test split of a centre holds between about 19
 
 \section{Experiment Families of the Main Protocol}
 \label{supp:families}
-Table~\ref{tab:families} lists the 859 runs of the main protocol of the article by family, with the number of configurations, seeds and runs counted from the logs. A configuration is a method with its parameters in one setting; the timing families count the runs of both worlds.
+Table~\ref{tab:families} lists the 946 runs of the main protocol of the article by family, with the number of configurations, seeds and runs counted from the logs. A configuration is a method with its parameters in one setting; the timing families count the runs of both worlds.
 
 \begin{table}[t]
 \caption{Experiment families of the main protocol: data and clients, number of configurations, seeds per configuration and runs}
@@ -220,14 +220,14 @@ Reference bounds & pooled data, per-group test splits & 2 & 10 & 20\\
 Accuracy--upload frontier & 20 specialty groups & 8 & 5 & 40\\
 Peak-aware variants & 20 specialty groups & 3 & 5 & 15\\
 Label-skew sweep & Dirichlet $\alpha\in\{0.1,0.3,1,10\}$ & 20 & 5 & 100\\
-ResNet backbone & 20 specialty groups & 5 & 7--8 & 38\\
+ResNet backbone & 20 specialty groups & 5 & 10 & 50\\
 Clinical centres & Fed-Heart-Disease, 4 centres & 13 & 20 & 260\\
-Carry-over synchronisation step & specialty groups, centres, ResNet & 10 & 20 & 150\\
-Matched-$\varepsilon$ DP ($q=1$) & 20 specialty groups & 5 & 6 & 30\\
-Timing side channel, MLP & clean or shifted target group & 5 & 5--9 per world & 72\\
-Timing side channel, ResNet & clean or shifted target group & 1 & 2 per world & 4\\
+Carry-over synchronisation step & specialty groups, centres, ResNet & 13 & 5--20 & 165\\
+Matched-$\varepsilon$ DP ($q=1$) & 20 specialty groups & 5 & 10 & 50\\
+Timing side channel, MLP & clean or shifted target group & 5 & 10 per world & 100\\
+Timing side channel, ResNet & clean or shifted target group & 1 & 8 per world & 16\\
 \midrule
-Total &  &  &  & 859\\
+Total &  &  &  & 946\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -553,7 +553,7 @@ $q$, $\varepsilon^\star$, method & $\sigma$ & Releases & AUROC\\
 \end{table}
 
 \section{Released Data}
-The final metrics of every run are in \texttt{results/tables/collected\_all\_raw.csv} of the released repository, and the per-round histories and per-round bit counts of every run are in \texttt{results/logs}. The repository held 2,218 run logs when this document was built.
+The final metrics of every run are in \texttt{results/tables/collected\_all\_raw.csv} of the released repository, and the per-round histories and per-round bit counts of every run are in \texttt{results/logs}. The repository held 2,760 run logs when this document was built.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

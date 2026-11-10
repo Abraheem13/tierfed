@@ -277,7 +277,7 @@ def tab_families(df):
         x = d[d.family == fam]
         if x.empty:
             continue
-        per = x.groupby("name").seed.nunique()
+        per = x.groupby(["setting", "name"]).seed.nunique() if fam.startswith("Carry-over") else x.groupby("name").seed.nunique()
         seeds = f"{per.min()}" if per.min() == per.max() else f"{per.min()}--{per.max()}"
         nconf = x.groupby(["setting", "name"]).ngroups if fam in ("Label-skew sweep", "Carry-over synchronisation step") else x["name"].nunique()
         if fam.startswith("Timing"):
@@ -671,6 +671,7 @@ def numbers(df, base, gate, tm, sel, pg, W, results, n_runs=0):
         W.num(key + "AucAll", f4(r.auc_total_mb, 2)); W.num(key + "AucTarget", f4(r.auc_target_tx_rounds, 2))
         W.num(key + "AucMax", f4(float(np.nanmax(aucs)), 2)); W.num(key + "AucMin", f4(float(np.nanmin(aucs)), 2))
         W.num(key + "P", pperm(r.p_perm).replace("$", "")); W.num(key + "Runs", str(int(min(r.n_clean, r.n_shift))))
+        W.num(key + "RunsWord", word(int(min(r.n_clean, r.n_shift))))
         pe = pperm(r.p_perm).replace("$", "")
         W.num(key + "PEq", pe if pe.startswith("<") else "=" + pe)
         obs = ("the number of rounds with traffic", "the number of rounds in which the target transmits",
@@ -790,6 +791,9 @@ def sync_resnet(base, W):
         W.num(k + "D", fs(r["diff"])); W.num(k + "Lo", fs(r["lo"])); W.num(k + "Hi", fs(r["hi"]))
         W.num(k + "P", fp(r["p"]).replace("$", "")); W.num(k + "N", str(int(r["n"])))
         ok &= not (np.isfinite(r["lo"]) and r["lo"] > 0 and r["diff"] >= PRACTICAL)
+        W.flag(k + "CiAboveZero", bool(np.isfinite(r["lo"]) and r["lo"] > 0))
+        W.flag(k + "BelowThreshold", bool(abs(r["diff"]) < PRACTICAL))
+        W.num(k + "Abs", f4(abs(r["diff"])))
         t = b[b.name == n]
         W.num(k + "Mb", f4(t.total_upload_mb.mean(), 0)); W.num(k + "KEarly", early_k(t))
         W.num(k + "DiffRate", f4(t["sch_frac_rounds_tier_differentiated"].mean(), 2))
