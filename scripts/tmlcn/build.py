@@ -233,7 +233,15 @@ def markdown(macros: dict):
                 missing.append(m.group(1))
                 return "??"
             return plain(macros[m.group(1)])
-        text = re.sub(r"@@([A-Za-z]+)@@", rep, src.read_text())
+        lab = {"M": labels(TM / "main.aux"), "S": labels(TM / "supp.aux")}
+
+        def ref(m):
+            if m.group(2) not in lab[m.group(1)]:
+                missing.append(m.group(0))
+                return "??"
+            return lab[m.group(1)][m.group(2)]
+        text = re.sub(r"@@([MS]):([A-Za-z:\-]+)@@", ref, src.read_text())
+        text = re.sub(r"@@([A-Za-z]+)@@", rep, text)
         if missing:
             raise SystemExit(f"{name}: numbers not defined: {sorted(set(missing))}")
         (TM / name).write_text(text)

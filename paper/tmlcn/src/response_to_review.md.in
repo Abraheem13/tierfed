@@ -25,29 +25,29 @@ to the selected checkpoint, the saving is 27.7% (45.7 vs 63.2 MB). Say which com
 headline uses and keep it consistent with the main metric."*
 
 Both readings are now defined and named, and no saving is stated without its reading.
-Section II-D defines the cumulative upload B(r) (Eq. (8)) and its two readings: B(r-hat), the
+Section @@M:sec:metrics@@ defines the cumulative upload B(r) (Eq. (@@M:eq:upload@@)) and its two readings: B(r-hat), the
 upload up to the validation-selected round, which is the cost that belongs to the primary metric,
 and B(R), the upload of the whole budget of 60 rounds. The abstract now reads "@@tmSaveSelPct@@% less upload up
 to that round and @@tmSaveAllPct@@% less over all 60 rounds" (@@tmTierfedMbSel@@ against @@tmFedperMbSel@@ MB, and @@tmTierfedMbAll@@ against @@tmFedperMbAll@@ MB;
-percentages are rounded to integers so that they agree with the rounded megabytes). Section V-B
+percentages are rounded to integers so that they agree with the rounded megabytes). Section @@M:sec:results-main@@
 states both with their megabytes and adds that the scheduler selects round @@tmTierfedRound@@ on average and
 FedPer round @@tmFedperRound@@, so the saving up to the selected round is obtained with about twice as many rounds.
-Tables IV and V and the paired table of the supplement carry both readings in separate columns.
+Tables @@M:tab:main@@ and @@M:tab:centres@@ and the paired table of the supplement (Table @@S:tab:paired@@) carry both readings in separate columns.
 
 **Comment 3 (Section II-A, one local epoch).** *"Are inactive tiers kept locally or reset from the
 server? Figure 2 suggests only active tiers are replaced. Clarify this, including what happens to
 the optimizer state."*
 
-Section II-A now states the complete round as three equations (Eqs. (1)-(3)) and says explicitly:
+Section @@M:sec:federation@@ now states the complete round as three equations (Eqs. (@@M:eq:restart@@)-(@@M:eq:adopt@@)) and says explicitly:
 
 - a tier that is not due is kept at the client, is neither reset nor frozen, and continues to be
   trained; the server copy does not change;
-- when a tier is due, the client first replaces its copy by the server copy (Eq. (1)), trains one
-  epoch and uploads; after aggregation it adopts the new average (Eq. (3));
+- when a tier is due, the client first replaces its copy by the server copy (Eq. (@@M:eq:restart@@)), trains one
+  epoch and uploads; after aggregation it adopts the new average (Eq. (@@M:eq:adopt@@));
 - the optimiser state belongs to the client: Adam's moment estimates and step count are kept from
   round to round for all parameters and are not reset when the values of a tier are replaced.
 
-The caption of Fig. 2 and that of Fig. 3 now say the same. Answering this comment exactly also
+The captions of Fig. @@M:fig:arch@@ and Fig. @@M:fig:round@@ now say the same. Answering this comment exactly also
 showed that the previous text described the synchronisation inaccurately in one respect, which
 has been corrected throughout. Because a due tier is restarted from the server copy, what a
 client uploads is always one local epoch away from the broadcast, whatever the interval. The
@@ -59,13 +59,13 @@ implementation. The revision therefore
   tier is uploaded after all local epochs since its last synchronisation);
 - restates Proposition 1 for the restart step, with the drift of the clients' copies and the
   bound for the server copy as separate parts, and gives the bound of the carry-over step next
-  to it (Section III-B, proofs in Section S1);
+  to it (Section @@M:sec:programme@@, proofs in Section @@S:supp:proofs@@);
 - reports the measured dispersion for both: under the restart step it is flat in the period
   (slow tier @@tmDispRsSlowMin@@-@@tmDispRsSlowMax@@, medium tier @@tmDispRsMedMin@@-@@tmDispRsMedMax@@, times 1e-3, for K = 1 to 8), under the
   carry-over step it is larger by factors of @@tmDispRatioSlowFour@@ and @@tmDispRatioMedFour@@ at K = 4 and of @@tmDispRatioSlowEight@@ and @@tmDispRatioMedEight@@ at K = 8
-  (Table S-V, Fig. 7(d));
+  (Table @@S:tab:dispersion@@, Fig. @@M:fig:sync@@(d));
 - adds an experiment with the carry-over step on the specialty groups, the clinical centres and
-  the ResNet (Section V-E, Table VII, Fig. 7(c)).
+  the ResNet (Section @@M:sec:results-sync@@, Table @@M:tab:sync@@, Fig. @@M:fig:sync@@(c)).
 
 The main finding is the same under both steps: the scheduler reduces to the uniform period. The
 step does change how a sparse period compares with FedPer, and this is reported (see comment 4).
@@ -76,7 +76,7 @@ under the same protocol would strengthen the clinical relevance."*
 
 Both parts were addressed.
 
-(a) Wording. Section II-C now says that the public release carries no hospital identifier, that
+(a) Wording. Section @@M:sec:data@@ now says that the public release carries no hospital identifier, that
 the clients of the main benchmark "are not hospitals" but 20 groups of patients formed from the
 medical-specialty column, and names them specialty groups. The word "site" is no longer used: the
 generic participant is a "client", the clients of the readmission benchmark are "specialty
@@ -85,8 +85,8 @@ abstract, all tables, figures and captions, and the limitation is repeated in th
 
 (b) Real institutions. Fed-Heart-Disease (the four collections of the UCI Heart Disease data:
 Cleveland, Budapest, Zurich/Basel and Long Beach; @@tmHospPatients@@ patients) was run under the protocol of the
-main benchmark, with the methods of the main comparison and @@tmHospSeeds@@ seeds (Section V-C, Table V,
-Fig. 7(a,b), supplement Section S7). The result is reported as it came out:
+main benchmark, with the methods of the main comparison and @@tmHospSeeds@@ seeds (Section @@M:sec:results-centres@@, Table @@M:tab:centres@@,
+Fig. @@M:fig:sync@@(a,b), supplement Section @@S:supp:centres@@). The result is reported as it came out:
 
 - the scheduler again selects the uniform period (4,4) in every seed (Psi = @@tmHospPsi@@%), and its runs are
   identical to those of that period;
@@ -105,7 +105,7 @@ sigma_g^2, so their average with equal weights has variance at most sigma_g^2 / 
 speed-up of local SGD). The proposition now states the equal-weight assumption explicitly, and
 the text adds what replaces 1/N under the sample weights used in the experiments: the sum of the
 squared weights, i.e. 1/N_eff, with N_eff = @@tmNeff@@ for the 20 specialty groups and @@tmHospNeff@@ for the four
-centres. The derivation is in Section S1.2.
+centres. The derivation is in Section @@S:supp:proofs@@ of the supplement.
 
 **Comment 6 (privacy planner, "can only choose equal intervals").** *"Usually, we will avoid using
 words such as 'only', since it is too absolute. It is better to double check if this statement is
@@ -117,7 +117,7 @@ Psi = 0), but the integer planner is not restricted to equal intervals. It was e
 of @@tmPlanCells@@ combinations of prior weight and quota (identical for four privacy budgets): it returns
 equal intervals in @@tmPlanCellsEqual@@ of them, including all those without a binding quota, and the unequal pair
 @@tmPlanUnequalPairs@@ in the remaining @@tmPlanCellsUnequal@@, all at a quota of @@tmPlanUnequalRho@@, where counting the warm-up makes (4,4) infeasible
-(Section III-D, Table S-IV). The corresponding sentence of the Discussion was removed.
+(Section @@M:sec:method-privacy@@, Table @@S:tab:planner@@). The corresponding sentence of the Discussion was removed.
 
 **Comment 7 ("The final-round lead of the sparse schedules, reported in an earlier version of this
 work").** *"???"*
@@ -126,9 +126,9 @@ All references to earlier versions of the work were removed from the article, th
 the declarations. The observation itself is kept and is now stated on the data of the article:
 over the last ten rounds the sparse schedules are ahead of FedPer (@@auTierfedLast@@ against @@auFedperLast@@), so a
 comparison at the final round would favour them, whereas at the validation-selected round the
-difference is @@auTierfedDFedper@@ (Section V-B). The section of the supplement that listed changes
+difference is @@auTierfedDFedper@@ (Section @@M:sec:results-main@@). The section of the supplement that listed changes
 with respect to earlier versions was removed; supplementary experiments that use a different
-configuration are described by that configuration (Section S8).
+configuration are described by that configuration (Section @@S:supp:legacy@@).
 
 **Comment 8 (Discussion, "Some conclusions of this study are firmer than others.").** *"??? AI
 generated?"*

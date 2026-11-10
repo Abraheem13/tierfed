@@ -596,7 +596,7 @@ def numbers(df, base, gate, tm, sel, pg, W, results, n_runs=0):
         ahead = sel[(sel.lo_fp > 0) & (sel.rule == "last10")]
         W.num("tmSelLastAhead", str(len(ahead)))
         sb = behind[behind.rule == "smooth3"]
-        W.num("tmSelSmoothBehind", str(len(sb)))
+        W.num("tmSelSmoothBehind", str(len(sb))); W.num("tmSelSmoothBehindWord", word(len(sb)))
         W.num("tmSelSmoothBehindList", "; ".join(
             f"{SETTING.get(r.setting, r.setting)}: {fs(r.d_fp)} [{fs(r.lo_fp)}, {fs(r.hi_fp)}]" for r in sb.itertuples()) or "none")
         W.flag("tmSelSmoothBehindTen", bool(len(behind[(behind.setting == "a10") & (behind.rule == "smooth3")])))
@@ -662,6 +662,7 @@ def numbers(df, base, gate, tm, sel, pg, W, results, n_runs=0):
         W.num("tmPlanCellsUnequal", str(int((cells.ks != cells.km).sum())))
     # ---- timing side channel
     t = tm.set_index("name") if tm is not None and len(tm) else pd.DataFrame()
+    leaks_any = False
     for n, _, _ in TIMING_ORDER:
         if n not in t.index:
             continue
@@ -670,10 +671,18 @@ def numbers(df, base, gate, tm, sel, pg, W, results, n_runs=0):
         W.num(key + "AucAll", f4(r.auc_total_mb, 2)); W.num(key + "AucTarget", f4(r.auc_target_tx_rounds, 2))
         W.num(key + "AucMax", f4(float(np.nanmax(aucs)), 2)); W.num(key + "AucMin", f4(float(np.nanmin(aucs)), 2))
         W.num(key + "P", pperm(r.p_perm).replace("$", "")); W.num(key + "Runs", str(int(min(r.n_clean, r.n_shift))))
+        pe = pperm(r.p_perm).replace("$", "")
+        W.num(key + "PEq", pe if pe.startswith("<") else "=" + pe)
+        obs = ("the number of rounds with traffic", "the number of rounds in which the target transmits",
+               "the upload of the target", "the total upload of all clients")
+        best = int(np.nanargmax(np.abs(np.array(aucs) - 0.5)))
+        W.num(key + "BestObs", obs[best]); W.num(key + "BestAuc", f4(aucs[best], 2))
+        leaks_any = leaks_any or bool(np.nanmax(np.abs(np.array(aucs) - 0.5)) >= 0.25 and r.p_perm < 0.05)
         W.num(key + "OtherSkipPct", f4(100 * r.other_skip_share, 0))
         W.flag(key + "Silent", bool(all(abs(x - 0.5) < 1e-12 for x in aucs)))
         W.flag(key + "TargetNeverSkips", bool(r.target_skips == 0))
         W.flag(key + "Leaks", bool(np.nanmax(np.abs(np.array(aucs) - 0.5)) >= 0.25 and r.p_perm < 0.05))
+    W.flag("tmTAnyLeak", bool(leaks_any))
     # ---- main benchmark: aggregation weights
     try:
         sw = site_weights("diabetes", 20, sorted(sp.seed.unique()))
@@ -766,6 +775,29 @@ def sync_vs_fedper(base, W):
                 W.num(k + "P", fp(r["p"]).replace("$", ""))
         W.num("tmSyncFp" + key[st] + "FedperMb", f4(a["upload_mb_valsel"].mean(), 1))
         W.num("tmSyncFp" + key[st] + "FedperRound", f4(a["valsel_round"].mean(), 0))
+
+
+def sync_resnet(base, W):
+    b = base[(base.setting == "resnet_co") & base.eps.isna()]
+    if not {"tierfed", "fixed44"} <= set(b.name):
+        return
+    ok = True
+    for n, nk in (("tierfed", "Tierfed"), ("tierfed_db", "TierfedDb")):
+        if n not in set(b.name):
+            continue
+        r = paired(b, n, "fixed44")
+        k = "tmSyncResVsFour" + nk
+        W.num(k + "D", fs(r["diff"])); W.num(k + "Lo", fs(r["lo"])); W.num(k + "Hi", fs(r["hi"]))
+        W.num(k + "P", fp(r["p"]).replace("$", "")); W.num(k + "N", str(int(r["n"])))
+        ok &= not (np.isfinite(r["lo"]) and r["lo"] > 0 and r["diff"] >= PRACTICAL)
+        t = b[b.name == n]
+        W.num(k + "Mb", f4(t.total_upload_mb.mean(), 0)); W.num(k + "KEarly", early_k(t))
+        W.num(k + "DiffRate", f4(t["sch_frac_rounds_tier_differentiated"].mean(), 2))
+        W.flag(k + "Splits", bool(t["sch_frac_rounds_tier_differentiated"].mean() > 0.5))
+    W.num("tmSyncResFourMb", f4(b[b.name == "fixed44"].total_upload_mb.mean(), 0))
+    W.num("tmSyncResSeeds", str(b[b.name == "tierfed"].seed.nunique()))
+    W.num("tmSyncResSeedsWord", word(b[b.name == "tierfed"].seed.nunique()))
+    W.flag("tmSyncResNoGainVsFour", bool(ok))
 
 
 def sync_numbers(sf, sg, dd, W):
@@ -888,7 +920,7 @@ def main(argv=None):
     sync_numbers(sf, sg, dd, W)
     if fed_same is not None:
         W.flag("tmSyncFedperSame", fed_same)
-    sync_vs_fedper(base, W)
+    sync_vs_fedper(base, W); sync_resnet(base, W)
     # numbers the paired table's sentences quote
     for r in pr:
         key = "tmPair" + _safe(r["name"].title().replace("_", ""))

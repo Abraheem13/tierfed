@@ -15,7 +15,7 @@ export PYTHONHASHSEED=0
 export SOURCE_DATE_EPOCH=0   # figure PDFs without a creation date: byte-identical on every rebuild
 cd "$(dirname "$0")/.."
 mkdir -p results/v6_logs
-S10="42 43 44 45 46 47 48 49 50 51"; S5="42 43 44 45 46"; S20="$(seq -s ' ' 42 61)"
+S10="42 43 44 45 46 47 48 49 50 51"; S5="42 43 44 45 46"; S20="$(seq -s ' ' 42 61)"; S8="42 43 44 45 46 47 48 49"
 MAIN="local fedavg fedprox fedper fedlama adacomm8 lag_uniform lag fixed44 fixed44_st fixed88 tierfed tierfed_st"
 A="-m src.experiments.run_audit --device cpu --out results"
 
@@ -30,13 +30,11 @@ core() {
 gate() {
   for a in 0.1 0.3 1 10; do for s in $S5; do
     echo "$A --stage hetero --alpha $a --only fedper local fixed44 fixed88 tierfed --seeds $s"; done; done
-  for s in $S20; do echo "$A --stage timing --model mlp --only lag_xi2000 adacomm8 --seeds $s"; done
-  for s in $S10; do echo "$A --stage timing --model mlp --only tierfed lag_xi5000 fixed44 --seeds $s"; done
+  for s in $S10; do echo "$A --stage timing --model mlp --only tierfed adacomm8 lag_xi2000 lag_xi5000 fixed44 --seeds $s"; done
 }
 resnet() {
   for s in $S10; do echo "$A --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s"; done
-  for s in $S10; do echo "$A --stage timing --model resnet --only tierfed --seeds $s"; done
-  for s in $S5; do echo "$A --stage timing --model resnet --only fixed15 --seeds $s"; done
+  for s in $S8; do echo "$A --stage timing --model resnet --only tierfed --seeds $s"; done
 }
 centres() {
   for s in $S20; do echo "$A --stage hospitals --seeds $s"; done
@@ -45,7 +43,7 @@ sync() {
   for s in $S10; do echo "$A --stage carryover --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s"; done
   echo "$A --stage carryover --only fedper --seeds 42"
   for s in $S20; do echo "$A --stage carryover --data heart --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s"; done
-  for s in $S5; do echo "$A --stage carryover --model resnet --only SYNCRESNETCONFIGS --seeds $s"; done
+  for s in $S5; do echo "$A --stage carryover --model resnet --only tierfed tierfed_db fixed44 --seeds $s"; done
 }
 run() {   # one python process per line, J at a time; each writes its own log
   nl -nln | while read -r i cmd; do echo "$i $cmd"; done |

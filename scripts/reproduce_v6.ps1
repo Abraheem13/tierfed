@@ -9,7 +9,7 @@ $env:SOURCE_DATE_EPOCH = "0"   # figure PDFs without a creation date: byte-ident
 Set-Location (Join-Path $PSScriptRoot "..")
 $py = (Resolve-Path ".\.venv\Scripts\python.exe").Path
 New-Item -ItemType Directory -Force -Path results\v6_logs | Out-Null
-$S10 = 42..51; $S5 = 42..46; $S20 = 42..61
+$S10 = 42..51; $S5 = 42..46; $S20 = 42..61; $S8 = 42..49
 $MAIN = "local fedavg fedprox fedper fedlama adacomm8 lag_uniform lag fixed44 fixed44_st fixed88 tierfed tierfed_st"
 # PowerShell variable names are case-insensitive: never reuse $AUD as a loop variable
 $AUD = "-m src.experiments.run_audit --device cpu --out results"
@@ -28,15 +28,13 @@ function Gate {
   $c = @()
   foreach ($alpha in @("0.1", "0.3", "1", "10")) { foreach ($s in $S5) {
     $c += "$AUD --stage hetero --alpha $alpha --only fedper local fixed44 fixed88 tierfed --seeds $s" } }
-  foreach ($s in $S20) { $c += "$AUD --stage timing --model mlp --only lag_xi2000 adacomm8 --seeds $s" }
-  foreach ($s in $S10) { $c += "$AUD --stage timing --model mlp --only tierfed lag_xi5000 fixed44 --seeds $s" }
+  foreach ($s in $S10) { $c += "$AUD --stage timing --model mlp --only tierfed adacomm8 lag_xi2000 lag_xi5000 fixed44 --seeds $s" }
   return $c
 }
 function Resnet {
   $c = @()
   foreach ($s in $S10) { $c += "$AUD --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s" }
-  foreach ($s in $S10) { $c += "$AUD --stage timing --model resnet --only tierfed --seeds $s" }
-  foreach ($s in $S5) { $c += "$AUD --stage timing --model resnet --only fixed15 --seeds $s" }
+  foreach ($s in $S8) { $c += "$AUD --stage timing --model resnet --only tierfed --seeds $s" }
   return $c
 }
 function Centres {
@@ -49,7 +47,7 @@ function Sync {
   foreach ($s in $S10) { $c += "$AUD --stage carryover --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s" }
   $c += "$AUD --stage carryover --only fedper --seeds 42"
   foreach ($s in $S20) { $c += "$AUD --stage carryover --data heart --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s" }
-  foreach ($s in $S5) { $c += "$AUD --stage carryover --model resnet --only SYNCRESNETCONFIGS --seeds $s" }
+  foreach ($s in $S5) { $c += "$AUD --stage carryover --model resnet --only tierfed tierfed_db fixed44 --seeds $s" }
   return $c
 }
 function Run-Parallel([string[]]$ArgList) {
