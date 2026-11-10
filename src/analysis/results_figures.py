@@ -77,7 +77,7 @@ def _curve(ax, hist, col, key, label=None, sel=None, ci=True):
 
 
 def fig_dynamics(L: Path, out: Path):
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.0))
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 1.9))
     series = [("fedper", "fedper"), ("lag", "lag"), ("adacomm8", "adacomm"), ("tierfed", "tierfed"), ("local", "local")]
     for name, key in series:
         hist, summ = _runs(L, f"diabetes_mlp_*_R60_C20_s*_au_{name}_history.csv")
@@ -117,7 +117,7 @@ def fig_dynamics(L: Path, out: Path):
 
 
 def fig_resdp(L: Path, out: Path):
-    fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.05))
+    fig, axes = plt.subplots(1, 4, figsize=(7.2, 1.92))
     # (a) ResNet backbone
     for name, key in (("fedper", "fedper"), ("fixed44", "fixed44"), ("fixed15", "fixed15"), ("tierfed", "tierfed"),
                       ("local", "local")):
@@ -186,7 +186,7 @@ def fig_sync(L: Path, out: Path):
     """(a, b) the four clinical centres: test AUROC per round and cumulative upload;
     (c) the fixed period (4,4) on the specialty groups under both synchronisation steps;
     (d) dispersion of the uploaded slices against the uniform period, both steps."""
-    fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.05))
+    fig, axes = plt.subplots(1, 4, figsize=(7.2, 1.92))
     for name, key in (("fedper", "fedper"), ("fixed22", "fixed22"), ("tierfed", "tierfed"), ("adacomm8", "adacomm"),
                       ("local", "local")):
         hist, summ = _runs(L, f"heart_mlp_*_R60_C4_s*_au_hosp_{name}_history.csv")

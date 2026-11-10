@@ -93,6 +93,9 @@ def read_macros(*files: Path) -> dict:
     return out
 
 
+DRAFT = False          # --draft: values that do not exist yet print as "??" and claims are not enforced
+
+
 def expand(s: str, macros: dict, failed: list) -> str:
     out, i = [], 0
     pat = re.compile(r"\\(num|ifflag|claim|gen)\{")
@@ -105,11 +108,11 @@ def expand(s: str, macros: dict, failed: list) -> str:
         name, j = brace_group(s, m.end() - 1)
         kind = m.group(1)
         if kind == "num":
-            if name not in macros:
+            if name not in macros and not DRAFT:
                 raise KeyError(f"number {name} is not defined")
-            out.append(macros[name])
+            out.append(macros.get(name, "??"))
         elif kind == "claim":
-            v = macros.get("flag" + name)
+            v = macros.get("flag" + name, "true" if DRAFT else None)
             if v not in ("true", "false"):
                 raise KeyError(f"flag {name} is not defined")
             if v == "false":
@@ -117,7 +120,7 @@ def expand(s: str, macros: dict, failed: list) -> str:
         elif kind == "ifflag":
             a, j = brace_group(s, j)
             b, j = brace_group(s, j)
-            v = macros.get("flag" + name)
+            v = macros.get("flag" + name, "true" if DRAFT else None)
             if v not in ("true", "false"):
                 raise KeyError(f"flag {name} is not defined")
             out.append(expand(a if v == "true" else b, macros, failed))
@@ -154,11 +157,13 @@ def flatten(stem: str, macros: dict) -> str:
         keep.append(line.replace("{../figures/", "{figures/"))
     failed: list = []
     body = expand(body, macros, failed)
-    if failed:
+    if failed and DRAFT:
+        print(f"{stem}: DRAFT, statements not supported by the logs: {', '.join(sorted(set(failed)))}")
+    elif failed:
         raise SystemExit(f"{stem}: statements not supported by the logs: {', '.join(sorted(set(failed)))}")
     out = "\n".join(keep) + "\n\\begin{document}" + body
     for bad in ("\\num{", "\\ifflag{", "\\gen{", "\\claim{", "RUN REQUIRED", "\\runreq", "TEXT"):
-        if bad in out.split("\\begin{document}", 1)[1]:
+        if bad in out.split("\\begin{document}", 1)[1] and not (DRAFT and bad in ("RUN REQUIRED", "\\runreq")):
             raise SystemExit(f"{stem}: '{bad}' left after flattening")
     return out
 
@@ -251,7 +256,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--analysis", action="store_true", help="regenerate numbers, tables and figures first")
     ap.add_argument("--zip", action="store_true", help="write the submission archive")
+    ap.add_argument("--draft", action="store_true", help="build although some runs are missing (never for submission)")
     a = ap.parse_args(argv)
+    global DRAFT
+    DRAFT = a.draft
     if a.analysis:
         analysis()
     macros = read_macros(ROOT / "paper" / "generated" / "numbers.tex", GEN / "numbers_au.tex", GEN / "numbers_tmlcn.tex")
@@ -267,6 +275,9 @@ def main(argv=None):
     if missing:
         raise SystemExit(f"cross-document labels not found: {sorted(missing)}")
     bad = [f"{stem}: {b}" for stem in flat for b in checks(stem)]
+    if DRAFT:
+        print("DRAFT build, not for submission:", "; ".join(bad) or "no check failed")
+        return
     if bad:
         raise SystemExit("build checks failed: " + "; ".join(bad))
     markdown(macros)

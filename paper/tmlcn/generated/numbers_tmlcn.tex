@@ -327,9 +327,9 @@
 \newcommand{\tmTierfedRound}{36}
 \newcommand{\tmFedperRound}{17}
 \newcommand{\tmMainSeeds}{10}
-\newcommand{\tmResnetSeeds}{6}
+\newcommand{\tmResnetSeeds}{7}
 \newcommand{\tmHetSeeds}{5}
-\newcommand{\tmRuns}{855}
+\newcommand{\tmRuns}{859}
 \newcommand{\tmGateAZeroPOnePHolm}{1.000}
 \newcommand{\tmGateResnetPHolm}{1.000}
 \newcommand{\tmGateSettings}{7}
@@ -434,24 +434,24 @@
 \newcommand{\tmSelAOneZeroLastOneZeroU}{\ensuremath{+}0.0000}
 \newcommand{\tmSelAOneZeroLastOneZeroULo}{\ensuremath{+}0.0000}
 \newcommand{\tmSelAOneZeroLastOneZeroUHi}{\ensuremath{+}0.0000}
-\newcommand{\tmSelResnetArgmaxFp}{\ensuremath{-}0.0030}
-\newcommand{\tmSelResnetArgmaxFpLo}{\ensuremath{-}0.0069}
-\newcommand{\tmSelResnetArgmaxFpHi}{\ensuremath{-}0.0005}
-\newcommand{\tmSelResnetArgmaxU}{\ensuremath{-}0.0020}
-\newcommand{\tmSelResnetArgmaxULo}{\ensuremath{-}0.0073}
-\newcommand{\tmSelResnetArgmaxUHi}{\ensuremath{+}0.0021}
-\newcommand{\tmSelResnetSmoothThreeFp}{\ensuremath{-}0.0071}
-\newcommand{\tmSelResnetSmoothThreeFpLo}{\ensuremath{-}0.0116}
-\newcommand{\tmSelResnetSmoothThreeFpHi}{\ensuremath{-}0.0030}
-\newcommand{\tmSelResnetSmoothThreeU}{\ensuremath{+}0.0024}
-\newcommand{\tmSelResnetSmoothThreeULo}{\ensuremath{-}0.0033}
+\newcommand{\tmSelResnetArgmaxFp}{\ensuremath{-}0.0020}
+\newcommand{\tmSelResnetArgmaxFpLo}{\ensuremath{-}0.0058}
+\newcommand{\tmSelResnetArgmaxFpHi}{\ensuremath{+}0.0011}
+\newcommand{\tmSelResnetArgmaxU}{\ensuremath{-}0.0011}
+\newcommand{\tmSelResnetArgmaxULo}{\ensuremath{-}0.0059}
+\newcommand{\tmSelResnetArgmaxUHi}{\ensuremath{+}0.0028}
+\newcommand{\tmSelResnetSmoothThreeFp}{\ensuremath{-}0.0057}
+\newcommand{\tmSelResnetSmoothThreeFpLo}{\ensuremath{-}0.0103}
+\newcommand{\tmSelResnetSmoothThreeFpHi}{\ensuremath{-}0.0014}
+\newcommand{\tmSelResnetSmoothThreeU}{\ensuremath{+}0.0031}
+\newcommand{\tmSelResnetSmoothThreeULo}{\ensuremath{-}0.0021}
 \newcommand{\tmSelResnetSmoothThreeUHi}{\ensuremath{+}0.0074}
-\newcommand{\tmSelResnetLastOneZeroFp}{\ensuremath{+}0.0078}
-\newcommand{\tmSelResnetLastOneZeroFpLo}{\ensuremath{+}0.0056}
-\newcommand{\tmSelResnetLastOneZeroFpHi}{\ensuremath{+}0.0093}
-\newcommand{\tmSelResnetLastOneZeroU}{\ensuremath{-}0.0064}
-\newcommand{\tmSelResnetLastOneZeroULo}{\ensuremath{-}0.0084}
-\newcommand{\tmSelResnetLastOneZeroUHi}{\ensuremath{-}0.0046}
+\newcommand{\tmSelResnetLastOneZeroFp}{\ensuremath{+}0.0073}
+\newcommand{\tmSelResnetLastOneZeroFpLo}{\ensuremath{+}0.0053}
+\newcommand{\tmSelResnetLastOneZeroFpHi}{\ensuremath{+}0.0091}
+\newcommand{\tmSelResnetLastOneZeroU}{\ensuremath{-}0.0058}
+\newcommand{\tmSelResnetLastOneZeroULo}{\ensuremath{-}0.0078}
+\newcommand{\tmSelResnetLastOneZeroUHi}{\ensuremath{-}0.0039}
 \newcommand{\tmSelHospitalsArgmaxFp}{\ensuremath{-}0.0085}
 \newcommand{\tmSelHospitalsArgmaxFpLo}{\ensuremath{-}0.0161}
 \newcommand{\tmSelHospitalsArgmaxFpHi}{\ensuremath{-}0.0010}
@@ -473,7 +473,8 @@
 \newcommand{\tmSelBehindFedper}{3}
 \newcommand{\tmSelLastAhead}{5}
 \newcommand{\tmSelSmoothBehind}{2}
-\newcommand{\tmSelSmoothBehindList}{Dirichlet $\alpha=10$: \ensuremath{-}0.0125 [\ensuremath{-}0.0168, \ensuremath{-}0.0090]; ResNet backbone: \ensuremath{-}0.0071 [\ensuremath{-}0.0116, \ensuremath{-}0.0030]}
+\newcommand{\tmSelSmoothBehindWord}{two}
+\newcommand{\tmSelSmoothBehindList}{Dirichlet $\alpha=10$: \ensuremath{-}0.0125 [\ensuremath{-}0.0168, \ensuremath{-}0.0090]; ResNet backbone: \ensuremath{-}0.0057 [\ensuremath{-}0.0103, \ensuremath{-}0.0014]}
 \newcommand{\tmDpSeeds}{6}
 \newcommand{\tmDpFinalMin}{0.4999}
 \newcommand{\tmDpFinalMax}{0.5303}
@@ -508,6 +509,9 @@
 \newcommand{\tmTFixedFourFourAucMin}{0.50}
 \newcommand{\tmTFixedFourFourP}{=1.000}
 \newcommand{\tmTFixedFourFourRuns}{5}
+\newcommand{\tmTFixedFourFourPEq}{=1.000}
+\newcommand{\tmTFixedFourFourBestObs}{the number of rounds with traffic}
+\newcommand{\tmTFixedFourFourBestAuc}{0.50}
 \newcommand{\tmTFixedFourFourOtherSkipPct}{70}
 \newcommand{\tmTTierfedAucAll}{0.50}
 \newcommand{\tmTTierfedAucTarget}{0.50}
@@ -515,6 +519,9 @@
 \newcommand{\tmTTierfedAucMin}{0.50}
 \newcommand{\tmTTierfedP}{=1.000}
 \newcommand{\tmTTierfedRuns}{7}
+\newcommand{\tmTTierfedPEq}{=1.000}
+\newcommand{\tmTTierfedBestObs}{the number of rounds with traffic}
+\newcommand{\tmTTierfedBestAuc}{0.50}
 \newcommand{\tmTTierfedOtherSkipPct}{70}
 \newcommand{\tmTAdacommEightAucAll}{0.50}
 \newcommand{\tmTAdacommEightAucTarget}{0.50}
@@ -522,6 +529,9 @@
 \newcommand{\tmTAdacommEightAucMin}{0.50}
 \newcommand{\tmTAdacommEightP}{=1.000}
 \newcommand{\tmTAdacommEightRuns}{8}
+\newcommand{\tmTAdacommEightPEq}{=1.000}
+\newcommand{\tmTAdacommEightBestObs}{the number of rounds with traffic}
+\newcommand{\tmTAdacommEightBestAuc}{0.50}
 \newcommand{\tmTAdacommEightOtherSkipPct}{87}
 \newcommand{\tmTLagXiTwoZeroZeroZeroAucAll}{0.83}
 \newcommand{\tmTLagXiTwoZeroZeroZeroAucTarget}{0.50}
@@ -529,6 +539,9 @@
 \newcommand{\tmTLagXiTwoZeroZeroZeroAucMin}{0.50}
 \newcommand{\tmTLagXiTwoZeroZeroZeroP}{=0.031}
 \newcommand{\tmTLagXiTwoZeroZeroZeroRuns}{7}
+\newcommand{\tmTLagXiTwoZeroZeroZeroPEq}{=0.031}
+\newcommand{\tmTLagXiTwoZeroZeroZeroBestObs}{the total upload of all clients}
+\newcommand{\tmTLagXiTwoZeroZeroZeroBestAuc}{0.83}
 \newcommand{\tmTLagXiTwoZeroZeroZeroOtherSkipPct}{56}
 \newcommand{\tmTLagXiFiveZeroZeroZeroAucAll}{0.93}
 \newcommand{\tmTLagXiFiveZeroZeroZeroAucTarget}{0.96}
@@ -536,6 +549,9 @@
 \newcommand{\tmTLagXiFiveZeroZeroZeroAucMin}{0.93}
 \newcommand{\tmTLagXiFiveZeroZeroZeroP}{=0.001}
 \newcommand{\tmTLagXiFiveZeroZeroZeroRuns}{7}
+\newcommand{\tmTLagXiFiveZeroZeroZeroPEq}{=0.001}
+\newcommand{\tmTLagXiFiveZeroZeroZeroBestObs}{the number of rounds in which the target transmits}
+\newcommand{\tmTLagXiFiveZeroZeroZeroBestAuc}{0.96}
 \newcommand{\tmTLagXiFiveZeroZeroZeroOtherSkipPct}{92}
 \newcommand{\tmTTierfedResnetAucAll}{0.25}
 \newcommand{\tmTTierfedResnetAucTarget}{0.25}
@@ -543,6 +559,9 @@
 \newcommand{\tmTTierfedResnetAucMin}{0.25}
 \newcommand{\tmTTierfedResnetP}{=1.000}
 \newcommand{\tmTTierfedResnetRuns}{2}
+\newcommand{\tmTTierfedResnetPEq}{=1.000}
+\newcommand{\tmTTierfedResnetBestObs}{the number of rounds with traffic}
+\newcommand{\tmTTierfedResnetBestAuc}{0.25}
 \newcommand{\tmTTierfedResnetOtherSkipPct}{1}
 \newcommand{\tmSumPSq}{0.085}
 \newcommand{\tmNeff}{11.8}
@@ -789,6 +808,7 @@
 \newcommand{\flagtmTTierfedResnetSilent}{false}
 \newcommand{\flagtmTTierfedResnetTargetNeverSkips}{false}
 \newcommand{\flagtmTTierfedResnetLeaks}{false}
+\newcommand{\flagtmTAnyLeak}{true}
 \newcommand{\flagtmHospNiTen}{false}
 \newcommand{\flagtmHospAlwaysFourFour}{true}
 \newcommand{\flagtmHospTierfedIsFixed}{true}

@@ -22,7 +22,7 @@
 \author{Abraheem Rashid and Mehwish Mahmood}
 \maketitle
 
-This supplement contains the proofs of the two propositions and of the phase condition (Section~\ref{supp:proofs}), details of the privacy accounting (Section~\ref{supp:dp}), the sensitivity of the primary contrasts to the rule that selects the reported round (Section~\ref{supp:selection}), a paired comparison on the main benchmark (Section~\ref{supp:paired}), the privacy planner on a grid of its parameters (Section~\ref{supp:planner}), details of the two synchronisation steps (Section~\ref{supp:sync}) and of the clinical-centre benchmark (Section~\ref{supp:centres}), and additional experiments that were read at the final round (Section~\ref{supp:legacy}). Equation, table and section numbers without the prefix S refer to the article.
+This supplement contains the proofs of the two propositions and of the phase condition (Section~\ref{supp:proofs}), details of the privacy accounting (Section~\ref{supp:dp}), the sensitivity of the primary contrasts to the rule that selects the reported round (Section~\ref{supp:selection}), a paired comparison on the main benchmark (Section~\ref{supp:paired}), the privacy planner on a grid of its parameters (Section~\ref{supp:planner}), details of the two synchronisation steps (Section~\ref{supp:sync}) and of the clinical-centre benchmark (Section~\ref{supp:centres}), the experiment families of the main protocol (Section~\ref{supp:families}), and additional experiments that were read at the final round (Section~\ref{supp:legacy}). Equation, table and section numbers without the prefix S refer to the article.
 
 \section{Proofs}
 \label{supp:proofs}
@@ -71,16 +71,23 @@ After warm-up, tier $a$ is due in the rounds $r=T_w+\phi_a+nK_a>T_w$ and tier $b
 
 \section{Differential-Privacy Accounting}
 \label{supp:dp}
-Clipping each client's update to $C$ makes the $\ell_2$ sensitivity of the sum to the addition or removal of one client equal to $C$, and the fixed denominator $qN$ of (17) does not depend on the realised cohort. With Poisson sampling at rate $q$ each release is a subsampled Gaussian mechanism, whose R\'enyi DP at integer order $\alpha$ is $\frac1{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^k\exp\frac{k^2-k}{2z^2}$~\cite{mironov2019sgm}; for $q=1$ it is $\alpha/(2z^2)$~\cite{mironov2017}. Composition over the $R_{\mathrm{tx}}$ planned releases is additive, and the conversion to $(\varepsilon,\delta)$-DP~\cite{mironov2017} is minimised over $\alpha\in\{2,\dots,256\}$, with a fine fractional grid for $q=1$. The sum is evaluated in log space. The implementation agrees with the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$ at $q=256/60000$, $z=1.1$, 60 epochs) to within 0.05. The accountant is valid only if the set of release rounds is independent of the private data, which is why only FedPer, the fixed periods, one-shot federation and the planner are run under DP in the article. Model selection on held-out data is not covered by the budget. The DP tables of Section~\ref{supp:legacy} therefore report final-round values, and Table~IX of the article gives the final round as its primary value and the validation-selected value as an uncharged reference only. In the tables of this supplement the noise multiplier $z$ of the article is denoted $\sigma$.
+Clipping each client's update to $C$ makes the $\ell_2$ sensitivity of the sum to the addition or removal of one client equal to $C$, and the fixed denominator $qN$ of (17) does not depend on the realised cohort. With Poisson sampling at rate $q$ each release is a subsampled Gaussian mechanism, whose R\'enyi DP at integer order $\alpha$ is $\frac1{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^k\exp\frac{k^2-k}{2z^2}$~\cite{mironov2019sgm}; for $q=1$ it is $\alpha/(2z^2)$~\cite{mironov2017}. Composition over the $R_{\mathrm{tx}}$ planned releases is additive, and the conversion to $(\varepsilon,\delta)$-DP~\cite{mironov2017} is minimised over $\alpha\in\{2,\dots,256\}$, with a fine fractional grid for $q=1$. The sum is evaluated in log space. The implementation agrees with the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$ at $q=256/60000$, $z=1.1$, 60 epochs) to within 0.05. The accountant is valid only if the set of release rounds is independent of the private data, which is why only FedPer, the fixed periods, one-shot federation and the planner are run under DP in the article. Model selection on held-out data is not covered by the budget. The DP tables of Section~\ref{supp:legacy} therefore report final-round values, and Table~VIII of the article gives the final round as its primary value and the validation-selected value as an uncharged reference only. In the tables of this supplement the noise multiplier $z$ of the article is denoted $\sigma$.
+
+\emph{Exact accountant at full participation.} At $q=1$ the $R_{\mathrm{tx}}$ releases are Gaussian mechanisms without subsampling, whose exact privacy is $\mu$-Gaussian DP with $\mu=\sqrt{R_{\mathrm{tx}}}/z$~\cite{dong2022gdp}. The corresponding $(\varepsilon,\delta)$ curve~\cite{balle2018} is
+\begin{equation}
+\delta(\varepsilon)=\Phi\Big(-\frac{\varepsilon}{\mu}+\frac{\mu}{2}\Big)-e^{\varepsilon}\,\Phi\Big(-\frac{\varepsilon}{\mu}-\frac{\mu}{2}\Big),
+\label{eq:gdp}
+\end{equation}
+where $\Phi$ is the standard normal distribution function. Like (18), it depends on $R_{\mathrm{tx}}$ only through $R_{\mathrm{tx}}/z^2$. Calibrated on (\ref{eq:gdp}) instead of (18), the noise multiplier of every method would be lower by the same factor: 24\%, 20\%, 17\% and 13\% for $\varepsilon^\star=1$, 2, 4 and 8. The article uses the R\'enyi accountant, so every $\varepsilon$ that it reports is an upper bound.
 
 \section{Sensitivity to the Round-Selection Rule}
 \label{supp:selection}
-The primary metric selects the first round that maximises the mean validation AUROC (7). Under a sparse schedule the test AUROC rises at each synchronisation and falls afterwards, so this rule can select the peak that follows a synchronisation, and on a flat validation curve a small numerical difference can move the selected round (Section~\mbox  {V-A}). Table~\ref{tab:selection} repeats both primary contrasts under two further rules that are computed from the same per-round logs: the first round that maximises the trailing three-round mean of the validation AUROC, and the mean test AUROC over the last ten rounds, which involves no selection. The first rule of the table reproduces the values of Table~\ref{tab:paired} and of Table~VI of the article exactly, since it uses the same bootstrap.
+The primary metric selects the first round that maximises the mean validation AUROC (7). Under a sparse schedule the test AUROC rises at each synchronisation and falls afterwards, so this rule can select the peak that follows a synchronisation, and on a flat validation curve a small numerical difference can move the selected round (Section~\mbox  {V-A}). Table~\ref{tab:selection} repeats both primary contrasts under two further rules that are computed from the same per-round logs: the first round that maximises the trailing three-round mean of the validation AUROC, and the mean test AUROC over the last ten rounds, which involves no selection. The first rule of the table reproduces the values of Table~\ref{tab:paired} and of Table~V of the article exactly, since it uses the same bootstrap.
 
-Under none of the three rules is \tierfed{} ahead of the best uniform period by the relevance threshold of 0.005 with an interval above zero in any setting. The comparison with FedPer depends on the rule. Under the smoothed rule \tierfed{} is below FedPer by more than the threshold, with an interval below zero, in 2 settings, and over the last ten rounds it is above FedPer, with an interval above zero, in 5 of the 7 settings, because full-rate training has overfitted by then (Section~\mbox  {V-B}).
+Under none of the three rules is \tierfed{} ahead of the best uniform period by the relevance threshold of 0.005 with an interval above zero in any setting. The comparison with FedPer depends on the rule. Under the smoothed rule \tierfed{} is below FedPer by more than the threshold, with an interval below zero, in two settings, and over the last ten rounds it is above FedPer, with an interval above zero, in 5 of the 7 settings, because full-rate training has overfitted by then (Section~\mbox  {V-B}).
 
 \begin{table*}[t]
-\caption{The two primary contrasts under three rules for the reported value, computed from the same runs: mean paired difference in AUROC with its bootstrap 95\% interval. The best uniform period is the one chosen in Table~VI of the article}
+\caption{The two primary contrasts under three rules for the reported value, computed from the same runs: mean paired difference in AUROC with its bootstrap 95\% interval. The best uniform period is the one chosen in Table~V of the article}
 \label{tab:selection}
 \centering\small
 \fit{\begin{tabular}{@{}llcc@{}}
@@ -107,9 +114,9 @@ Dirichlet $\alpha=10$, 5 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main 
  & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0125 [\ensuremath{-}0.0168, \ensuremath{-}0.0090] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
  & Mean of the last ten rounds & \ensuremath{+}0.0017 [\ensuremath{-}0.0005, \ensuremath{+}0.0043] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
 \midrule
-ResNet backbone, 6 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0030 [\ensuremath{-}0.0069, \ensuremath{-}0.0005] & \ensuremath{-}0.0020 [\ensuremath{-}0.0073, \ensuremath{+}0.0021]\\
- & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0071 [\ensuremath{-}0.0116, \ensuremath{-}0.0030] & \ensuremath{+}0.0024 [\ensuremath{-}0.0033, \ensuremath{+}0.0074]\\
- & Mean of the last ten rounds & \ensuremath{+}0.0078 [\ensuremath{+}0.0056, \ensuremath{+}0.0093] & \ensuremath{-}0.0064 [\ensuremath{-}0.0084, \ensuremath{-}0.0046]\\
+ResNet backbone, 7 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0020 [\ensuremath{-}0.0058, \ensuremath{+}0.0011] & \ensuremath{-}0.0011 [\ensuremath{-}0.0059, \ensuremath{+}0.0028]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0057 [\ensuremath{-}0.0103, \ensuremath{-}0.0014] & \ensuremath{+}0.0031 [\ensuremath{-}0.0021, \ensuremath{+}0.0074]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0073 [\ensuremath{+}0.0053, \ensuremath{+}0.0091] & \ensuremath{-}0.0058 [\ensuremath{-}0.0078, \ensuremath{-}0.0039]\\
 \midrule
 Clinical centres, 20 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0085 [\ensuremath{-}0.0161, \ensuremath{-}0.0010] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
  & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0059 [\ensuremath{-}0.0125, \ensuremath{+}0.0000] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
@@ -120,7 +127,7 @@ Clinical centres, 20 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text
 
 \section{Paired Comparison on the Specialty Groups}
 \label{supp:paired}
-Table~\ref{tab:paired} compares \tierfed{} with every baseline of Table~IV of the article on the same 10 seeds. The fixed period $(4,4)$ is identical to \tierfed{} and is not listed. The $p$-values are corrected by Holm's method over the listed contrasts.
+Table~\ref{tab:paired} compares \tierfed{} with every baseline of Table~III of the article on the same 10 seeds. The fixed period $(4,4)$ is identical to \tierfed{} and is not listed. The $p$-values are corrected by Holm's method over the listed contrasts.
 
 \begin{table}[t]
 \caption{Paired comparison of \tierfed{} with each baseline on the specialty groups: difference in AUROC at $\hat r$ with its bootstrap 95\% interval, Holm-corrected Wilcoxon $p$-value, number of seeds on which \tierfed{} is strictly higher, and difference in upload in MB up to $\hat r$ and over 60 rounds}
@@ -146,7 +153,7 @@ Staggered (4,4) & \ensuremath{+}0.0024 [\ensuremath{+}0.0000, \ensuremath{+}0.00
 
 \section{The Privacy Planner on a Grid}
 \label{supp:planner}
-Table~\ref{tab:planner} gives the intervals that the planner of Section~\mbox  {III-D} selects by minimising (20), computed with the class that the experiments use, for the tier shares of the MLP on the main benchmark, $R=60$, $T_w=5$, $K_{\max}=8$, $q=1$ and $\delta=10^{-5}$. The grid has 7 values of the prior weight $\lambda$, 5 quotas and four budgets $\varepsilon^\star\in\{1,2,4,8\}$. The selected pair is the same for all four budgets, because at $q=1$ the ratio of noise energies in (20) does not depend on $\varepsilon^\star$, so the table has one row per quota. The quota is applied to the realised payload fraction $\Pi_R$, warm-up included; quotas below $(5+6)/60\approx0.18$ are infeasible, since the sparsest pair $(8,8)$ already transmits in 11 of the 60 rounds. Without a binding quota ($\rho=1$) the planner returns equal intervals for every $\lambda$, and a larger $\lambda$, which weights the noise more, gives longer intervals. The only unequal pair is (5,6) at $\rho=0.25$: there $(4,4)$ realises a payload fraction of 0.30 and is infeasible, and among the feasible pairs the planner gives the longer interval to the medium tier, which carries the larger share of the payload.
+Table~\ref{tab:planner} gives the intervals that the planner of Section~\mbox  {III-D} selects by minimising (19), computed with the class that the experiments use, for the tier shares of the MLP on the main benchmark, $R=60$, $T_w=5$, $K_{\max}=8$, $q=1$ and $\delta=10^{-5}$. The grid has 7 values of the prior weight $\lambda$, 5 quotas and four budgets $\varepsilon^\star\in\{1,2,4,8\}$. The selected pair is the same for all four budgets, because at $q=1$ the ratio of noise energies in (19) does not depend on $\varepsilon^\star$, so the table has one row per quota. The quota is applied to the realised payload fraction $\Pi_R$, warm-up included; quotas below $(5+6)/60\approx0.18$ are infeasible, since the sparsest pair $(8,8)$ already transmits in 11 of the 60 rounds. Without a binding quota ($\rho=1$) the planner returns equal intervals for every $\lambda$, and a larger $\lambda$, which weights the noise more, gives longer intervals. The only unequal pair is (5,6) at $\rho=0.25$: there $(4,4)$ realises a payload fraction of 0.30 and is infeasible, and among the feasible pairs the planner gives the longer interval to the medium tier, which carries the larger share of the payload.
 
 \begin{table}[t]
 \caption{Intervals (slow, medium) selected by the privacy planner for each quota $\rho$ on the realised payload fraction and each prior weight $\lambda$; the selection is the same for $\varepsilon^\star\in\{1,2,4,8\}$}
@@ -169,7 +176,7 @@ Quota $\rho$ & $\lambda=0.1$ & $\lambda=0.25$ & $\lambda=0.5$ & $\lambda=1$ & $\
 \label{supp:sync}
 Section~\mbox  {II-A} of the article defines the restart step, which every experiment of the main protocol uses, and the carry-over step, which is examined in Section~\mbox  {V-E}. The two differ in one line of the round: under the carry-over step a client does not replace its copy of a due tier by the server copy before it trains, except in the first round, so the tier that it uploads is the result of all local epochs since the tier's last synchronisation. Full-rate methods are identical under both steps, because a tier that is due in every round is adopted from the server at the end of each round by (3); FedPer was run under the carry-over step for one seed and reproduced its restart run exactly. The carry-over runs use full participation and no DP.
 
-Table~\ref{tab:dispersion} reports the dispersion $\Gh_g$ of the uploaded slices, averaged over the synchronisation rounds after warm-up, for uniform periods on the main benchmark. Under the restart step it varies by a factor of at most 1.29 between $K=1$ and $K=8$ and shows no trend in $K$. Under the carry-over step it is larger by factors of 7.5 and 5.3 at $K=4$ and of 26.9 and 11.9 at $K=8$ for the slow and the medium tier, which lies between the linear and the quadratic growth that Lemma~\ref{lem:drift} allows. A controller that reads $\Gh_g$ under the carry-over step therefore measures the interval that it chose earlier together with the disagreement of the clients. The variant of \tierfed{} with a rescaled dispersion, listed in Table~VII of the article, divides $\Gh_g$ by the square of the number of rounds since the tier's last synchronisation to remove this dependence.
+Table~\ref{tab:dispersion} reports the dispersion $\Gh_g$ of the uploaded slices, averaged over the synchronisation rounds after warm-up, for uniform periods on the main benchmark. Under the restart step it varies by a factor of at most 1.29 between $K=1$ and $K=8$ and shows no trend in $K$. Under the carry-over step it is larger by factors of 7.5 and 5.3 at $K=4$ and of 26.9 and 11.9 at $K=8$ for the slow and the medium tier, which lies between the linear and the quadratic growth that Lemma~\ref{lem:drift} allows. A controller that reads $\Gh_g$ under the carry-over step therefore measures the interval that it chose earlier together with the disagreement of the clients. The variant of \tierfed{} with a rescaled dispersion, listed in Table~VI of the article, divides $\Gh_g$ by the square of the number of rounds since the tier's last synchronisation to remove this dependence. On the specialty groups and at the clinical centres both variants select $(4,4)$ in every seed under the carry-over step, and their runs are identical to those of the fixed period $(4,4)$ under that step; the ResNet is discussed in Section~\mbox  {V-E} of the article.
 
 \begin{table}[t]
 \caption{Dispersion $\Gh_g$ ($\times10^{-3}$) of the uploaded slices of the two shared tiers, averaged over the synchronisation rounds after warm-up, for uniform periods $K$ on the specialty groups (MLP) under the two synchronisation steps; $K=1$ is FedPer, for which the steps coincide}
@@ -194,7 +201,36 @@ Period $K$ & Seeds & Slow tier & Medium tier & Seeds & Slow tier & Medium tier\\
 \label{supp:centres}
 Fed-Heart-Disease~\cite{duterrail2022flamby} consists of the four processed collections of the UCI Heart Disease data~\cite{detrano1989}: Cleveland (303 patients), Hungary (294), Switzerland (123) and Long Beach (200), 920 patients in total. The label is the presence of angiographic disease (a diagnosis value above zero). The 13 clinical attributes are encoded as 36 features. The six numeric attributes are standardised; a missing value is replaced by the median and marked by an indicator feature, because some attributes are mostly missing outside the Cleveland collection. The seven categorical attributes are one-hot encoded, with a missing value as a category of its own. As on the main benchmark, the medians and the scaling use statistics of the pooled data and do not involve the labels. Each collection is one client. A fifth of the patients is set aside and enters no result, as on the main benchmark, and the remaining 736 patients are split per centre into training, validation and test sets (70/10/20\%). The MLP of the main benchmark has 29,634 parameters on this input, of which the slow, medium and fast tiers hold 16.0\%, 83.6\% and 0.4\%. All hyperparameters are those of Table~II of the article, with a batch size of 32. The methods, the 20 seeds and the statistical procedure are those of the main comparison, with the uniform period $K=2$ added so that the matched-bytes contrast has four candidate periods ($K\in\{1,2,4,8\}$).
 
-Because the centres are small, the test split of a centre holds between about 19 and 50 patients, and in 30\% of the runs one centre has a test split with a single class, which removes it from the average of that run for every method alike. The results of Table~V of the article should therefore be read as a check that the behaviour observed on the specialty groups carries over to clients that are real institutions, and not as a clinical evaluation.
+Because the centres are small, the test split of a centre holds between about 19 and 50 patients, and in 30\% of the runs one centre has a test split with a single class, which removes it from the average of that run for every method alike. The results of Table~IV of the article should therefore be read as a check that the behaviour observed on the specialty groups carries over to clients that are real institutions, and not as a clinical evaluation.
+
+\section{Experiment Families of the Main Protocol}
+\label{supp:families}
+Table~\ref{tab:families} lists the 859 runs of the main protocol of the article by family, with the number of configurations, seeds and runs counted from the logs. A configuration is a method with its parameters in one setting; the timing families count the runs of both worlds.
+
+\begin{table}[t]
+\caption{Experiment families of the main protocol: data and clients, number of configurations, seeds per configuration and runs}
+\label{tab:families}
+\centering\small
+\fit{\begin{tabular}{@{}llccc@{}}
+\toprule
+Family & Data and clients & Configurations & Seeds & Runs\\
+\midrule
+Main comparison & 20 specialty groups & 13 & 10 & 130\\
+Reference bounds & pooled data, per-group test splits & 2 & 10 & 20\\
+Accuracy--upload frontier & 20 specialty groups & 8 & 5 & 40\\
+Peak-aware variants & 20 specialty groups & 3 & 5 & 15\\
+Label-skew sweep & Dirichlet $\alpha\in\{0.1,0.3,1,10\}$ & 20 & 5 & 100\\
+ResNet backbone & 20 specialty groups & 5 & 7--8 & 38\\
+Clinical centres & Fed-Heart-Disease, 4 centres & 13 & 20 & 260\\
+Carry-over synchronisation step & specialty groups, centres, ResNet & 10 & 20 & 150\\
+Matched-$\varepsilon$ DP ($q=1$) & 20 specialty groups & 5 & 6 & 30\\
+Timing side channel, MLP & clean or shifted target group & 5 & 5--9 per world & 72\\
+Timing side channel, ResNet & clean or shifted target group & 1 & 2 per world & 4\\
+\midrule
+Total &  &  &  & 859\\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \section{Additional Experiments Read at the Final Round}
 \label{supp:legacy}

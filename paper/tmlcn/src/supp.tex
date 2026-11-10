@@ -26,7 +26,7 @@
 \author{Abraheem Rashid and Mehwish Mahmood}
 \maketitle
 
-This supplement contains the proofs of the two propositions and of the phase condition (Section~\ref{supp:proofs}), details of the privacy accounting (Section~\ref{supp:dp}), the sensitivity of the primary contrasts to the rule that selects the reported round (Section~\ref{supp:selection}), a paired comparison on the main benchmark (Section~\ref{supp:paired}), the privacy planner on a grid of its parameters (Section~\ref{supp:planner}), details of the two synchronisation steps (Section~\ref{supp:sync}) and of the clinical-centre benchmark (Section~\ref{supp:centres}), and additional experiments that were read at the final round (Section~\ref{supp:legacy}). Equation, table and section numbers without the prefix S refer to the article.
+This supplement contains the proofs of the two propositions and of the phase condition (Section~\ref{supp:proofs}), details of the privacy accounting (Section~\ref{supp:dp}), the sensitivity of the primary contrasts to the rule that selects the reported round (Section~\ref{supp:selection}), a paired comparison on the main benchmark (Section~\ref{supp:paired}), the privacy planner on a grid of its parameters (Section~\ref{supp:planner}), details of the two synchronisation steps (Section~\ref{supp:sync}) and of the clinical-centre benchmark (Section~\ref{supp:centres}), the experiment families of the main protocol (Section~\ref{supp:families}), and additional experiments that were read at the final round (Section~\ref{supp:legacy}). Equation, table and section numbers without the prefix S refer to the article.
 
 \section{Proofs}
 \label{supp:proofs}
@@ -76,6 +76,13 @@ After warm-up, tier $a$ is due in the rounds $r=T_w+\phi_a+nK_a>T_w$ and tier $b
 \section{Differential-Privacy Accounting}
 \label{supp:dp}
 Clipping each client's update to $C$ makes the $\ell_2$ sensitivity of the sum to the addition or removal of one client equal to $C$, and the fixed denominator $qN$ of (\mref{eq:dp}) does not depend on the realised cohort. With Poisson sampling at rate $q$ each release is a subsampled Gaussian mechanism, whose R\'enyi DP at integer order $\alpha$ is $\frac1{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^k\exp\frac{k^2-k}{2z^2}$~\cite{mironov2019sgm}; for $q=1$ it is $\alpha/(2z^2)$~\cite{mironov2017}. Composition over the $R_{\mathrm{tx}}$ planned releases is additive, and the conversion to $(\varepsilon,\delta)$-DP~\cite{mironov2017} is minimised over $\alpha\in\{2,\dots,256\}$, with a fine fractional grid for $q=1$. The sum is evaluated in log space. The implementation agrees with the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$ at $q=256/60000$, $z=1.1$, 60 epochs) to within 0.05. The accountant is valid only if the set of release rounds is independent of the private data, which is why only FedPer, the fixed periods, one-shot federation and the planner are run under DP in the article. Model selection on held-out data is not covered by the budget. The DP tables of Section~\ref{supp:legacy} therefore report final-round values, and Table~\mref{tab:dp} of the article gives the final round as its primary value and the validation-selected value as an uncharged reference only. In the tables of this supplement the noise multiplier $z$ of the article is denoted $\sigma$.
+
+\emph{Exact accountant at full participation.} At $q=1$ the $R_{\mathrm{tx}}$ releases are Gaussian mechanisms without subsampling, whose exact privacy is $\mu$-Gaussian DP with $\mu=\sqrt{R_{\mathrm{tx}}}/z$~\cite{dong2022gdp}. The corresponding $(\varepsilon,\delta)$ curve~\cite{balle2018} is
+\begin{equation}
+\delta(\varepsilon)=\Phi\Big(-\frac{\varepsilon}{\mu}+\frac{\mu}{2}\Big)-e^{\varepsilon}\,\Phi\Big(-\frac{\varepsilon}{\mu}-\frac{\mu}{2}\Big),
+\label{eq:gdp}
+\end{equation}
+where $\Phi$ is the standard normal distribution function. Like (\mref{eq:rdp}), it depends on $R_{\mathrm{tx}}$ only through $R_{\mathrm{tx}}/z^2$. Calibrated on (\ref{eq:gdp}) instead of (\mref{eq:rdp}), the noise multiplier of every method would be lower by the same factor: \num{gdpSigmaCutOnePct}\%, \num{gdpSigmaCutTwoPct}\%, \num{gdpSigmaCutFourPct}\% and \num{gdpSigmaCutEightPct}\% for $\varepsilon^\star=1$, 2, 4 and 8. The article uses the R\'enyi accountant, so every $\varepsilon$ that it reports is an upper bound.
 
 \section{Sensitivity to the Round-Selection Rule}
 \label{supp:selection}
@@ -130,6 +137,17 @@ Table~\ref{tab:dispersion} reports the dispersion $\Gh_g$ of the uploaded slices
 Fed-Heart-Disease~\cite{duterrail2022flamby} consists of the four processed collections of the UCI Heart Disease data~\cite{detrano1989}: Cleveland (303 patients), Hungary (294), Switzerland (123) and Long Beach (200), \num{tmHospPatients} patients in total. The label is the presence of angiographic disease (a diagnosis value above zero). The 13 clinical attributes are encoded as \num{tmHospFeatures} features. The six numeric attributes are standardised; a missing value is replaced by the median and marked by an indicator feature, because some attributes are mostly missing outside the Cleveland collection. The seven categorical attributes are one-hot encoded, with a missing value as a category of its own. As on the main benchmark, the medians and the scaling use statistics of the pooled data and do not involve the labels. Each collection is one client. A fifth of the patients is set aside and enters no result, as on the main benchmark, and the remaining \num{tmHospAtSites} patients are split per centre into training, validation and test sets (70/10/20\%). The MLP of the main benchmark has \num{tmHospParams} parameters on this input, of which the slow, medium and fast tiers hold \num{tmHospTierSlowPct}\%, \num{tmHospTierMediumPct}\% and \num{tmHospTierFastPct}\%. All hyperparameters are those of Table~\mref{tab:setup} of the article, with a batch size of 32. The methods, the \num{tmHospSeeds} seeds and the statistical procedure are those of the main comparison, with the uniform period $K=2$ added so that the matched-bytes contrast has four candidate periods ($K\in\{1,2,4,8\}$).
 
 Because the centres are small, the test split of a centre holds between about 19 and 50 patients, and in \num{tmHospSingleRuns}\% of the runs one centre has a test split with a single class, which removes it from the average of that run for every method alike. The results of Table~\mref{tab:centres} of the article should therefore be read as a check that the behaviour observed on the specialty groups carries over to clients that are real institutions, and not as a clinical evaluation.
+
+\section{Experiment Families of the Main Protocol}
+\label{supp:families}
+Table~\ref{tab:families} lists the \num{tmRuns} runs of the main protocol of the article by family, with the number of configurations, seeds and runs counted from the logs. A configuration is a method with its parameters in one setting; the timing families count the runs of both worlds.
+
+\begin{table}[t]
+\caption{Experiment families of the main protocol: data and clients, number of configurations, seeds per configuration and runs}
+\label{tab:families}
+\centering\small
+\fit{\gen{tm_families}}
+\end{table}
 
 \section{Additional Experiments Read at the Final Round}
 \label{supp:legacy}
