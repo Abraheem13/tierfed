@@ -521,7 +521,7 @@ These results have to be read with the size of the dataset in mind. The smallest
 
 \begin{figure*}[t]
 \centering\fig{fig_au}{\textwidth}
-\caption{Accuracy, upload and the bound. (a) $A^{\mathcal T}(\hat r)$ against the total upload $B(R)$, with the communication parameter of every method swept (mean and 95\% interval; grey lines: local training, centralised MLP and gradient boosting). (b) $A^{\mathcal T}(\hat r)$ against the Dirichlet parameter $\alpha$; the series are offset horizontally so that equal values remain visible, and the dotted line is local training. (c) Gain $\Delta_{\mathrm u}$ of (\ref{eq:gate}) against $\Psi$ at the end of warm-up, one point per setting. (d) Share $v(W)$ of rounds that miss the transfer window on the 5-Mbit/s link, against the window length relative to the upload time of the full payload; identical schedules coincide.}
+\caption{Accuracy, upload and the bound. (a) $A^{\mathcal T}(\hat r)$ against the total upload $B(R)$, with the communication parameter of every method swept (mean and 95\% interval; grey lines: local training, centralised MLP and gradient boosting). (b) $A^{\mathcal T}(\hat r)$ against the Dirichlet parameter $\alpha$ for \tierfed{}, FedPer and the best uniform period at matched bytes; the series are offset horizontally so that equal values remain visible, and the dotted line is local training. (c) Gain $\Delta_{\mathrm u}$ of (\ref{eq:gate}) with its 95\% interval in every setting, ordered by $\Psi$ at the end of warm-up (right-hand axis); open markers: identical runs, shaded band: $\pm0.005$. (d) Share $v(W)$ of rounds that miss the transfer window on the 5-Mbit/s link, against the window length relative to the upload time of the full payload; \tierfed{} produces the same curves as the fixed period with the same phases.}
 \label{fig:au}
 \end{figure*}
 
@@ -539,7 +539,7 @@ Table~\ref{tab:gate} and Fig.~\ref{fig:au}(b,c) apply the second primary contras
 
 \begin{figure*}[t]
 \centering\fig{fig_resdp}{\textwidth}
-\caption{Backbone and privacy. (a) $A^{\mathcal T}(r)$ on the ResNet (means over \num{tmResnetSeeds} seeds; dots mark the mean $\hat r$); the curves of \tierfed{} and Fixed $\num{auResnetKEarly}$ coincide until round \num{auResnetFirstDiffMin}. (b) Intervals chosen by \tierfed{} on the ResNet, as means over seeds. (c) $A^{\mathcal T}(r)$ under client-level DP with $\varepsilon^\star=4$ and $q=1$ (\num{tmDpSeeds} seeds), with local training without DP for reference. (d) Total upload of all clients in each run of the timing experiment, relative to the median of the clean runs of the same schedule, for the clean world and for the world in which the target client holds flipped labels (symmetric-log axis; TF, ResNet: \tierfed{} on the ResNet).}
+\caption{Backbone and privacy. (a) $A^{\mathcal T}(r)$ on the ResNet (means over \num{tmResnetSeeds} seeds; dots mark the mean $\hat r$; axis starts at 0.60); the curves of \tierfed{} and Fixed $\num{auResnetKEarly}$ coincide until round \num{auResnetFirstDiffMin}. (b) Intervals chosen by \tierfed{} on the ResNet, as means over seeds. (c) $A^{\mathcal T}(r)$ under client-level DP with $\varepsilon^\star=4$ and $q=1$ (\num{tmDpSeeds} seeds), with local training without DP for reference. (d) Total upload of all clients in each run of the timing experiment, relative to the median of the clean runs of the same schedule, for the clean world and for the world in which the target client holds flipped labels (symmetric-log axis); the last row is \tierfed{} on the ResNet.}
 \label{fig:resdp}
 \end{figure*}
 
