@@ -21,6 +21,13 @@ Stages
   timing    timing side channel: a shifted target site against the schedule it induces (D-8)
   peak      staggered tiers with an 8-bit warm-up, so no round sends the full payload (M-1, M-6),
             and the byte quota counted over all rounds, warm-up included (P0-5)
+  hospitals Fed-Heart-Disease: the four UCI Heart Disease collections, one client per
+            real hospital (natural partition), under the same validation-selected protocol
+            and with the methods of the main comparison
+  carryover the round-sparse schedules with the carry-over synchronisation step: a due tier is
+            uploaded after all local epochs since its last synchronisation (local SGD with
+            period K) instead of being restarted from the server copy (--data heart for the
+            hospitals, --model resnet for the ResNet)
 
 One process runs one stage for one seed (and one alpha in the hetero stage);
 scripts/run_audit.ps1 runs them in parallel and skips finished runs.
@@ -173,6 +180,25 @@ def timing_configs():
             ("fixed", al(4, 4), "fixed44")]
 
 
+def hospitals_configs():
+    """The main comparison on four real hospitals (Fed-Heart-Disease). The uniform
+    periods K in {1, 2, 4, 8} give the matched-bytes contrast its candidates."""
+    keep = ("fedavg", "fedprox", "fedper", "fedlama", "adacomm8", "lag", "fixed44", "fixed44_st", "fixed88",
+            "tierfed", "tierfed_st", "local")
+    return [c for c in main_configs() if c[2] in keep] + [("fixed", al(2, 2), "fixed22")]
+
+
+def carryover_configs():
+    """The round-sparse schedules with the carry-over synchronisation step (sync_restart=False):
+    a client uploads a due tier after all the local epochs since that tier's last synchronisation,
+    as in local SGD with period K, instead of restarting it from the server copy. Full-rate methods
+    are identical under both steps. tierfed_db divides the dispersion of a tier by the square of the
+    interval that produced it, which this step makes grow with the interval."""
+    return [("fixed", al(4, 4), "fixed44"), ("fixed", al(8, 8), "fixed88"), ("tierfed", TF, "tierfed"),
+            ("tierfed", {**TF, "debias": True}, "tierfed_db"),
+            ("adacomm", {"tau0": 8, "max_interval": 8}, "adacomm8"), ("fedper", {}, "fedper")]
+
+
 def derma_configs():
     return [("fedavg", {}, "fedavg"), ("fedper", {}, "fedper"), ("local", {}, "local"),
             ("fixed", al(4, 4), "fixed44"), ("tierfed", TF, "tierfed")]
@@ -187,7 +213,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Audit batch (v6)")
     ap.add_argument("--stage", required=True,
                     choices=["main", "frontier", "hetero", "dp", "derma", "peak", "backbone", "timing",
-                             "frontier2", "dropout"])
+                             "frontier2", "dropout", "hospitals", "carryover"])
+    ap.add_argument("--data", default="diabetes", choices=["diabetes", "heart"],
+                    help="carryover stage: the specialty groups (default) or the four hospitals")
     ap.add_argument("--model", default="mlp", choices=["mlp", "resnet", "transformer"],
                     help="backbone stage: resnet or transformer; timing stage: mlp or resnet")
     ap.add_argument("--seeds", nargs="+", type=int, default=list(range(42, 52)))
@@ -218,10 +246,28 @@ def main(argv=None):
     elif a.stage == "timing":
         if a.model != "resnet" or a.smoke:
             confs = timing_configs()
-        else:                                   # where TierFed differentiates (GPU)
-            base["model"] = "resnet"; confs = [("tierfed", TF, "tierfed")]
+        else:                                   # where TierFed differentiates the tiers
+            base["model"] = "resnet"
+            ks, km = FROZEN["resnet"]
+            confs = [("tierfed", TF, "tierfed"), ("fixed", al(ks, km), f"fixed{ks}{km}"),
+                     ("fixed", al(4, 4), "fixed44")]
         jobs = [(s, k, f"tm_{w}_{n}", {"perturb_site": {"site": 0, "flip": 0.5}} if w == "shift" else None)
                 for w in ("clean", "shift") for s, k, n in confs]
+    elif a.stage == "hospitals":
+        # same hyperparameters as the earlier runs on this data (batch 32); the sites are the hospitals
+        base.update(dataset="heart", n_clients=0, batch_size=32)
+        if a.smoke:
+            base.update(dataset="synthetic", dataset_kwargs=syn, n_clients=4)
+        jobs = [(s, k, f"hosp_{n}", {"eval_finetune_epochs": FT}) for s, k, n in hospitals_configs()]
+    elif a.stage == "carryover":
+        pre = "co_"
+        if a.data == "heart":
+            base.update(dataset="heart", n_clients=0, batch_size=32); pre = "co_hosp_"
+        elif a.model == "resnet":
+            base["model"] = "resnet"; pre = "co_bb_"
+        if a.smoke:
+            base.update(dataset="synthetic", dataset_kwargs=syn, n_clients=4, model="mlp")
+        jobs = [(s, k, f"{pre}{n}", {"sync_restart": False}) for s, k, n in carryover_configs()]
     elif a.stage == "dropout":
         jobs = [(s, k, n, extra) for s, k, n, extra in dropout_configs()]
     elif a.stage == "frontier2":
@@ -260,7 +306,7 @@ def main(argv=None):
             for pre in ("het_a", "derma_a"):                      # het_a0.1_<name>
                 if full.startswith(pre):
                     return full.split("_", 2)[2] if full.count("_") >= 2 else full
-            for pre in ("bb_", "tm_clean_", "tm_shift_"):
+            for pre in ("co_hosp_", "co_bb_", "co_", "bb_", "tm_clean_", "tm_shift_", "hosp_"):
                 if full.startswith(pre):
                     return full[len(pre):]
             return full

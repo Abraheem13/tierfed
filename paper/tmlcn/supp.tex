@@ -1,0 +1,560 @@
+\documentclass[journal]{IEEEtran}
+% Every number, table and figure in this file was generated from the per-seed logs by
+% https://github.com/Abraheem13/tierfed and is written here as plain text.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,xcolor,etoolbox,url,hyperref}
+\hypersetup{hidelinks, pdftitle={Supplementary Material: Per-Tier Synchronisation in Communication-Budgeted Federated Learning: A Closed-Form Bound and an Empirical Study}, pdfauthor={Abraheem Rashid, Mehwish Mahmood}}
+\newcommand{\tierfed}{TierFed}
+\newcommand{\Gh}{\hat\Gamma}
+\newsavebox\tabbox
+\newcommand{\fit}[1]{\sbox\tabbox{#1}\ifdim\wd\tabbox>\linewidth\resizebox{\linewidth}{!}{\usebox\tabbox}\else\usebox\tabbox\fi}
+\renewcommand{\thetable}{S-\Roman{table}}
+\renewcommand{\thefigure}{S-\arabic{figure}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\newcommand{\fig}[2]{\includegraphics[width=#2]{figures/#1.pdf}}
+\newtheorem{lemma}{Lemma}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\begin{document}
+\bstctlcite{IEEEexample:BSTcontrol}
+\title{Supplementary Material: Per-Tier Synchronisation in Communication-Budgeted Federated Learning: A Closed-Form Bound and an Empirical Study}
+\author{Abraheem Rashid and Mehwish Mahmood}
+\maketitle
+
+This supplement contains the proofs of the two propositions and of the phase condition (Section~\ref{supp:proofs}), details of the privacy accounting (Section~\ref{supp:dp}), the sensitivity of the primary contrasts to the rule that selects the reported round (Section~\ref{supp:selection}), a paired comparison on the main benchmark (Section~\ref{supp:paired}), the privacy planner on a grid of its parameters (Section~\ref{supp:planner}), details of the two synchronisation steps (Section~\ref{supp:sync}) and of the clinical-centre benchmark (Section~\ref{supp:centres}), the experiment families of the main protocol (Section~\ref{supp:families}), and additional experiments that were read at the final round (Section~\ref{supp:legacy}). Equation, table and section numbers without the prefix S refer to the article.
+
+\section{Proofs}
+\label{supp:proofs}
+The notation and the assumptions are those of Section~\mbox  {III-B} of the article: local SGD with step size $\eta$, $s$ local steps per epoch at every client, equal weights $1/N$, block-separable client objectives $F_k(\theta)=\sum_gF_{k,g}(\theta_g)$ with $L$-smooth blocks, unbiased stochastic gradients with variance at most $\sigma_g^2$ on tier $g$ that are independent across clients and steps, and heterogeneity bounded by $\Gamma_g$. Because the blocks are separable, each tier evolves independently of the others, and the index $g$ is dropped where no confusion can arise.
+
+\subsection{Proposition 1(a): Drift of the Client Copies}
+\begin{lemma}[Drift from a common value]
+\label{lem:drift}
+Let all clients start from a common value $\theta^0$ of a tier and take $t$ steps of SGD on their own objectives, $\theta_k^{\tau+1}=\theta_k^\tau-\eta(\nabla F_k(\theta_k^\tau)+\zeta_k^\tau)$, where $\zeta_k^\tau$ has zero mean given the past and $\mathbb E\|\zeta_k^\tau\|^2\le\sigma^2$. Let $\bar\theta^\tau=\frac1N\sum_k\theta_k^\tau$ and $V_\tau=\frac1N\sum_k\mathbb E\|\theta_k^\tau-\bar\theta^\tau\|^2$. If $\eta\le1/(\sqrt6\,Lt)$, then
+\begin{equation}
+V_t\le6\eta^2\big(t\sigma^2+t^2\Gamma\big).
+\label{eq:s-drift}
+\end{equation}
+\end{lemma}
+\begin{proof}
+Write $a_k^u=\nabla F_k(\theta_k^u)-\nabla F_k(\bar\theta^u)$ and $h_k^u=\nabla F_k(\bar\theta^u)-\nabla F(\bar\theta^u)$, and denote averages over the clients by a bar. Since $F=\frac1N\sum_kF_k$, the difference between the update of client $k$ and the mean update at step $u$ is $(\zeta_k^u-\bar\zeta^u)+(a_k^u-\bar a^u)+h_k^u$, so that
+\[
+\theta_k^\tau-\bar\theta^\tau=-\eta\sum_{u<\tau}\big[(\zeta_k^u-\bar\zeta^u)+(a_k^u-\bar a^u)+h_k^u\big].
+\]
+Using $\|x+y+z\|^2\le3(\|x\|^2+\|y\|^2+\|z\|^2)$, the three sums are bounded separately. The noise terms are martingale differences, so their cross terms vanish, and $\frac1N\sum_k\|x_k-\bar x\|^2\le\frac1N\sum_k\|x_k\|^2$ gives $\frac1N\sum_k\mathbb E\|\sum_{u<\tau}(\zeta_k^u-\bar\zeta^u)\|^2\le\tau\sigma^2$. For the other two sums, $\|\sum_{u<\tau}x_u\|^2\le\tau\sum_{u<\tau}\|x_u\|^2$, the smoothness of $F_k$ gives $\frac1N\sum_k\|a_k^u-\bar a^u\|^2\le L^2\frac1N\sum_k\|\theta_k^u-\bar\theta^u\|^2$, and the heterogeneity bound gives $\frac1N\sum_k\|h_k^u\|^2\le\Gamma$. Hence
+\[
+V_\tau\le3\eta^2\big(\tau\sigma^2+\tau^2\Gamma\big)+3\eta^2L^2\tau\sum_{u<\tau}V_u .
+\]
+Let $M_\tau=6\eta^2(\tau\sigma^2+\tau^2\Gamma)$, which is non-decreasing in $\tau$. $V_0=0\le M_0$, and if $V_u\le M_u$ for all $u<\tau\le t$, then $V_\tau\le\frac12M_\tau+3\eta^2L^2\tau^2M_\tau\le M_\tau$, because $3\eta^2L^2t^2\le\frac12$. The claim follows by induction.
+\end{proof}
+Part (a) of Proposition~1 is Lemma~\ref{lem:drift} with $t=ms$: after $m$ local epochs from a common value, $V\le6\eta^2(ms\,\sigma_g^2+m^2s^2\Gamma_g)\le6\eta^2s^2m^2(\Gamma_g+\sigma_g^2)$, and the condition on the step size holds for all $m\le K_{\max}$ when $\eta\le c_0/(LK_{\max}s)$ with $c_0=1/\sqrt6$. Under the restart step the clients' copies of tier $g$ leave a common value at two points: at the start of a round in which the tier is due, by (1), after which one local epoch follows before (3) makes them equal again ($m=1$), and after that adoption, from which they evolve for the $K_g-1$ rounds in which the tier is not due ($m\le K_g-1$). Therefore $m\le\max(1,K_g-1)$.
+
+\subsection{Proposition 1(b): The Server Copy}
+In a round $r_j$ in which tier $g$ is due, every client starts from the server copy $\theta_g^{(r_j)}$ by (1), takes $s$ steps of SGD on $F_{k,g}$, and the server averages the results by (2). This is one round of federated averaging with $s$ local steps on $F_g=\frac1N\sum_kF_{k,g}$. Between $r_j$ and $r_{j+1}$ the server copy does not change. What the clients do with their own copies of the tier in those rounds has no effect on round $r_{j+1}$: the copies are overwritten by (1), SGD carries no state from one step to the next, and, by block separability, the gradient on tier $g$ does not depend on the other tiers. The server copies $\theta_g^{(r_1)},\theta_g^{(r_2)},\dots$ are therefore exactly the iterates of federated averaging with $s$ local steps, full participation and equal weights, run for $J_g$ rounds. For this algorithm, with $L$-smooth client objectives, unbiased stochastic gradients of variance at most $\sigma_g^2$ and gradient dissimilarity bounded by $\Gamma_g$, the standard non-convex analysis (for instance that of~\cite{wang2020fednova} with equal numbers of local steps, in which case its surrogate objective coincides with $F_g$; see also~\cite{karimireddy2020,wang2021coop}) yields, for $\eta\le c_0/(Ls)$,
+\begin{align*}
+\min_{j\le J_g}\mathbb E\big\|\nabla F_g(\theta_g^{(r_j)})\big\|^2&\le\frac{c_1D_g}{\eta sJ_g}+c_1\eta L\frac{\sigma_g^2}{N}\\
+&\quad+c_2\eta^2L^2s^2\big(\Gamma_g+\sigma_g^2\big),
+\end{align*}
+which is (12), since $\nabla_gF(\theta)=\nabla F_g(\theta_g)$. The three terms have the usual origin. The first is the progress of $sJ_g$ gradient steps from an initial gap $D_g$. The second is the variance of the averaged stochastic gradient: the average $\frac1N\sum_k\zeta_k$ of $N$ independent noise vectors with $\mathbb E\|\zeta_k\|^2\le\sigma_g^2$ has $\mathbb E\|\frac1N\sum_k\zeta_k\|^2\le\sigma_g^2/N$, and for a weighted average $\sum_kp_k\zeta_k$ the bound is $\sigma_g^2\sum_kp_k^2$, which is at least $\sigma_g^2/N$ and equals it only for equal weights. The third is the drift of the local iterates within one round, which is bounded as in Lemma~\ref{lem:drift} with $t\le s$. No claim is made about the values of the constants.
+
+\emph{Carry-over step.} If (1) is skipped after the first round, the clients' copies of tier $g$ evolve from the last aggregate for $K_gs$ steps before they are averaged again. This is local SGD with a period of $K_gs$ steps~\cite{stich2019,wang2021coop}. Its bound has the progress term $c_1D_g/(\eta sR)$, because all $sR$ local steps now contribute to the server copy, the same variance term, and the drift term $c_2\eta^2L^2s^2K_g^2(\Gamma_g+\sigma_g^2)$, which follows from Lemma~\ref{lem:drift} with $t\le K_gs$ and requires $\eta\le c_0/(LK_{\max}s)$.
+
+\emph{What the controller measures.} The numerator of $\Gh_g$ in (10) is the dispersion of the uploaded slices of tier $g$. Under the restart step every uploaded slice is $s$ steps away from a common value, so by (\ref{eq:s-drift}) its expectation is at most $6\eta^2(s\sigma_g^2+s^2\Gamma_g)$ whatever the interval; the noise and the heterogeneity enter with different powers of $s$, and the denominator is the squared norm of the tier, so $\Gh_g$ is a proxy and not an estimate of $\Gamma_g+\sigma_g^2$. Under the carry-over step the slices are $K_gs$ steps away from a common value, and the same bound grows by a factor between $K_g$ (noise) and $K_g^2$ (heterogeneity). Table~\ref{tab:dispersion} shows both behaviours in the logs.
+
+\subsection{Proposition 2}
+\label{supp:cuberoot}
+Write $x_g=K_g>0$. The objective $f(x)=\sum_g\Gamma_gx_g^2$ is strictly convex, the constraint $h(x)=\sum_gw_g/x_g-\rho\le0$ is convex on $x>0$, and Slater's condition holds, so the KKT conditions are necessary and sufficient and the minimiser is unique. Since $f$ increases and $h$ decreases in every coordinate, the constraint is active: if $h(x)<0$, some $x_g$ can be lowered, which lowers $f$. Stationarity, $2\Gamma_gx_g=\lambda w_g/x_g^2$, gives $x_g=(\lambda w_g/2\Gamma_g)^{1/3}$. Substitution into $\sum_gw_g/x_g=\rho$ gives $(\lambda/2)^{1/3}=S/\rho$ with $S=\sum_hw_h^{2/3}\Gamma_h^{1/3}$, hence $K_g^\star=(w_g/\Gamma_g)^{1/3}S/\rho$ and $f(K^\star)=\frac{S^2}{\rho^2}\sum_g\Gamma_g(w_g/\Gamma_g)^{2/3}=S^3/\rho^2$. H\"older's inequality with exponents $3/2$ and $3$, applied to $a_g=w_g^{2/3}$ and $b_g=\Gamma_g^{1/3}$, gives $S\le(\sum_gw_g)^{2/3}(\sum_g\Gamma_g)^{1/3}=(\sum_g\Gamma_g)^{1/3}$, with equality if and only if $a_g^{3/2}\propto b_g^{3}$, that is, $w_g\propto\Gamma_g$. The uniform point $x_g=1/\rho$ satisfies the constraint with equality and costs $\sum_g\Gamma_g/\rho^2$. Finally, the integer feasible set is contained in the real one, so the integer optimum satisfies $J_{\mathrm{int}}\ge J^\star$; when $1/\rho\in\{1,\dots,K_{\max}\}$ the uniform period is integer-feasible, and $1-J_{\mathrm{int}}/J_{\mathrm u}\le1-J^\star/J_{\mathrm u}=\Psi$. $\Psi$ is invariant under $\Gamma\mapsto c\Gamma$, because $S^3$ and $\sum_g\Gamma_g$ are both linear in $c$. \hfill$\square$
+
+\subsection{Staggered Phases}
+After warm-up, tier $a$ is due in the rounds $r=T_w+\phi_a+nK_a>T_w$ and tier $b$ in the rounds $r=T_w+\phi_b+mK_b>T_w$, for integers $n,m\ge0$ ($n\ge1$ when $\phi_a=0$ and $m\ge1$ when $\phi_b=0$). A common round requires $nK_a-mK_b=\phi_b-\phi_a$. This linear Diophantine equation is solvable if and only if $\gcd(K_a,K_b)$ divides $\phi_b-\phi_a$, and when it is solvable it has infinitely many solutions with $n,m\ge1$. The two sets of due rounds are therefore disjoint if and only if $\phi_a-\phi_b\not\equiv0\pmod{\gcd(K_a,K_b)}$.
+
+\section{Differential-Privacy Accounting}
+\label{supp:dp}
+Clipping each client's update to $C$ makes the $\ell_2$ sensitivity of the sum to the addition or removal of one client equal to $C$, and the fixed denominator $qN$ of (17) does not depend on the realised cohort. With Poisson sampling at rate $q$ each release is a subsampled Gaussian mechanism, whose R\'enyi DP at integer order $\alpha$ is $\frac1{\alpha-1}\log\sum_{k=0}^{\alpha}\binom{\alpha}{k}(1-q)^{\alpha-k}q^k\exp\frac{k^2-k}{2z^2}$~\cite{mironov2019sgm}; for $q=1$ it is $\alpha/(2z^2)$~\cite{mironov2017}. Composition over the $R_{\mathrm{tx}}$ planned releases is additive, and the conversion to $(\varepsilon,\delta)$-DP~\cite{mironov2017} is minimised over $\alpha\in\{2,\dots,256\}$, with a fine fractional grid for $q=1$. The sum is evaluated in log space. The implementation agrees with the TensorFlow-Privacy MNIST reference ($\varepsilon\approx3.0$ at $q=256/60000$, $z=1.1$, 60 epochs) to within 0.05. The accountant is valid only if the set of release rounds is independent of the private data, which is why only FedPer, the fixed periods, one-shot federation and the planner are run under DP in the article. Model selection on held-out data is not covered by the budget. The DP tables of Section~\ref{supp:legacy} therefore report final-round values, and Table~VIII of the article gives the final round as its primary value and the validation-selected value as an uncharged reference only. In the tables of this supplement the noise multiplier $z$ of the article is denoted $\sigma$.
+
+\emph{Exact accountant at full participation.} At $q=1$ the $R_{\mathrm{tx}}$ releases are Gaussian mechanisms without subsampling, whose exact privacy is $\mu$-Gaussian DP with $\mu=\sqrt{R_{\mathrm{tx}}}/z$~\cite{dong2022gdp}. The corresponding $(\varepsilon,\delta)$ curve~\cite{balle2018} is
+\begin{equation}
+\delta(\varepsilon)=\Phi\Big(-\frac{\varepsilon}{\mu}+\frac{\mu}{2}\Big)-e^{\varepsilon}\,\Phi\Big(-\frac{\varepsilon}{\mu}-\frac{\mu}{2}\Big),
+\label{eq:gdp}
+\end{equation}
+where $\Phi$ is the standard normal distribution function. Like (18), it depends on $R_{\mathrm{tx}}$ only through $R_{\mathrm{tx}}/z^2$. Calibrated on (\ref{eq:gdp}) instead of (18), the noise multiplier of every method would be lower by the same factor: 24\%, 20\%, 17\% and 13\% for $\varepsilon^\star=1$, 2, 4 and 8. The article uses the R\'enyi accountant, so every $\varepsilon$ that it reports is an upper bound.
+
+\section{Sensitivity to the Round-Selection Rule}
+\label{supp:selection}
+The primary metric selects the first round that maximises the mean validation AUROC (7). Under a sparse schedule the test AUROC rises at each synchronisation and falls afterwards, so this rule can select the peak that follows a synchronisation, and on a flat validation curve a small numerical difference can move the selected round (Section~\mbox  {V-A}). Table~\ref{tab:selection} repeats both primary contrasts under two further rules that are computed from the same per-round logs: the first round that maximises the trailing three-round mean of the validation AUROC, and the mean test AUROC over the last ten rounds, which involves no selection. The first rule of the table reproduces the values of Table~\ref{tab:paired} and of Table~V of the article exactly, since it uses the same bootstrap.
+
+Under none of the three rules is \tierfed{} ahead of the best uniform period by the relevance threshold of 0.005 with an interval above zero in any setting. The comparison with FedPer depends on the rule. Under the smoothed rule \tierfed{} is below FedPer by more than the threshold, with an interval below zero, in two settings, and over the last ten rounds it is above FedPer, with an interval above zero, in 5 of the 7 settings, because full-rate training has overfitted by then (Section~\mbox  {V-B}).
+
+\begin{table*}[t]
+\caption{The two primary contrasts under three rules for the reported value, computed from the same runs: mean paired difference in AUROC with its bootstrap 95\% interval. The best uniform period is the one chosen in Table~V of the article}
+\label{tab:selection}
+\centering\small
+\fit{\begin{tabular}{@{}llcc@{}}
+\toprule
+Setting, seeds, best uniform period & Reported value & \tierfed{} $-$ FedPer [95\% CI] & \tierfed{} $-$ best uniform [95\% CI]\\
+\midrule
+Specialty groups, 10 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0007 [\ensuremath{-}0.0033, \ensuremath{+}0.0018] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0030 [\ensuremath{-}0.0056, \ensuremath{-}0.0005] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0085 [\ensuremath{+}0.0051, \ensuremath{+}0.0118] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+\midrule
+Dirichlet $\alpha=0.1$, 5 seeds, $K=8$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0010 [\ensuremath{-}0.0182, \ensuremath{+}0.0215] & \ensuremath{-}0.0113 [\ensuremath{-}0.0270, \ensuremath{+}0.0040]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0091 [\ensuremath{-}0.0224, \ensuremath{+}0.0058] & \ensuremath{-}0.0099 [\ensuremath{-}0.0289, \ensuremath{+}0.0004]\\
+ & Mean of the last ten rounds & \ensuremath{-}0.0052 [\ensuremath{-}0.0208, \ensuremath{+}0.0084] & \ensuremath{-}0.0096 [\ensuremath{-}0.0219, \ensuremath{-}0.0008]\\
+\midrule
+Dirichlet $\alpha=0.3$, 5 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{+}0.0354 [\ensuremath{+}0.0075, \ensuremath{+}0.0788] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{+}0.0342 [\ensuremath{+}0.0089, \ensuremath{+}0.0726] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0100 [\ensuremath{+}0.0002, \ensuremath{+}0.0221] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+\midrule
+Dirichlet $\alpha=1$, 5 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{+}0.0029 [\ensuremath{-}0.0049, \ensuremath{+}0.0112] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{+}0.0038 [\ensuremath{-}0.0086, \ensuremath{+}0.0161] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0140 [\ensuremath{+}0.0041, \ensuremath{+}0.0239] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+\midrule
+Dirichlet $\alpha=10$, 5 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{+}0.0000 [\ensuremath{-}0.0021, \ensuremath{+}0.0028] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0125 [\ensuremath{-}0.0168, \ensuremath{-}0.0090] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0017 [\ensuremath{-}0.0005, \ensuremath{+}0.0043] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+\midrule
+ResNet backbone, 10 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0029 [\ensuremath{-}0.0057, \ensuremath{-}0.0002] & \ensuremath{-}0.0023 [\ensuremath{-}0.0061, \ensuremath{+}0.0011]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0055 [\ensuremath{-}0.0088, \ensuremath{-}0.0025] & \ensuremath{+}0.0038 [\ensuremath{-}0.0004, \ensuremath{+}0.0074]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0078 [\ensuremath{+}0.0047, \ensuremath{+}0.0113] & \ensuremath{-}0.0062 [\ensuremath{-}0.0077, \ensuremath{-}0.0047]\\
+\midrule
+Clinical centres, 20 seeds, $K=4$ & First maximum of $A^{\mathcal V}$ (main text) & \ensuremath{-}0.0085 [\ensuremath{-}0.0161, \ensuremath{-}0.0010] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Maximum of the three-round mean of $A^{\mathcal V}$ & \ensuremath{-}0.0059 [\ensuremath{-}0.0125, \ensuremath{+}0.0000] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+ & Mean of the last ten rounds & \ensuremath{+}0.0063 [\ensuremath{+}0.0012, \ensuremath{+}0.0114] & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000]\\
+\bottomrule
+\end{tabular}}
+\end{table*}
+
+\section{Paired Comparison on the Specialty Groups}
+\label{supp:paired}
+Table~\ref{tab:paired} compares \tierfed{} with every baseline of Table~III of the article on the same 10 seeds. The fixed period $(4,4)$ is identical to \tierfed{} and is not listed. The $p$-values are corrected by Holm's method over the listed contrasts.
+
+\begin{table}[t]
+\caption{Paired comparison of \tierfed{} with each baseline on the specialty groups: difference in AUROC at $\hat r$ with its bootstrap 95\% interval, Holm-corrected Wilcoxon $p$-value, number of seeds on which \tierfed{} is strictly higher, and difference in upload in MB up to $\hat r$ and over 60 rounds}
+\label{tab:paired}
+\centering\small
+\fit{\begin{tabular}{@{}lccccc@{}}
+\toprule
+\tierfed{} against & $\Delta$AUROC [95\% CI] & $p_{\mathrm{Holm}}$ & Higher & $\Delta$MB to $\hat r$ & $\Delta$MB, 60 rounds\\
+\midrule
+Local only & \ensuremath{+}0.0232 [\ensuremath{+}0.0187, \ensuremath{+}0.0272] & 0.020 & 10/10 & \ensuremath{+}45.7 & \ensuremath{+}65.3\\
+FedAvg & \ensuremath{-}0.0014 [\ensuremath{-}0.0042, \ensuremath{+}0.0012] & 1.000 & 4/10 & \ensuremath{-}4.9 & \ensuremath{-}153.1\\
+FedProx & \ensuremath{-}0.0014 [\ensuremath{-}0.0047, \ensuremath{+}0.0023] & 1.000 & 2/10 & \ensuremath{-}32.2 & \ensuremath{-}153.1\\
+FedPer & \ensuremath{-}0.0007 [\ensuremath{-}0.0033, \ensuremath{+}0.0018] & 1.000 & 4/10 & \ensuremath{-}17.4 & \ensuremath{-}152.5\\
+FedLAMA-style & \ensuremath{-}0.0019 [\ensuremath{-}0.0044, \ensuremath{+}0.0002] & 1.000 & 3/10 & \ensuremath{-}3.7 & \ensuremath{-}88.7\\
+AdaComm & \ensuremath{+}0.0048 [\ensuremath{+}0.0022, \ensuremath{+}0.0076] & 0.088 & 9/10 & \ensuremath{+}18.1 & \ensuremath{+}36.2\\
+LAG, equal weights & \ensuremath{+}0.0005 [\ensuremath{-}0.0028, \ensuremath{+}0.0043] & 1.000 & 4/10 & \ensuremath{-}71.1 & \ensuremath{-}153.1\\
+LAG & \ensuremath{-}0.0018 [\ensuremath{-}0.0044, \ensuremath{+}0.0004] & 1.000 & 4/10 & \ensuremath{+}1.3 & \ensuremath{-}153.1\\
+Fixed (8,8) & \ensuremath{+}0.0005 [\ensuremath{-}0.0015, \ensuremath{+}0.0023] & 1.000 & 7/10 & \ensuremath{+}9.8 & \ensuremath{+}25.4\\
+Staggered (4,4) & \ensuremath{+}0.0024 [\ensuremath{+}0.0000, \ensuremath{+}0.0052] & 0.844 & 7/10 & \ensuremath{+}5.5 & \ensuremath{-}1.6\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{The Privacy Planner on a Grid}
+\label{supp:planner}
+Table~\ref{tab:planner} gives the intervals that the planner of Section~\mbox  {III-D} selects by minimising (19), computed with the class that the experiments use, for the tier shares of the MLP on the main benchmark, $R=60$, $T_w=5$, $K_{\max}=8$, $q=1$ and $\delta=10^{-5}$. The grid has 7 values of the prior weight $\lambda$, 5 quotas and four budgets $\varepsilon^\star\in\{1,2,4,8\}$. The selected pair is the same for all four budgets, because at $q=1$ the ratio of noise energies in (19) does not depend on $\varepsilon^\star$, so the table has one row per quota. The quota is applied to the realised payload fraction $\Pi_R$, warm-up included; quotas below $(5+6)/60\approx0.18$ are infeasible, since the sparsest pair $(8,8)$ already transmits in 11 of the 60 rounds. Without a binding quota ($\rho=1$) the planner returns equal intervals for every $\lambda$, and a larger $\lambda$, which weights the noise more, gives longer intervals. The only unequal pair is (5,6) at $\rho=0.25$: there $(4,4)$ realises a payload fraction of 0.30 and is infeasible, and among the feasible pairs the planner gives the longer interval to the medium tier, which carries the larger share of the payload.
+
+\begin{table}[t]
+\caption{Intervals (slow, medium) selected by the privacy planner for each quota $\rho$ on the realised payload fraction and each prior weight $\lambda$; the selection is the same for $\varepsilon^\star\in\{1,2,4,8\}$}
+\label{tab:planner}
+\centering\small
+\fit{\begin{tabular}{@{}cccccccc@{}}
+\toprule
+Quota $\rho$ & $\lambda=0.1$ & $\lambda=0.25$ & $\lambda=0.5$ & $\lambda=1$ & $\lambda=2$ & $\lambda=4$ & $\lambda=10$\\
+\midrule
+1 & (2,2) & (2,2) & (2,2) & (3,3) & (4,4) & (4,4) & (5,5)\\
+0.4 & (3,3) & (3,3) & (3,3) & (3,3) & (4,4) & (4,4) & (5,5)\\
+0.3 & (4,4) & (4,4) & (4,4) & (4,4) & (4,4) & (4,4) & (5,5)\\
+0.25 & (5,6) & (5,6) & (5,6) & (5,6) & (6,6) & (6,6) & (6,6)\\
+0.2 & (7,7) & (7,7) & (7,7) & (7,7) & (7,7) & (7,7) & (7,7)\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{The Two Synchronisation Steps}
+\label{supp:sync}
+Section~\mbox  {II-A} of the article defines the restart step, which every experiment of the main protocol uses, and the carry-over step, which is examined in Section~\mbox  {V-E}. The two differ in one line of the round: under the carry-over step a client does not replace its copy of a due tier by the server copy before it trains, except in the first round, so the tier that it uploads is the result of all local epochs since the tier's last synchronisation. Full-rate methods are identical under both steps, because a tier that is due in every round is adopted from the server at the end of each round by (3); FedPer was run under the carry-over step for one seed and reproduced its restart run exactly. The carry-over runs use full participation and no DP.
+
+Table~\ref{tab:dispersion} reports the dispersion $\Gh_g$ of the uploaded slices, averaged over the synchronisation rounds after warm-up, for uniform periods on the main benchmark. Under the restart step it varies by a factor of at most 1.29 between $K=1$ and $K=8$ and shows no trend in $K$. Under the carry-over step it is larger by factors of 7.5 and 5.3 at $K=4$ and of 26.9 and 11.9 at $K=8$ for the slow and the medium tier, which lies between the linear and the quadratic growth that Lemma~\ref{lem:drift} allows. A controller that reads $\Gh_g$ under the carry-over step therefore measures the interval that it chose earlier together with the disagreement of the clients. The variant of \tierfed{} with a rescaled dispersion, listed in Table~VI of the article, divides $\Gh_g$ by the square of the number of rounds since the tier's last synchronisation to remove this dependence. On the specialty groups and at the clinical centres both variants select $(4,4)$ in every seed under the carry-over step, and their runs are identical to those of the fixed period $(4,4)$ under that step; the ResNet is discussed in Section~\mbox  {V-E} of the article.
+
+\begin{table}[t]
+\caption{Dispersion $\Gh_g$ ($\times10^{-3}$) of the uploaded slices of the two shared tiers, averaged over the synchronisation rounds after warm-up, for uniform periods $K$ on the specialty groups (MLP) under the two synchronisation steps; $K=1$ is FedPer, for which the steps coincide}
+\label{tab:dispersion}
+\centering\small
+\fit{\begin{tabular}{@{}ccccccc@{}}
+\toprule
+ & \multicolumn{3}{c}{Restart step} & \multicolumn{3}{c}{Carry-over step}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Period $K$ & Seeds & Slow tier & Medium tier & Seeds & Slow tier & Medium tier\\
+\midrule
+1 & 10 & 4.81 & 7.40 & -- & -- & --\\
+2 & 5 & 5.93 & 7.46 & -- & -- & --\\
+4 & 10 & 5.70 & 6.93 & 10 & 42.90 & 36.67\\
+6 & 5 & 5.10 & 7.22 & -- & -- & --\\
+8 & 10 & 4.59 & 7.71 & 10 & 123.25 & 91.74\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{The Clinical-Centre Benchmark}
+\label{supp:centres}
+Fed-Heart-Disease~\cite{duterrail2022flamby} consists of the four processed collections of the UCI Heart Disease data~\cite{detrano1989}: Cleveland (303 patients), Hungary (294), Switzerland (123) and Long Beach (200), 920 patients in total. The label is the presence of angiographic disease (a diagnosis value above zero). The 13 clinical attributes are encoded as 36 features. The six numeric attributes are standardised; a missing value is replaced by the median and marked by an indicator feature, because some attributes are mostly missing outside the Cleveland collection. The seven categorical attributes are one-hot encoded, with a missing value as a category of its own. As on the main benchmark, the medians and the scaling use statistics of the pooled data and do not involve the labels. Each collection is one client. A fifth of the patients is set aside and enters no result, as on the main benchmark, and the remaining 736 patients are split per centre into training, validation and test sets (70/10/20\%). The MLP of the main benchmark has 29,634 parameters on this input, of which the slow, medium and fast tiers hold 16.0\%, 83.6\% and 0.4\%. All hyperparameters are those of Table~II of the article, with a batch size of 32. The methods, the 20 seeds and the statistical procedure are those of the main comparison, with the uniform period $K=2$ added so that the matched-bytes contrast has four candidate periods ($K\in\{1,2,4,8\}$).
+
+Because the centres are small, the test split of a centre holds between about 19 and 50 patients, and in 30\% of the runs one centre has a test split with a single class, which removes it from the average of that run for every method alike. The results of Table~IV of the article should therefore be read as a check that the behaviour observed on the specialty groups carries over to clients that are real institutions, and not as a clinical evaluation.
+
+\section{Experiment Families of the Main Protocol}
+\label{supp:families}
+Table~\ref{tab:families} lists the 946 runs of the main protocol of the article by family, with the number of configurations, seeds and runs counted from the logs. A configuration is a method with its parameters in one setting; the timing families count the runs of both worlds.
+
+\begin{table}[t]
+\caption{Experiment families of the main protocol: data and clients, number of configurations, seeds per configuration and runs}
+\label{tab:families}
+\centering\small
+\fit{\begin{tabular}{@{}llccc@{}}
+\toprule
+Family & Data and clients & Configurations & Seeds & Runs\\
+\midrule
+Main comparison & 20 specialty groups & 13 & 10 & 130\\
+Reference bounds & pooled data, per-group test splits & 2 & 10 & 20\\
+Accuracy--upload frontier & 20 specialty groups & 8 & 5 & 40\\
+Peak-aware variants & 20 specialty groups & 3 & 5 & 15\\
+Label-skew sweep & Dirichlet $\alpha\in\{0.1,0.3,1,10\}$ & 20 & 5 & 100\\
+ResNet backbone & 20 specialty groups & 5 & 10 & 50\\
+Clinical centres & Fed-Heart-Disease, 4 centres & 13 & 20 & 260\\
+Carry-over synchronisation step & specialty groups, centres, ResNet & 13 & 5--20 & 165\\
+Matched-$\varepsilon$ DP ($q=1$) & 20 specialty groups & 5 & 10 & 50\\
+Timing side channel, MLP & clean or shifted target group & 5 & 10 per world & 100\\
+Timing side channel, ResNet & clean or shifted target group & 1 & 8 per world & 16\\
+\midrule
+Total &  &  &  & 946\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Additional Experiments Read at the Final Round}
+\label{supp:legacy}
+The experiments of this section cover settings that the main protocol of the article does not: sweeps of the baselines' parameters, ablations, further backbones, imaging data, scaling, a transport check and sweeps of the privacy budget. They were run with a different configuration from that of the article, and their values are not comparable with those of its tables. Each client's patients are split 80/20\% into training and test sets without a validation set, and the AUROC is read at the final round, which favours sparse schedules over full-rate methods (Section~\mbox  {V-B}). The fixed schedule of these tables synchronises the slow tier every five and the medium tier every two rounds from round 1, without warm-up, and LAG averages with equal client weights. All tables are generated from the per-seed logs by the script that generates the tables of the article, with the best value of each group in bold.
+
+\begin{table}[t]
+\caption{Sweep of the fixed period $(K_{\mathrm s},K_{\mathrm m})$ with local-only rounds (top) and comparison of the exact and the greedy solver of \tierfed{} at every quota (bottom): final-round AUROC and upload over 60 rounds (10 seeds)}
+\centering\small
+\begin{tabular}{@{}lcr@{}}
+\toprule
+$(K_{\mathrm s},K_{\mathrm m})$ or quota, solver & AUROC & Upload (MB)\\
+\midrule
+(2, 1) & 0.6317 $\pm$ 0.0097 & 170.0 \\
+(2, 2) & \textbf{0.6362} $\pm$ 0.0110 & 112.5 \\
+\midrule
+(4, 1) & 0.6314 $\pm$ 0.0102 & 145.3 \\
+(4, 2) & 0.6370 $\pm$ 0.0112 & 87.8 \\
+(4, 4) & \textbf{0.6407} $\pm$ 0.0114 & 58.1 \\
+\midrule
+(8, 1) & 0.6130 $\pm$ 0.0079 & 132.1 \\
+(8, 2) & 0.6155 $\pm$ 0.0077 & 74.6 \\
+(8, 4) & \textbf{0.6254} $\pm$ 0.0073 & 44.9 \\
+(8, 8) & 0.6250 $\pm$ 0.0088 & 29.0 \\
+\midrule
+$\rho=0.15$, exact & \textbf{0.6070} $\pm$ 0.0119 & 45.7 \\
+\midrule
+$\rho=0.25$, exact & \textbf{0.6269} $\pm$ 0.0082 & 65.3 \\
+$\rho=0.25$, greedy & \textbf{0.6269} $\pm$ 0.0082 & 65.3 \\
+\midrule
+$\rho=0.40$, exact & \textbf{0.6366} $\pm$ 0.0119 & 84.9 \\
+$\rho=0.40$, greedy & 0.6283 $\pm$ 0.0112 & 95.7 \\
+\midrule
+$\rho=0.60$, exact & \textbf{0.6290} $\pm$ 0.0093 & 116.2 \\
+\midrule
+$\rho=0.80$, exact & \textbf{0.6296} $\pm$ 0.0094 & 167.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Sweeps of the baselines (10 seeds): initial period $\tau_0$ of AdaComm, threshold $\xi$ of LAG, and the methods with an SGD local solver (learning rate $5\times10^{-2}$), among them SCAFFOLD}
+\label{tab:baselines-legacy}
+\centering\small
+\fit{\begin{tabular}{@{}lccrr@{}}
+\toprule
+Configuration & AUROC & AUPRC & Upload (MB) & Tx rounds\\
+\midrule
+AdaComm, $\tau_0=16$ & 0.6125 $\pm$ 0.0111 & 0.152 & 18.2 & 5 \\
+AdaComm, $\tau_0=2$ & 0.6301 $\pm$ 0.0095 & 0.177 & 109.2 & 30 \\
+AdaComm, $\tau_0=4$ & 0.6275 $\pm$ 0.0068 & 0.174 & 54.6 & 15 \\
+AdaComm, $\tau_0=8$ & \textbf{0.6302} $\pm$ 0.0071 & 0.168 & 29.1 & 8 \\
+\midrule
+FedAvg, SGD solver & \textbf{0.6396} $\pm$ 0.0109 & 0.172 & 218.4 & 60 \\
+\midrule
+FedPer, SGD solver & \textbf{0.6379} $\pm$ 0.0110 & 0.170 & 217.8 & 60 \\
+\midrule
+LAG, $\xi=10$ & 0.6351 $\pm$ 0.0124 & 0.179 & 218.4 & 60 \\
+LAG, $\xi=100$ & 0.6351 $\pm$ 0.0124 & 0.179 & 218.4 & 60 \\
+LAG, $\xi=1000$ & \textbf{0.6352} $\pm$ 0.0126 & 0.179 & 168.4 & 60 \\
+LAG, $\xi=10000$ & 0.5673 $\pm$ 0.0498 & 0.135 & 6.8 & 7 \\
+\midrule
+SCAFFOLD, SGD solver & \textbf{0.6383} $\pm$ 0.0106 & 0.173 & 436.9 & 60 \\
+\midrule
+TierFed, SGD solver & \textbf{0.6251} $\pm$ 0.0095 & 0.157 & 65.3 & 18 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Sensitivity of the privacy planner to its prior weight $\lambda$ (10 seeds): selected intervals, calibrated noise multiplier $\sigma$, number of releases, final-round AUROC and upload. Top: 20 clients at $q=1$, $\varepsilon^\star=4$. Bottom: 100 clients at $q=0.2$, $\varepsilon^\star=4$}
+\centering\small
+\begin{tabular}{@{}lrrrcr@{}}
+\toprule
+$\lambda$ & $K$ & $\sigma$ & Releases & AUROC & Upload (MB)\\
+\midrule
+0.3 & 2 & 7.33 & 32 & 0.5237 $\pm$ 0.0150 & 116.2 \\
+1.0 & 3 & 6.22 & 23 & 0.5211 $\pm$ 0.0121 & 83.5 \\
+3.0 & 4 & 5.50 & 18 & \textbf{0.5318} $\pm$ 0.0081 & 65.3 \\
+10.0 & 5 & 5.18 & 16 & 0.5200 $\pm$ 0.0071 & 58.1 \\
+\midrule
+0.3 & 2 & 1.85 & 32 & \textbf{0.5158} $\pm$ 0.0256 & 116.3 \\
+1.0 & 3 & 1.67 & 23 & 0.5122 $\pm$ 0.0226 & 83.0 \\
+3.0 & 4 & 1.56 & 18 & 0.5084 $\pm$ 0.0192 & 64.5 \\
+10.0 & 6 & 1.47 & 14 & 0.5114 $\pm$ 0.0283 & 50.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Exposure of the transmitted updates without DP (10 seeds): parameters exposed per transmitting round, normalised mean squared error (NMSE) and feature correlation of an update-inversion attack on the slices that were actually transmitted, AUC of a membership-inference attack (MIA) on the deployed models, for which 0.5 corresponds to no leakage, and upload. Arrows give the direction that is better for privacy}
+\centering\small
+\fit{\begin{tabular}{@{}lrrccr@{}}
+\toprule
+Method & Params exposed & NMSE $\uparrow$ & Corr.\ $\downarrow$ & MIA AUC $\downarrow$ & Upload (MB)\\
+\midrule
+AdaComm & 45,506 & 11.58 & 0.065 & 0.534 & 29.1 \\
+FedAvg & 45,506 & 9.04 & 0.103 & 0.534 & 218.4 \\
+FedPer & 45,376 & 9.04 & 0.088 & 0.535 & 217.8 \\
+Fixed schedule & 27,509 & 11.93 & 0.048 & 0.526 & 82.9 \\
+TierFed & 45,376 & 10.45 & 0.089 & 0.540 & 65.3 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Ablations (10 seeds). Top: private head and schedule, and \tierfed{} with and without the private head. Middle: length $T_w$ of the warm-up. Bottom: loss used against class imbalance, for FedPer and \tierfed{}}
+\centering\small
+\fit{\begin{tabular}{@{}lccr@{}}
+\toprule
+Configuration & AUROC & AUPRC & Upload (MB)\\
+\midrule
+FedAvg: shared head, every round & 0.6203 $\pm$ 0.0100 & 0.171 & 218.4 \\
+FedPer: private head, every round & 0.6215 $\pm$ 0.0087 & 0.171 & 217.8 \\
+Fixed schedule, private head & \textbf{0.6339} $\pm$ 0.0100 & 0.177 & 82.9 \\
+Fixed schedule, shared head & 0.6336 $\pm$ 0.0102 & 0.177 & 83.5 \\
+TierFed, private head & 0.6269 $\pm$ 0.0082 & 0.175 & 65.3 \\
+TierFed, shared head & 0.6264 $\pm$ 0.0073 & 0.174 & 65.5 \\
+\midrule
+TierFed, $T_w=0$ & 0.6270 $\pm$ 0.0080 & 0.173 & 54.5 \\
+TierFed, $T_w=2$ & 0.6323 $\pm$ 0.0092 & 0.176 & 58.1 \\
+TierFed, $T_w=5$ & 0.6269 $\pm$ 0.0082 & 0.175 & 65.3 \\
+TierFed, $T_w=10$ & 0.6289 $\pm$ 0.0093 & 0.176 & 79.9 \\
+TierFed, $T_w=20$ & \textbf{0.6354} $\pm$ 0.0112 & 0.179 & 108.9 \\
+\midrule
+Class-balanced, FedPer & 0.6232 $\pm$ 0.0108 & 0.173 & 217.8 \\
+Class-balanced, TierFed & \textbf{0.6264} $\pm$ 0.0071 & 0.173 & 65.3 \\
+\midrule
+Focal, FedPer & 0.6198 $\pm$ 0.0100 & 0.170 & 217.8 \\
+Focal, TierFed & \textbf{0.6237} $\pm$ 0.0089 & 0.173 & 65.3 \\
+\midrule
+LDAM, FedPer & 0.6150 $\pm$ 0.0114 & 0.164 & 217.8 \\
+LDAM, TierFed & \textbf{0.6276} $\pm$ 0.0091 & 0.171 & 65.3 \\
+\midrule
+Inverse-frequency CE, FedPer & 0.6215 $\pm$ 0.0087 & 0.171 & 217.8 \\
+Inverse-frequency CE, TierFed & \textbf{0.6269} $\pm$ 0.0082 & 0.175 & 65.3 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Backbones on the readmission data (5 seeds): final-round AUROC, AUPRC, upload and number of parameters; the transformer runs used a fused attention kernel that is not deterministic}
+\centering\small
+\fit{\begin{tabular}{@{}lccrr@{}}
+\toprule
+Backbone, method & AUROC & AUPRC & Upload (MB) & Params\\
+\midrule
+MLP / FedAvg & 0.6236 $\pm$ 0.0103 & 0.171 & 218.4 & 45,506 \\
+MLP / FedPer & 0.6240 $\pm$ 0.0087 & 0.172 & 217.8 & 45,506 \\
+MLP / Fixed schedule & \textbf{0.6373} $\pm$ 0.0117 & 0.176 & 82.9 & 45,506 \\
+MLP / TierFed & 0.6298 $\pm$ 0.0128 & 0.175 & 65.3 & 45,506 \\
+\midrule
+ResNet / FedAvg & 0.6258 $\pm$ 0.0192 & 0.168 & 2007.3 & 418,178 \\
+ResNet / FedPer & 0.6137 $\pm$ 0.0107 & 0.161 & 2006.0 & 418,178 \\
+ResNet / Fixed schedule & \textbf{0.6382} $\pm$ 0.0150 & 0.177 & 1006.8 & 418,178 \\
+ResNet / TierFed & 0.6279 $\pm$ 0.0130 & 0.175 & 603.5 & 418,178 \\
+\midrule
+FT-Transformer / FedAvg & \textbf{0.6401} $\pm$ 0.0134 & 0.177 & 581.8 & 121,218 \\
+FT-Transformer / FedPer & 0.6352 $\pm$ 0.0115 & 0.173 & 581.2 & 121,218 \\
+FT-Transformer / Fixed schedule & 0.6386 $\pm$ 0.0116 & 0.172 & 270.7 & 121,218 \\
+FT-Transformer / TierFed & 0.6345 $\pm$ 0.0083 & 0.171 & 165.2 & 121,218 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Imaging data (PneumoniaMNIST, 20 clients with Dirichlet label skew, 10 seeds): final-round AUROC with its BCa 95\% interval, AUPRC, upload, transmitting rounds and $p$-value of the non-inferiority test on the AUROC against FedPer. Between 3 and 9 clients per seed have a held-out split with a single class and are excluded identically for every method}
+\centering\small
+\fit{\begin{tabular}{@{}lccrrc@{}}
+\toprule
+Method & AUROC [95\% CI] & AUPRC & Upload (MB) & Tx & NI $p$\\
+\midrule
+FedAvg & 0.9959 [0.9944, 0.9972] & 0.991 & 1214.8 & 60 & 0.037 \\
+FedPer & 0.9643 [0.8952, 0.9917] & 0.986 & 1213.7 & 60 & (ref.) \\
+FedLAMA & \textbf{0.9965} [0.9953, 0.9975] & 0.995 & 877.4 & 60 & 0.036 \\
+Fixed schedule & 0.9642 [0.8938, 0.9934] & 0.989 & 614.8 & 37 & \ensuremath{<10^{-4}} \\
+TierFed & 0.9698 [0.9536, 0.9820] & 0.984 & 364.1 & 18 & 0.182 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Scaling with the number of clients (readmission data, Dirichlet $\alpha=1$, 30 rounds, 3 seeds): AUROC, upload per client, wall-clock seconds per round and peak memory on one CPU}
+\centering\small
+\fit{\begin{tabular}{@{}lcrrr@{}}
+\toprule
+Clients, method & AUROC & Upload (MB) & s/round & Peak MB\\
+\midrule
+10 sites, FedAvg & \textbf{0.6127} $\pm$ 0.0206 & 54.6 & 3.07 & 80 \\
+10 sites, FedLAMA & 0.6056 $\pm$ 0.0117 & 43.1 & 3.03 & 80 \\
+10 sites, FedPer & 0.5935 $\pm$ 0.0072 & 54.5 & 3.03 & 80 \\
+10 sites, TierFed & 0.6118 $\pm$ 0.0100 & 20.0 & 3.01 & 80 \\
+\midrule
+20 sites, FedAvg & 0.6187 $\pm$ 0.0110 & 109.2 & 3.12 & 87 \\
+20 sites, FedLAMA & 0.6187 $\pm$ 0.0183 & 85.4 & 3.09 & 87 \\
+20 sites, FedPer & 0.6189 $\pm$ 0.0235 & 108.9 & 3.11 & 87 \\
+20 sites, TierFed & \textbf{0.6205} $\pm$ 0.0242 & 39.9 & 3.04 & 87 \\
+\midrule
+50 sites, FedAvg & 0.6128 $\pm$ 0.0224 & 273.0 & 3.40 & 108 \\
+50 sites, FedLAMA & 0.6108 $\pm$ 0.0203 & 219.3 & 3.33 & 108 \\
+50 sites, FedPer & \textbf{0.6188} $\pm$ 0.0240 & 272.3 & 3.37 & 108 \\
+50 sites, TierFed & 0.6048 $\pm$ 0.0170 & 99.8 & 3.21 & 108 \\
+\midrule
+100 sites, FedAvg & \textbf{0.6068} $\pm$ 0.0210 & 546.1 & 3.99 & 142 \\
+100 sites, FedLAMA & 0.6061 $\pm$ 0.0230 & 437.1 & 3.86 & 142 \\
+100 sites, FedPer & 0.5929 $\pm$ 0.0255 & 544.5 & 3.86 & 142 \\
+100 sites, TierFed & 0.5883 $\pm$ 0.0157 & 199.7 & 3.57 & 142 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Replay of the logged uploads over TCP for the runs of a wide MLP (1,740,290 parameters, 3 seeds; cell-edge profile for one seed). The per-client uploads of each run are sent over loopback TCP paced at the rate of the link profile. The table gives the total replayed upload time, the prediction of the model of Section~\mbox  {II-B}, their relative difference, the total compute time of the slowest client, and the wall-clock time to an AUROC of 0.60 and of 0.62 (``never'': not reached in 60 rounds)}
+\label{tab:replay}
+\centering\small
+\fit{\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+Profile & Method & Replayed (s) & Model (s) & Diff.\ (\%) & Compute (s) & $t_{0.60}$ (s) & $t_{0.62}$ (s)\\
+\midrule
+Wired WAN & AdaComm & 5.2 & 5.1 & -1.7 & 10 & 1 & never \\
+Wired WAN & FedAvg & 34.6 & 34.0 & -1.7 & 10 & 1 & 2 \\
+Wired WAN & FedPer & 34.6 & 34.0 & -1.6 & 10 & 1 & 2 \\
+Wired WAN & Fixed schedule & 9.2 & 9.1 & -1.7 & 10 & 1 & 2 \\
+Wired WAN & TierFed & 10.4 & 10.2 & -1.9 & 10 & 1 & 2 \\
+\midrule
+5G NR, typical & AdaComm & 10.2 & 10.2 & -0.2 & 10 & 1 & never \\
+5G NR, typical & FedAvg & 68.2 & 68.0 & -0.2 & 10 & 2 & 3 \\
+5G NR, typical & FedPer & 68.1 & 68.0 & -0.2 & 10 & 3 & 4 \\
+5G NR, typical & Fixed schedule & 18.2 & 18.1 & -0.2 & 10 & 1 & 4 \\
+5G NR, typical & TierFed & 20.4 & 20.4 & -0.2 & 10 & 3 & 4 \\
+\midrule
+5G NR, cell edge & AdaComm & 100.5 & 100.5 & 0.1 & 10 & 11 & never \\
+5G NR, cell edge & FedAvg & 669.6 & 670.1 & 0.1 & 11 & 13 & 24 \\
+5G NR, cell edge & FedPer & 669.2 & 669.7 & 0.1 & 10 & 23 & 34 \\
+5G NR, cell edge & Fixed schedule & 178.5 & 178.6 & 0.1 & 10 & 12 & 35 \\
+5G NR, cell edge & TierFed & 200.8 & 200.9 & 0.1 & 10 & 23 & 34 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Schedules at matched privacy budgets on the 20 specialty groups for all sampling rates, $q=1$ included (10 seeds, $C=1$, $\delta=10^{-5}$): calibrated noise multiplier $\sigma$, number of releases and final-round AUROC for each sampling rate $q$ and budget $\varepsilon^\star$}
+\label{tab:dp20}
+\centering\small
+\fit{\begin{tabular}{@{}lrrc@{}}
+\toprule
+$q$, $\varepsilon^\star$, method & $\sigma$ & Releases & AUROC\\
+\midrule
+0.5, 1, FedAvg & 19.14 & 60 & 0.5073 $\pm$ 0.0163 \\
+0.5, 1, FedPer & 19.14 & 60 & 0.5102 $\pm$ 0.0092 \\
+0.5, 1, Fixed $K=4$ & 10.95 & 19 & 0.5150 $\pm$ 0.0083 \\
+0.5, 1, Fixed $K=8$ & 8.83 & 12 & \textbf{0.5208} $\pm$ 0.0086 \\
+0.5, 1, TierFed-DP & 12.00 & 23 & 0.5115 $\pm$ 0.0094 \\
+\midrule
+0.5, 2, FedAvg & 9.84 & 60 & 0.5079 $\pm$ 0.0193 \\
+0.5, 2, FedPer & 9.84 & 60 & 0.5090 $\pm$ 0.0092 \\
+0.5, 2, Fixed $K=4$ & 5.72 & 19 & 0.5178 $\pm$ 0.0149 \\
+0.5, 2, Fixed $K=8$ & 4.66 & 12 & \textbf{0.5248} $\pm$ 0.0113 \\
+0.5, 2, TierFed-DP & 6.25 & 23 & 0.5118 $\pm$ 0.0105 \\
+\midrule
+0.5, 4, FedAvg & 5.18 & 60 & 0.5104 $\pm$ 0.0198 \\
+0.5, 4, FedPer & 5.18 & 60 & 0.5135 $\pm$ 0.0089 \\
+0.5, 4, Fixed $K=4$ & 3.09 & 19 & 0.5218 $\pm$ 0.0134 \\
+0.5, 4, Fixed $K=8$ & 2.57 & 12 & \textbf{0.5292} $\pm$ 0.0110 \\
+0.5, 4, TierFed-DP & 3.36 & 23 & 0.5127 $\pm$ 0.0106 \\
+\midrule
+0.5, 8, FedAvg & 2.84 & 60 & 0.5148 $\pm$ 0.0173 \\
+0.5, 8, FedPer & 2.84 & 60 & 0.5162 $\pm$ 0.0107 \\
+0.5, 8, Fixed $K=4$ & 1.76 & 19 & 0.5300 $\pm$ 0.0163 \\
+0.5, 8, Fixed $K=8$ & 1.48 & 12 & \textbf{0.5460} $\pm$ 0.0164 \\
+0.5, 8, TierFed-DP & 1.89 & 23 & 0.5144 $\pm$ 0.0083 \\
+\midrule
+1.0, 4, FedAvg & 10.04 & 60 & 0.5100 $\pm$ 0.0192 \\
+1.0, 4, FedPer & 10.04 & 60 & 0.5174 $\pm$ 0.0103 \\
+1.0, 4, Fixed $K=4$ & 5.65 & 19 & \textbf{0.5294} $\pm$ 0.0083 \\
+1.0, 4, Fixed $K=8$ & 4.49 & 12 & 0.5272 $\pm$ 0.0104 \\
+1.0, 4, TierFed-DP & 6.22 & 23 & 0.5211 $\pm$ 0.0121 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\caption{Schedules at matched privacy budgets on a federation of 100 clients with Dirichlet label skew (10 seeds, $C=1$, $\delta=10^{-5}$): calibrated noise multiplier $\sigma$, number of releases and final-round AUROC for each sampling rate $q$ and budget $\varepsilon^\star$}
+\label{tab:dp100}
+\centering\small
+\fit{\begin{tabular}{@{}lrrc@{}}
+\toprule
+$q$, $\varepsilon^\star$, method & $\sigma$ & Releases & AUROC\\
+\midrule
+0.2, 1, FedAvg & 7.86 & 60 & 0.5062 $\pm$ 0.0197 \\
+0.2, 1, FedPer & 7.86 & 60 & 0.5069 $\pm$ 0.0115 \\
+0.2, 1, Fixed $K=4$ & 4.73 & 19 & 0.5109 $\pm$ 0.0203 \\
+0.2, 1, Fixed $K=8$ & 3.95 & 12 & 0.5112 $\pm$ 0.0148 \\
+0.2, 1, TierFed-DP & 5.12 & 23 & \textbf{0.5114} $\pm$ 0.0219 \\
+\midrule
+0.2, 2, FedAvg & 4.15 & 60 & 0.5126 $\pm$ 0.0216 \\
+0.2, 2, FedPer & 4.15 & 60 & 0.5076 $\pm$ 0.0117 \\
+0.2, 2, Fixed $K=4$ & 2.64 & 19 & 0.5108 $\pm$ 0.0206 \\
+0.2, 2, Fixed $K=8$ & 2.28 & 12 & \textbf{0.5139} $\pm$ 0.0188 \\
+0.2, 2, TierFed-DP & 2.83 & 23 & 0.5100 $\pm$ 0.0246 \\
+\midrule
+0.2, 4, FedAvg & 2.31 & 60 & 0.5159 $\pm$ 0.0200 \\
+0.2, 4, FedPer & 2.31 & 60 & 0.5064 $\pm$ 0.0147 \\
+0.2, 4, Fixed $K=4$ & 1.59 & 19 & 0.5117 $\pm$ 0.0201 \\
+0.2, 4, Fixed $K=8$ & 1.42 & 12 & \textbf{0.5180} $\pm$ 0.0232 \\
+0.2, 4, TierFed-DP & 1.67 & 23 & 0.5122 $\pm$ 0.0226 \\
+\midrule
+0.2, 8, FedAvg & 1.39 & 60 & 0.5175 $\pm$ 0.0211 \\
+0.2, 8, FedPer & 1.39 & 60 & 0.5064 $\pm$ 0.0142 \\
+0.2, 8, Fixed $K=4$ & 1.04 & 19 & 0.5112 $\pm$ 0.0204 \\
+0.2, 8, Fixed $K=8$ & 0.93 & 12 & \textbf{0.5217} $\pm$ 0.0216 \\
+0.2, 8, TierFed-DP & 1.09 & 23 & 0.5101 $\pm$ 0.0220 \\
+\midrule
+0.5, 4, FedAvg & 5.18 & 60 & 0.5196 $\pm$ 0.0203 \\
+0.5, 4, FedPer & 5.18 & 60 & 0.5135 $\pm$ 0.0094 \\
+0.5, 4, Fixed $K=4$ & 3.09 & 19 & 0.5304 $\pm$ 0.0151 \\
+0.5, 4, Fixed $K=8$ & 2.57 & 12 & \textbf{0.5421} $\pm$ 0.0159 \\
+0.5, 4, TierFed-DP & 3.36 & 23 & 0.5274 $\pm$ 0.0281 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Released Data}
+The final metrics of every run are in \texttt{results/tables/collected\_all\_raw.csv} of the released repository, and the per-round histories and per-round bit counts of every run are in \texttt{results/logs}. The repository held 2,760 run logs when this document was built.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

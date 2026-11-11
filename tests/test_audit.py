@@ -205,3 +205,31 @@ def test_crossmachine_pair_comparison():
     b["config"]["seed"] = 43
     r = compare_pair(a, b)
     assert not r["bits_same"] and r["config_diff"] == ["seed"]
+
+
+def test_synchronisation_steps():
+    """Restart (default): every upload is one local epoch away from the broadcast, so the
+    dispersion of the uploads does not grow with the period. Carry-over
+    (sync_restart=False): a tier is uploaded after all local epochs since its last
+    synchronisation, so the dispersion grows with the period. A method that
+    synchronises every round is the same run under both steps."""
+    import pandas as pd
+    base = {**BASE, "rounds": 14}
+
+    def disp(res):
+        h = pd.DataFrame(res["history"])
+        tx = h[(h["round"] > 2) & (h["payload_fraction"] > 0)]
+        return float(tx["divergence_medium"].mean())
+
+    kw = {"k_slow": 4, "k_med": 4, "warmup": 2, "aligned": True}
+    a = run_single({**base, "strategy": "fixed", "strategy_kwargs": kw, "tag": "_rs"}, robust=False)
+    b = run_single({**base, "strategy": "fixed", "strategy_kwargs": kw, "tag": "_co", "sync_restart": False}, robust=False)
+    assert a["summary"]["total_upload_mb"] == b["summary"]["total_upload_mb"]      # same schedule, same bytes
+    assert a["summary"]["fed_auroc_final"] != b["summary"]["fed_auroc_final"]      # different trajectories
+    assert disp(b) > 1.5 * disp(a)                                                  # uploads drift with the period
+    f1 = run_single({**base, "strategy": "fedper", "tag": "_rs"}, robust=False)["summary"]
+    f2 = run_single({**base, "strategy": "fedper", "tag": "_co", "sync_restart": False}, robust=False)["summary"]
+    assert f1["fed_auroc_final"] == f2["fed_auroc_final"] and f1["total_upload_mb"] == f2["total_upload_mb"]
+    with pytest.raises(ValueError):
+        run_single({**base, "strategy": "fedper", "tag": "_co_p", "sync_restart": False, "participation": 0.5},
+                   robust=False)

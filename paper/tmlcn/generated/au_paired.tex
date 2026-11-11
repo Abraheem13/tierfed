@@ -1,0 +1,18 @@
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\tierfed{} vs. & $\Delta$AUROC [95\% CI] & $p_{\mathrm{Holm}}$ & Higher & $\Delta$MB\\
+\midrule
+Local only & \ensuremath{+}0.0232 [\ensuremath{+}0.0187, \ensuremath{+}0.0272] & 0.023 & 10/10 & \ensuremath{+}65.3\\
+FedAvg & \ensuremath{-}0.0014 [\ensuremath{-}0.0042, \ensuremath{+}0.0012] & 1.000 & 4/10 & \ensuremath{-}153.1\\
+FedProx & \ensuremath{-}0.0014 [\ensuremath{-}0.0047, \ensuremath{+}0.0023] & 1.000 & 2/10 & \ensuremath{-}153.1\\
+FedPer & \ensuremath{-}0.0007 [\ensuremath{-}0.0033, \ensuremath{+}0.0018] & 1.000 & 4/10 & \ensuremath{-}152.5\\
+FedLAMA-style & \ensuremath{-}0.0019 [\ensuremath{-}0.0044, \ensuremath{+}0.0002] & 1.000 & 3/10 & \ensuremath{-}88.7\\
+AdaComm & \ensuremath{+}0.0048 [\ensuremath{+}0.0022, \ensuremath{+}0.0076] & 0.107 & 9/10 & \ensuremath{+}36.2\\
+LAG, equal weights & \ensuremath{+}0.0005 [\ensuremath{-}0.0028, \ensuremath{+}0.0043] & 1.000 & 4/10 & \ensuremath{-}153.1\\
+LAG & \ensuremath{-}0.0018 [\ensuremath{-}0.0044, \ensuremath{+}0.0004] & 1.000 & 4/10 & \ensuremath{-}153.1\\
+Fixed (4,4) & \ensuremath{+}0.0000 [\ensuremath{+}0.0000, \ensuremath{+}0.0000] & 1.000 & 0/10 & \ensuremath{+}0.0\\
+Fixed (4,4), staggered & \ensuremath{+}0.0024 [\ensuremath{+}0.0000, \ensuremath{+}0.0052] & 1.000 & 7/10 & \ensuremath{-}1.6\\
+Fixed (8,8) & \ensuremath{+}0.0005 [\ensuremath{-}0.0015, \ensuremath{+}0.0023] & 1.000 & 7/10 & \ensuremath{+}25.4\\
+\tierfed{}, staggered & \ensuremath{+}0.0024 [\ensuremath{+}0.0000, \ensuremath{+}0.0052] & 1.000 & 7/10 & \ensuremath{-}1.6\\
+\bottomrule
+\end{tabular}

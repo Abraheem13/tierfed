@@ -1,6 +1,6 @@
 # One-click reproduction of every v6 run and number used in the paper (Windows, CPU).
 #   powershell -ExecutionPolicy Bypass -File scripts\reproduce_v6.ps1 -Part gate -Jobs 3
-# Parts: core (235 runs), gate (140 runs), resnet (30 runs), analysis, all.
+# Parts: core, gate, resnet, centres (four clinical centres), sync (carry-over step), analysis, all.
 # Finished runs are skipped, so the script can be stopped and restarted at any time.
 param([string]$Part = "all", [int]$Jobs = 3)
 $ErrorActionPreference = "Continue"
@@ -9,7 +9,7 @@ $env:SOURCE_DATE_EPOCH = "0"   # figure PDFs without a creation date: byte-ident
 Set-Location (Join-Path $PSScriptRoot "..")
 $py = (Resolve-Path ".\.venv\Scripts\python.exe").Path
 New-Item -ItemType Directory -Force -Path results\v6_logs | Out-Null
-$S10 = 42..51; $S6 = 42..47; $S5 = 42..46
+$S10 = 42..51; $S5 = 42..46; $S20 = 42..61; $S8 = 42..49
 $MAIN = "local fedavg fedprox fedper fedlama adacomm8 lag_uniform lag fixed44 fixed44_st fixed88 tierfed tierfed_st"
 # PowerShell variable names are case-insensitive: never reuse $AUD as a loop variable
 $AUD = "-m src.experiments.run_audit --device cpu --out results"
@@ -17,7 +17,7 @@ $AUD = "-m src.experiments.run_audit --device cpu --out results"
 function Core {
   $c = @()
   foreach ($s in $S10) { $c += "$AUD --stage main --only $MAIN --seeds $s" }
-  foreach ($s in $S6) { $c += "$AUD --stage dp --eps 4 --q 1 --only fedper fixed44 fixed88 oneshot tierfed_dp --seeds $s" }
+  foreach ($s in $S10) { $c += "$AUD --stage dp --eps 4 --q 1 --only fedper fixed44 fixed88 oneshot tierfed_dp --seeds $s" }
   foreach ($s in $S10) { $c += "-m src.experiments.run_bounds --seeds $s --out results" }
   foreach ($s in $S5) { $c += "$AUD --stage frontier --only fixed22 fixed66 adacomm4 adacomm16 tierfed_rho0.15 tierfed_rho0.4 --seeds $s" }
   foreach ($s in $S5) { $c += "$AUD --stage frontier2 --only lag_xi5000 lag_xi10000 --seeds $s" }
@@ -28,12 +28,26 @@ function Gate {
   $c = @()
   foreach ($alpha in @("0.1", "0.3", "1", "10")) { foreach ($s in $S5) {
     $c += "$AUD --stage hetero --alpha $alpha --only fedper local fixed44 fixed88 tierfed --seeds $s" } }
-  foreach ($s in $S5) { $c += "$AUD --stage timing --model mlp --only tierfed lag_xi2000 lag_xi5000 fixed44 --seeds $s" }
+  foreach ($s in $S10) { $c += "$AUD --stage timing --model mlp --only tierfed adacomm8 lag_xi2000 lag_xi5000 fixed44 --seeds $s" }
   return $c
 }
 function Resnet {
   $c = @()
-  foreach ($s in $S6) { $c += "$AUD --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s" }
+  foreach ($s in $S10) { $c += "$AUD --stage backbone --model resnet --only fedper local fixed44 fixed15 tierfed --seeds $s" }
+  foreach ($s in $S8) { $c += "$AUD --stage timing --model resnet --only tierfed --seeds $s" }
+  return $c
+}
+function Centres {
+  $c = @()
+  foreach ($s in $S20) { $c += "$AUD --stage hospitals --seeds $s" }
+  return $c
+}
+function Sync {
+  $c = @()
+  foreach ($s in $S10) { $c += "$AUD --stage carryover --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s" }
+  $c += "$AUD --stage carryover --only fedper --seeds 42"
+  foreach ($s in $S20) { $c += "$AUD --stage carryover --data heart --only fixed44 fixed88 tierfed tierfed_db adacomm8 --seeds $s" }
+  foreach ($s in $S5) { $c += "$AUD --stage carryover --model resnet --only tierfed tierfed_db fixed44 --seeds $s" }
   return $c
 }
 function Run-Parallel([string[]]$ArgList) {
@@ -63,6 +77,8 @@ function Analysis {
     pdflatex -interaction=nonstopmode supp.tex | Out-Null; bibtex supp | Out-Null
     pdflatex -interaction=nonstopmode supp.tex | Out-Null; pdflatex -interaction=nonstopmode supp.tex | Out-Null
     Pop-Location
+    # the TMLCN manuscript: numbers, tables, figures, both PDFs and the submission archive
+    & $py scripts\tmlcn\build.py --analysis --zip
   }
 }
 
@@ -76,7 +92,9 @@ switch ($Part) {
   "core"     { Run-Parallel (Core) }
   "gate"     { Run-Parallel (Gate) }
   "resnet"   { Run-Parallel (Resnet) }
+  "centres"  { Run-Parallel (Centres) }
+  "sync"     { Run-Parallel (Sync) }
   "analysis" { Analysis }
-  "all"      { Run-Parallel ((Core) + (Gate) + (Resnet)); Analysis }
+  "all"      { Run-Parallel ((Core) + (Gate) + (Resnet) + (Centres) + (Sync)); Analysis }
 }
 Write-Host "V6 $Part DONE"

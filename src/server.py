@@ -98,6 +98,9 @@ class FederatedServer:
         self.poisson = (self.dp.enabled and self.dp.sample_rate < 1.0) or cfg.get("participation_mode") == "poisson"
         self.q = self.dp.sample_rate if self.dp.enabled and self.dp.sample_rate < 1.0 else float(self.participation)
         self.planned_releases = None
+        self.sync_restart = bool(cfg.get("sync_restart", True))
+        if not self.sync_restart and (self.dp.enabled or float(self.participation) < 1.0):
+            raise ValueError("sync_restart=False is defined for full participation without DP only")
         self.dp_safe = False
         if self.dp.enabled:
             # Under client-level DP the transmission schedule is observable. A
@@ -144,7 +147,12 @@ class FederatedServer:
             per_client_bits, compute_s = [], []
             for cid in sel:
                 c = self.clients[cid]
-                c.set_parameters(self.global_state, keys)
+                # Synchronisation step. Default (restart): a client replaces its copy of every
+                # due tier by the server copy before it trains, so what it uploads is one local
+                # epoch away from the broadcast. sync_restart=False (carry-over): after round 1
+                # the client keeps its own copy, so a tier due every K rounds is uploaded after
+                # K local epochs, as in local SGD with period K.
+                c.set_parameters(self.global_state, keys if (self.sync_restart or r == 1) else [])
                 t0 = time.perf_counter()
                 s = c.train(self.strategy, payload if keys else None, self.local_epochs, self.seed)
                 compute_s.append(time.perf_counter() - t0)

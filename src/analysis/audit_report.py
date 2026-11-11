@@ -76,6 +76,9 @@ def parse_cfg(cfg: str, strategy: str):
     """Split a tag into (setting, name, eps, q). setting: 'specialty', 'a<alpha>', 'derma'."""
     eps = q = None
     setting = "specialty"
+    carry = cfg.startswith("co_")                  # carry-over synchronisation step: its own settings
+    if carry:
+        cfg = cfg[3:]
     m = re.match(r"^het_a([0-9.]+)_(.+)$", cfg)
     if m:
         setting, cfg = f"a{float(m.group(1)):g}", m.group(2)
@@ -88,6 +91,9 @@ def parse_cfg(cfg: str, strategy: str):
     m = re.match(r"^bb_(.+)$", cfg)
     if m:
         setting, cfg = "backbone", m.group(1)
+    m = re.match(r"^hosp_(.+)$", cfg)
+    if m:
+        setting, cfg = "hospitals", m.group(1)
     m = re.match(r"^derma_a([0-9.]+)_(.+)$", cfg)
     if m:
         setting, cfg = "derma", m.group(2)
@@ -97,6 +103,8 @@ def parse_cfg(cfg: str, strategy: str):
     cfg = cfg.replace("_comp_quant8", "")
     if cfg == "bound":
         cfg = strategy                         # 'central' or 'hgb'
+    if carry:
+        setting += "_co"
     return setting, cfg, eps, q
 
 
@@ -121,7 +129,7 @@ def load(results: str, dataset: str | None) -> pd.DataFrame:
     for f in glob.glob(str(Path(results) / "logs" / "*_au*_summary.json")):
         d = json.loads(Path(f).read_text())
         c = d.get("config", {})
-        if dataset and c.get("dataset") not in (dataset, "medmnist"):
+        if dataset and c.get("dataset") not in (dataset, "medmnist", "heart"):
             continue
         tag = c.get("tag", "")
         if not tag.startswith("_au"):
@@ -131,6 +139,10 @@ def load(results: str, dataset: str | None) -> pd.DataFrame:
         s = d["summary"]
         if setting == "backbone":
             setting = c.get("model", "backbone")
+        elif setting == "backbone_co":
+            setting = c.get("model", "backbone") + "_co"
+        if setting.startswith("tm_") and c.get("model", "mlp") != "mlp":
+            name = f"{name}_{c['model']}"          # timing on the ResNet: its own row
         row = {"file": f, "setting": setting, "name": name, "eps": eps, "q": q, "seed": int(c.get("seed", -1)),
                "strategy": c.get("strategy"), "dataset": c.get("dataset"), **s}
         sch = d.get("schedule") or {}
@@ -203,14 +215,15 @@ def best_uniform(df, max_mb):
 
 
 # --------------------------------------------------------------------------- #
-def main_table(df):
-    sp = df[(df.setting == "specialty") & df.eps.isna()]
+def main_table(df, setting="specialty", order=None):
+    sp = df[(df.setting == setting) & df.eps.isna()]
+    names = list(order) if order else MAIN_ORDER + ["central", "hgb"]
     cols = [PRIMARY, "valsel_round", "upload_mb_valsel", "total_upload_mb", "rounds_transmitting",
             "fed_auroc_final", "fed_auroc_last10_mean", "fed_auroc_phase", "fed_ft1_auroc_final",
             "fed_ft3_auroc_final", "fed_auprc_valsel", "fed_ece_valsel", "fed_cal_ece_valsel",
             "fed_cal_brier_valsel", "fed_cal_slope_valsel", "fed_auroc_site_min_valsel",
             "fed_auroc_site_p10_valsel", "n_clients_single_class_valsel", "peak_frac", "realised_payload_fraction"]
-    t = agg(sp[sp.name.isin(MAIN_ORDER + ["central", "hgb"])], cols=cols)
+    t = agg(sp[sp.name.isin(names)], cols=cols)
     for metric, lab in ((PRIMARY, "valsel"), ("fed_auroc_last10_mean", "last10"),
                         ("fed_auroc_phase", "phase"), ("fed_auroc_final", "final")):
         for n in t.index:
@@ -220,8 +233,7 @@ def main_table(df):
                 t.loc[n, "ci_lo_fedper_valsel"], t.loc[n, "ci_hi_fedper_valsel"] = r["lo"], r["hi"]
                 t.loc[n, "p_ni010_fedper_valsel"] = r.get("p_ni", np.nan)
                 t.loc[n, "p_ni005_fedper_valsel"] = paired(sp, n, "fedper", metric, delta=0.005).get("p_ni", np.nan)
-    order = [n for n in MAIN_ORDER + ["central", "hgb"] if n in t.index]
-    return t.loc[order]
+    return t.loc[[n for n in names if n in t.index]]
 
 
 def common_seeds(sp):
@@ -256,7 +268,7 @@ def gate_table(df):
     rows = []
     settings = (["specialty"] + sorted([s for s in df.setting.unique() if s.startswith("a")],
                                        key=lambda s: float(s[1:]))
-                + [s for s in ("resnet", "transformer") if s in set(df.setting)])
+                + [s for s in ("resnet", "transformer", "hospitals") if s in set(df.setting)])
     for st in settings:
         d = df[(df.setting == st) & df.eps.isna()]
         if "tierfed" not in set(d.name):
@@ -334,6 +346,27 @@ def _auc(pos, neg):
     return float(gt + 0.5 * eq)
 
 
+def _perm_p(shift, clean, n_perm=10000, seed=0):
+    """Permutation test of 'the traffic does not depend on the target's data'. The
+    statistic is the largest |AUC - 0.5| over the observables, so the choice of the
+    best observable is part of the test; world labels are permuted over the runs."""
+    shift = [np.asarray(v, float) for v in shift]; clean = [np.asarray(v, float) for v in clean]
+    n1, n0 = len(shift[0]), len(clean[0])
+    pooled = [np.concatenate([a, b]) for a, b in zip(shift, clean)]
+
+    def stat(idx1, idx0):
+        return max(abs(_auc(v[idx1], v[idx0]) - 0.5) for v in pooled)
+    obs = stat(np.arange(n1), np.arange(n1, n1 + n0))
+    if obs == 0:
+        return 1.0
+    rng = np.random.default_rng(seed)
+    hits = 0
+    for _ in range(n_perm):
+        perm = rng.permutation(n1 + n0)
+        hits += stat(perm[:n1], perm[n1:]) >= obs - 1e-12
+    return float((1 + hits) / (1 + n_perm))
+
+
 def timing_table(df):
     """D-8: what a passive observer of the traffic learns about one site's data.
     Observables per run: rounds with any traffic, rounds in which the target site
@@ -364,6 +397,7 @@ def timing_table(df):
             r[f"adv_{lab}"] = abs(a - 0.5) * 2 if np.isfinite(a) else np.nan   # 0 = no leak, 1 = perfect
             r[f"mean_clean_{lab}"] = float(np.mean(obs["tm_clean"][i]))
             r[f"mean_shift_{lab}"] = float(np.mean(obs["tm_shift"][i]))
+        r["p_perm"] = _perm_p([obs["tm_shift"][i] for i in range(4)], [obs["tm_clean"][i] for i in range(4)])
         rows.append(r)
     return pd.DataFrame(rows)
 

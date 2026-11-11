@@ -1,0 +1,22 @@
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Method & Peak/payload & Viol., $W=0.6t_1$ & Viol., $W=0.8t_1$ & Wake-ups/site\\
+\midrule
+Local only & -- & 0.00 & 0.00 & 0\\
+FedAvg & 1.00 & 1.00 & 1.00 & 60\\
+FedProx & 1.00 & 1.00 & 1.00 & 60\\
+FedPer & 1.00 & 1.00 & 1.00 & 60\\
+FedLAMA-style & 1.00 & 0.54 & 0.54 & 60\\
+AdaComm & 1.00 & 0.13 & 0.13 & 8\\
+LAG, equal weights & 1.00 & 1.00 & 1.00 & 60\\
+LAG & 1.00 & 1.00 & 1.00 & 60\\
+Fixed (4,4) & 1.00 & 0.30 & 0.30 & 18\\
+Fixed (4,4), staggered & 1.00 & 0.08 & 0.08 & 32\\
+Fixed (8,8) & 1.00 & 0.18 & 0.18 & 11\\
+\tierfed{} & 1.00 & 0.30 & 0.30 & 18\\
+\tierfed{}, staggered & 1.00 & 0.08 & 0.08 & 32\\
+\tierfed{}, staggered, 8-bit warm-up & 0.55 & 0.00 & 0.00 & 32\\
+Fixed (4,4), staggered, 8-bit warm-up & 0.55 & 0.00 & 0.00 & 32\\
+\tierfed{}, quota over all rounds & 1.00 & 0.10 & 0.10 & 24\\
+\bottomrule
+\end{tabular}

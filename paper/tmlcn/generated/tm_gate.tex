@@ -1,0 +1,13 @@
+\begin{tabular}{@{}lcccccccccc@{}}
+\toprule
+Setting & $\Psi$ (\%) & $\mathbf K$ & \tierfed{} & MB & Best uniform & AUROC & MB & Gain $\Delta_{\mathrm u}$ [95\% CI] & $p$ & Seeds\\
+\midrule
+Specialty groups & 0.1 & (4,4) & 0.6377 & 65 & $K=4$ & 0.6377 & 65 & identical runs & -- & 10\\
+Dirichlet $\alpha=0.1$ & 0.2 & (4,4) & 0.5858 & 52 & $K=8$ & 0.5971 & 31 & \ensuremath{-}0.0113 [\ensuremath{-}0.0270, \ensuremath{+}0.0040] & 0.625 & 5\\
+Dirichlet $\alpha=0.3$ & 0.7 & (4,4) & 0.6003 & 65 & $K=4$ & 0.6003 & 65 & identical runs & -- & 5\\
+Dirichlet $\alpha=1$ & 2.2 & (4,4) & 0.6176 & 65 & $K=4$ & 0.6176 & 65 & identical runs & -- & 5\\
+Dirichlet $\alpha=10$ & 0.2 & (4,4) & 0.6445 & 65 & $K=4$ & 0.6445 & 65 & identical runs & -- & 5\\
+ResNet backbone & 71.4 & (1,5) & 0.6365 & 604 & $K=4$ & 0.6388 & 602 & \ensuremath{-}0.0023 [\ensuremath{-}0.0061, \ensuremath{+}0.0011] & 0.557 & 10\\
+Clinical centres & 0.7 & (4,4) & 0.8094 & 8 & $K=4$ & 0.8094 & 8 & identical runs & -- & 20\\
+\bottomrule
+\end{tabular}
