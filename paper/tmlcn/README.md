@@ -1,7 +1,7 @@
 # TMLCN manuscript
 
-"Per-Tier Synchronisation in Communication-Budgeted Federated Learning: A Closed-Form Bound
-and an Empirical Study", for the IEEE Transactions on Machine Learning in Communications and
+"Per-Tier Synchronisation Under a Byte Quota in Federated Learning: A Closed-Form Gain
+Bound, Peak-Load Control and Schedule Leakage", for the IEEE Transactions on Machine Learning in Communications and
 Networking.
 
 | Path | Content |

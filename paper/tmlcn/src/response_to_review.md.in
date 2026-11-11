@@ -1,7 +1,7 @@
 # Response to the review of the previous version
 
-Manuscript: "Per-Tier Synchronisation in Communication-Budgeted Federated Learning: A Closed-Form
-Bound and an Empirical Study" (previous title: "When Does Per-Tier Synchronisation Pay? A
+Manuscript: "Per-Tier Synchronisation Under a Byte Quota in Federated Learning: A Closed-Form
+Gain Bound, Peak-Load Control and Schedule Leakage" (previous title: "When Does Per-Tier Synchronisation Pay? A
 Closed-Form Test and a Traffic Side Channel in Communication-Budgeted Federated Learning").
 
 All nine comments of the annotated manuscript are answered below, in the order in which they
@@ -12,13 +12,21 @@ here is taken from the same generated values as the article.
 
 **Comment 1 (title).** *"The title promises more than the results show."*
 
-The title has been changed to "Per-Tier Synchronisation in Communication-Budgeted Federated
-Learning: A Closed-Form Bound and an Empirical Study". It no longer asks when per-tier
-synchronisation pays, because the results do not answer that question in the affirmative: in none
-of the @@tmGateSettingsWord@@ settings was the per-tier schedule more accurate than the best uniform period at
-matched bytes. "Test" has become "bound", because Psi bounds the reduction of a surrogate and was
-not shown to predict a gain in accuracy, and the side channel is no longer in the title. The
-running head, the abstract, the contribution list and the conclusion were rewritten to match.
+The title has been changed to "Per-Tier Synchronisation Under a Byte Quota in Federated
+Learning: A Closed-Form Gain Bound, Peak-Load Control and Schedule Leakage".
+
+- It no longer asks when per-tier synchronisation pays, because the results do not answer that
+  question in the affirmative: in none of the @@tmGateSettingsWord@@ settings was the per-tier
+  schedule more accurate than the best uniform period at matched bytes.
+- Instead it names the three results the article does establish: a closed-form bound on what a
+  per-tier schedule can gain over a uniform period in the scheduler's drift objective (Psi,
+  Proposition 2), the control of the payload of a single round by staggered tiers, and the
+  leakage of adaptive schedules through traffic metadata.
+- "Gain bound" replaces "test", because Psi bounds the reduction of a surrogate and was not shown
+  to predict a gain in accuracy; the abstract says so explicitly.
+- "Under a byte quota" states the networking constraint that the whole study is built on.
+
+The running head, the abstract, the contribution list and the conclusion were rewritten to match.
 
 **Comment 2 (abstract, 65.3 of 217.8 MB).** *"These numbers give a 70.0% saving over 60 rounds. Up
 to the selected checkpoint, the saving is 27.7% (45.7 vs 63.2 MB). Say which comparison the

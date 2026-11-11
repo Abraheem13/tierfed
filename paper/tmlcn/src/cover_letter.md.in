@@ -4,8 +4,8 @@
 
 Dear Editor-in-Chief,
 
-Please consider the enclosed manuscript, "Per-Tier Synchronisation in Communication-Budgeted
-Federated Learning: A Closed-Form Bound and an Empirical Study", by Abraheem Rashid (Brunel
+Please consider the enclosed manuscript, "Per-Tier Synchronisation Under a Byte Quota in
+Federated Learning: A Closed-Form Gain Bound, Peak-Load Control and Schedule Leakage", by Abraheem Rashid (Brunel
 University London) and Mehwish Mahmood (Queen's University Belfast), for publication in the IEEE
 Transactions on Machine Learning in Communications and Networking.
 
