@@ -35,8 +35,8 @@ headline uses and keep it consistent with the main metric."*
 Both readings are now defined and named, and no saving is stated without its reading.
 Section \mbox  {II-D} defines the cumulative upload B(r) (Eq. (8)) and its two readings: B(r-hat), the
 upload up to the validation-selected round, which is the cost that belongs to the primary metric,
-and B(R), the upload of the whole budget of 60 rounds. The abstract now reads "28% less upload up
-to that round and 70% less over all 60 rounds" (45.7 against 63.2 MB, and 65.3 against 217.8 MB;
+and B(R), the upload of the whole budget of 60 rounds. The abstract now reads "uploading 28% less up
+to the validation-selected round and 70% less over 60 rounds" (45.7 against 63.2 MB, and 65.3 against 217.8 MB;
 percentages are rounded to integers so that they agree with the rounded megabytes). Section \mbox  {V-B}
 states both with their megabytes and adds that the scheduler selects round 36 on average and
 FedPer round 17, so the saving up to the selected round is obtained with about twice as many rounds.
@@ -168,5 +168,7 @@ sentences.
   250 accountant checks.
 - **References.** All 57 cited entries were re-checked against external records; four were
   corrected and four completed (see `REFERENCE_CHECK.md`).
+- **Abstract.** Rewritten to the IEEE limit of 250 words; it no longer contains absolute wording
+  ("never"), and the leakage result names the schedule for which it was shown (LAG).
 - **Preprocessing.** The article now states that features are standardised, and missing values
   imputed, with label-free statistics of the pooled data.
