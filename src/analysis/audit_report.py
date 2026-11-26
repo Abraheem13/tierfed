@@ -126,7 +126,8 @@ def _peak_stats(d, n_clients):
 
 def load(results: str, dataset: str | None) -> pd.DataFrame:
     rows = []
-    for f in glob.glob(str(Path(results) / "logs" / "*_au*_summary.json")):
+    # sorted, and ordered by seed below: the seeded bootstrap must not depend on the directory order
+    for f in sorted(glob.glob(str(Path(results) / "logs" / "*_au*_summary.json"))):
         d = json.loads(Path(f).read_text())
         c = d.get("config", {})
         if dataset and c.get("dataset") not in (dataset, "medmnist", "heart"):
@@ -166,7 +167,8 @@ def load(results: str, dataset: str | None) -> pd.DataFrame:
                     rel = hd["upload_mb"].diff().fillna(hd["upload_mb"]) > 0
                     row["clip_fraction"] = float(hd.loc[rel, "dp_clip_fraction"].mean()) if rel.any() else np.nan
         rows.append(row)
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    return df.sort_values(["seed", "file"], kind="stable").reset_index(drop=True) if len(df) else df
 
 
 # --------------------------------------------------------------------------- #
