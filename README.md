@@ -1,5 +1,11 @@
 # TierFed v3 — budget-constrained, divergence-driven federated aggregation over constrained links
 
+> **Current manuscript.** The version prepared for the IEEE Open Journal of the Communications Society is in
+> `paper/ojcoms/` (flattened LaTeX sources, PDFs, figure files, graphical abstract, cover letter, and
+> `README_REVISION.md`, which lists every change and check). The macro-based sources under `paper/tmlcn/` are the
+> earlier TMLCN version and are kept for the record.
+
+
 Code, experiment drivers and manuscript source for
 
 > **Communication as the binding constraint: budget-optimal multi-rate federated learning for clinical prediction over bandwidth-limited links**

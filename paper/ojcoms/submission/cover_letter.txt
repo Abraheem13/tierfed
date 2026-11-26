@@ -1,0 +1,26 @@
+Prof. Sinem Coleri
+Editor-in-Chief, IEEE Open Journal of the Communications Society
+
+Dear Prof. Coleri,
+
+We submit the manuscript "Quota-Constrained Multi-Rate Synchronization in Federated Learning: Gain Bound, Peak-Load Control, and Schedule Leakage" for consideration as an Original Manuscript in the IEEE Open Journal of the Communications Society. The article is 18 pages in the IEEE Open Journals template and is accompanied by a supplement, a graphical abstract, and the figures as separate files.
+
+Summary. The article studies a scheduler for cross-silo federated learning over constrained links that synchronizes groups of layers at different rates under a byte quota. It gives a closed-form bound on how far any per-tier schedule can lower a measured surrogate of client drift below that of a uniform period, shows that staggering the tiers controls the payload of a single round, and analyzes the schedule as a privacy release and as a timing side channel under client-level differential privacy. The central result is negative and is stated as such: in seven settings the scheduler shows no relevant accuracy gain over the best uniform period at matched bytes. In the six settings where the bound is small, it predicts this outcome; in the seventh, the bound is large and there is still no gain. We believe the article fits the journal's topics "Big Data and Machine Learning for Communications" and "Cloud Computing, Edge Computing, and Internet of Things".
+
+Disclosure of a prior submission. An earlier version of this manuscript, titled "Per-Tier Synchronisation Under a Byte Quota in Federated Learning: A Closed-Form Gain Bound, Peak-Load Control and Schedule Leakage" (TMLCN-11-26-0385), was submitted to the IEEE Transactions on Machine Learning in Communications and Networking and received an Immediate Reject decision from the Editor-in-Chief on 20 November 2026. The manuscript was not sent to reviewers. The stated reasons were the quality of the writing, including grammatical errors in the abstract and introduction, and incomplete information in the references. This is the only rejection the manuscript has received, and it is not under consideration elsewhere.
+
+Main differences from that version.
+1. Writing. The abstract and the Introduction were rewritten, a Related Work section with a positioning table was added, and the whole article and supplement were edited for grammar, terminology, and IEEE style. The title was shortened.
+2. References. Every entry was checked against its source and completed (place and month for proceedings; volume, issue, pages, and month for journals; DOIs; arXiv numbers). Five missing citations were added to the article, which now has 57 references, and eight were added to the supplement, which now has 18.
+3. Corrections. While revising, we checked every statement against the released logs and code and corrected several sentences, table notes, and captions. No result changed. The bootstrap confidence intervals were regenerated with the seeds read in ascending order, so that they do not depend on the order of the log files; this changes the limits of the intervals in Tables 3 and 4 and in Table S-II, mostly in the last digit, and one permutation p-value in Table 9 (0.009 to 0.010). The settings of two baselines are now stated, and three supplement captions were corrected.
+4. Format. The manuscript now follows the IEEE Open Journals template and includes the required graphical abstract.
+
+Use of AI tools. As disclosed in the Acknowledgment, we used Claude (Anthropic) to edit the language of the article and the supplement, to redraft the abstract and Sections I and II from our own material, and to check the reference list against its sources and the text against the released logs and code. Generative AI tools were also used for code refactoring. We verified all content and take full responsibility for it.
+
+All authors have approved the manuscript and agree with its submission. The code, configuration, and per-seed logs are public at https://github.com/Abraheem13/tierfed.
+
+Yours sincerely,
+
+Pengpeng Hu (corresponding author), on behalf of all authors
+Department of Materials, The University of Manchester, Manchester M13 9PL, U.K.
+pengpeng.hu@manchester.ac.uk
