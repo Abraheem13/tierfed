@@ -1,6 +1,6 @@
 # TierFed manuscript for IEEE Open Journal of the Communications Society (OJ-COMS)
 
-Title: Quota-Constrained Multi-Rate Synchronization in Federated Learning: Gain Bound, Peak-Load Control, and Schedule Leakage
+Title: Quota-Constrained Multirate Synchronization in Federated Learning: Gain Bound, Peak-Load Control, and Schedule Leakage
 
 ## 1. Status
 
@@ -59,7 +59,7 @@ All table cells and all equations are otherwise identical to the submitted versi
 
 ## 4. What only the authors can do before submitting
 
-1. Recompile with the official class file. The structure of main.tex was checked against IEEE's own Open Journals template on Overleaf (\documentclass{IEEEoj}, date and DOI lines, uppercase author names, \affil, \corresp, \authornote, \markboth, abstract and keywords before \maketitle, uppercase section and subsection headings, \IEEEPARstart, "ACKNOWLEDGMENT") and matches it. The IEEEoj.cls file itself was taken from a public repository of an OJ-COMS manuscript, because IEEE's download site could not be reached from here; get the OJ-COMS template from https://template-selector.ieee.org/ and build main.tex with its class file. IEEE Xplore could not be opened from here either, so the look of published OJ-COMS articles was not compared directly.
+1. Template: checked against the official "IEEE_OJCOMS-template-LaTex_202401" package supplied by the authors. IEEEoj.cls and ojcoms.png in this folder are byte-identical to the official files (same MD5). Front matter, heading case, abstract rules (150-250 words, one paragraph, no abbreviations, footnotes, references or displayed math), alphabetical index terms, caption placement, \label after \caption, "Fig." usage, no eqnarray, funding in the first-page note, and "ACKNOWLEDGMENT" follow the template. Following its style notes, "multi-rate" is now "multirate" (title included) and one contrastive "while" is "whereas". Deliberate differences: \raggedbottom is set (without it 24 pages or columns are stretched vertically); subsection references are made to print as "IV-D"; reference entries with more than six authors use "et al." as the IEEE Reference Guide prescribes, although the template text says to list all names; author biographies and photos, which the template says authors "may include", are not included.
 2. Confirm the Acknowledgment. It names Claude (Anthropic) for language editing of every section and for redrafting the abstract and Sections I and II. The sentence "Generative AI tools were also used for code refactoring" names no system; IEEE policy covers code, so name the tool you used.
 3. Confirm that TMLCN is the only journal that has rejected this manuscript. OJ-COMS accepts a previously rejected paper only once and only if it was rejected once; the cover letter says so.
 4. Mehwish Mahmood: add her department and confirm the spelling (the TMLCN e-mail used "m.mehmood@qub.ac.uk"). The affiliation line currently reads "Queen's University Belfast, Belfast BT7 1NN, U.K."
